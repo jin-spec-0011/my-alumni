@@ -1,25 +1,22 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <!-- 앱 바로가기 및 PWA 설정 -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>회장 선출소 - 5인 동창 곗모임</title>
+
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
-
-  <!-- 아이폰(iOS) 전용 전체화면 단독 앱 설정 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="5인곗모임">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
-  
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>회장 선출소 - 5인 동창 곗모임</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 공통 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
@@ -29,10 +26,11 @@
           <span class="text-[10px] text-slate-400 font-medium">대통령 임기 연동 룰렛 추첨제</span>
         </div>
       </div>
-      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">자율 참여 모드</span>
+      <span id="sync-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <i class="fa-solid fa-rotate mr-1"></i>실시간 연동
+      </span>
     </div>
 
-    <!-- 5대 메인 탭 + 부가기능 콤보박스 -->
     <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
       <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
         <a href="index.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">대시보드</a>
@@ -48,10 +46,7 @@
         </button>
         <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
           <a href="gathering.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-            <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i><span>모임 & 예약</span>
-          </a>
-          <a href="ledger.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-            <i class="fa-solid fa-won-sign text-amber-600 w-3.5"></i><span>회비 장부</span>
+            <i class="fa-solid fa-bullhorn text-amber-600 w-3.5"></i><span>모임 공표</span>
           </a>
         </div>
       </div>
@@ -60,11 +55,10 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 대통령 임기 연동 시계 -->
     <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-4 shadow-sm space-y-3">
       <div class="flex justify-between items-center text-xs">
         <span class="text-[10px] bg-indigo-500/30 text-indigo-200 border border-indigo-400/40 px-2 py-0.5 rounded-full font-bold">회칙 제4조 연동</span>
-        <span class="text-amber-300 font-bold text-[11px]">송환오 회장 재임 중</span>
+        <span id="current-leader-status-tag" class="text-amber-300 font-bold text-[11px]">회장 재임 중</span>
       </div>
 
       <div>
@@ -92,7 +86,6 @@
       </div>
     </div>
 
-    <!-- 룰렛 게임기 (페이지 로드 즉시 상시 표시) -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-4 text-center">
       <div class="border-b pb-2 flex justify-between items-center text-left">
         <div>
@@ -102,13 +95,11 @@
         <span class="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded">후보 4인 풀</span>
       </div>
 
-      <!-- 총무 면제 표기 -->
       <div class="p-2 bg-slate-50 border border-dashed rounded-lg flex justify-between items-center text-xs opacity-60">
         <span class="font-bold text-slate-700">장우석 (총무)</span>
         <span class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded">회장직 영구 면제</span>
       </div>
 
-      <!-- 원형 룰렛 캔버스 (상시 렌더링) -->
       <div class="relative w-64 h-64 mx-auto my-2 flex items-center justify-center">
         <div class="absolute -top-3 z-20 text-rose-600 text-2xl filter drop-shadow">
           <i class="fa-solid fa-caret-down"></i>
@@ -116,39 +107,32 @@
         <canvas id="roulette-canvas" width="250" height="250" class="rounded-full shadow-md border-4 border-slate-800 bg-white"></canvas>
       </div>
 
-      <!-- 룰렛 회전 버튼 -->
       <button id="btn-spin" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm rounded-xl transition shadow flex items-center justify-center gap-2">
         <i class="fa-solid fa-play"></i>
         <span>룰렛 회전 시작 (추첨)</span>
       </button>
 
-      <!-- 당선 결과 가안 및 확정 버튼 -->
-      <div id="result-box" class="hidden p-3.5 bg-amber-50 border-2 border-amber-300 rounded-xl space-y-2">
+      <div id="result-box" class="hidden p-3.5 bg-amber-50 border-2 border-amber-300 rounded-xl space-y-2.5">
         <div class="text-[11px] font-bold text-amber-800">🎯 룰렛 추첨 결과</div>
         <div id="winner-name-display" class="text-2xl font-black text-slate-900">당선자: -</div>
-        <p class="text-[10px] text-slate-500">아래 [확정] 버튼을 눌러야 차기 회장으로 공식 등록됩니다.</p>
+        <div class="p-2 bg-white/80 border border-amber-200 rounded text-[11px] text-slate-600 text-left leading-relaxed">
+          ⚡ <strong>원클릭 승계:</strong> 확정 즉시 대시보드 배너가 교체되고, 회칙(제2조, 제4조)이 새 회장 명의로 자동 갱신됩니다.
+        </div>
 
         <button id="btn-confirm-winner" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-lg shadow transition flex items-center justify-center gap-1.5">
           <i class="fa-solid fa-stamp"></i>
-          <span>👑 차기 회장 공식 확정 및 DB 저장</span>
+          <span>👑 차기 회장 공식 확정 (대시보드·회칙 자동 갱신)</span>
         </button>
       </div>
     </div>
 
-    <!-- 역대 선출 기록 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2 text-xs">
       <div class="font-bold text-slate-900 border-b pb-1.5 flex justify-between">
         <span>역대 회장 선출 역사</span>
-        <span class="text-[10px] text-slate-400">2019~</span>
+        <span class="text-[10px] text-slate-400">실시간 로그</span>
       </div>
       <div id="history-list" class="space-y-1.5 text-[11px]">
-        <div class="p-2 bg-slate-50 rounded flex justify-between items-center">
-          <div>
-            <strong class="text-slate-800">송환오 회장</strong>
-            <span class="text-slate-400 ml-1">(모임 창립 추첨 당선)</span>
-          </div>
-          <span class="text-[10px] text-slate-400 font-mono">2019-09</span>
-        </div>
+        <div class="p-4 text-center text-slate-400">선출 이력을 동기화 중...</div>
       </div>
     </div>
 
@@ -156,9 +140,16 @@
 
   <script type="module">
     import { db } from "./js/firebase.js";
-    import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { 
+      doc, 
+      setDoc, 
+      getDoc, 
+      getDocs, 
+      collection, 
+      onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // 콤보박스 클릭
+    // 드롭다운 토글
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
     btnDropdown.addEventListener("click", (e) => {
@@ -167,7 +158,6 @@
     });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // 룰렛 설정
     const candidates = [
       { id: "user_song", name: "송환오", color: "#F59E0B" },
       { id: "user_kim_js", name: "김진세", color: "#3B82F6" },
@@ -182,7 +172,6 @@
     let isSpinning = false;
     let pendingWinner = null;
 
-    // 룰렛 판 그리기 함수 (상시 실행)
     function drawRoulette() {
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
@@ -215,7 +204,6 @@
         ctx.restore();
       });
 
-      // 중앙 핀
       ctx.beginPath();
       ctx.arc(cx, cy, 16, 0, 2 * Math.PI);
       ctx.fillStyle = "#1E293B";
@@ -225,7 +213,6 @@
       ctx.stroke();
     }
 
-    // 룰렛 회전 시작
     document.getElementById("btn-spin").onclick = () => {
       if (isSpinning) return;
       isSpinning = true;
@@ -265,41 +252,181 @@
       requestAnimationFrame(animate);
     };
 
-    // 공식 확정
+    // [핵심 엔진] 공식 확정 시 대시보드 배너 & 뱃지 & 회칙 100% 자동 동시 교체
     document.getElementById("btn-confirm-winner").onclick = async () => {
       if (!pendingWinner) return;
       const operator = prompt("확정자 본인 이름을 입력하세요 (김진세, 송환오, 장우석, 김정수, 이해웅):");
       if (!operator) return;
 
-      const now = new Date();
-      const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+      const btn = document.getElementById("btn-confirm-winner");
+      btn.disabled = true;
+      btn.innerText = "대시보드 및 회칙 자동 갱신 중...";
 
-      const list = document.getElementById("history-list");
-      const div = document.createElement("div");
-      div.className = "p-2 bg-indigo-50 border border-indigo-200 rounded flex justify-between items-center";
-      div.innerHTML = `
-        <div>
-          <strong class="text-indigo-900">${pendingWinner.name} 회장 (확정)</strong>
-          <span class="text-[10px] text-indigo-500 block">[${operator}] 4인 룰렛 선출 승인</span>
-        </div>
-        <span class="text-[10px] text-indigo-400 font-mono">${dateStr}</span>
-      `;
-      list.prepend(div);
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
       try {
+        // 1. 차기 회장 상태 저장 (대시보드 상단 배너용)
         await setDoc(doc(db, "app_state", "current_president"), {
           presidentId: pendingWinner.id,
           presidentName: pendingWinner.name,
           confirmedBy: operator,
-          confirmedAt: now.toISOString()
+          confirmedAt: dateStr
         });
-      } catch (e) {
-        console.warn(e);
-      }
 
-      alert(`🎉 [${operator}] ${pendingWinner.name} 회장 당선이 공식 확정되었습니다.`);
-      document.getElementById("result-box").classList.add("hidden");
+        // 2. 동창 5인 회원 뱃지 자동 교체 (기존 회장 -> 회원, 새 당선자 -> 👑 회장)
+        const membersSnap = await getDoc(doc(db, "app_state", "members_status"));
+        let members = membersSnap.exists() ? membersSnap.data().list : [
+          { id: "user_song", name: "송환오", role: "👑 회장", roleBadge: "bg-amber-100 text-amber-800", marital: "married", children: 0 },
+          { id: "user_jang", name: "장우석", role: "🛡️ 총무", roleBadge: "bg-slate-200 text-slate-700", marital: "married", children: 2 },
+          { id: "user_kim_js", name: "김진세", role: "회원", roleBadge: "text-slate-400", marital: "married", children: 1 },
+          { id: "user_kim_jungsoo", name: "김정수", role: "회원", roleBadge: "text-slate-400", marital: "single", children: 0 },
+          { id: "user_lee", name: "이해웅", role: "회원", roleBadge: "text-slate-400", marital: "single", children: 0 }
+        ];
+
+        members = members.map(m => {
+          if (m.id === pendingWinner.id) {
+            return { ...m, role: "👑 회장", roleBadge: "bg-amber-100 text-amber-800" };
+          } else if (m.role.includes("회장")) {
+            return { ...m, role: "회원", roleBadge: "text-slate-400" };
+          }
+          return m;
+        });
+
+        await setDoc(doc(db, "app_state", "members_status"), { list: members });
+
+        // 3. 회칙 10개 조항(제2조 회원현황, 제4조 피선거권 문구) 자동 재생성
+        let adultCount = 5;
+        let spouseCount = 0;
+        let childCount = 0;
+        let marriedCount = 0;
+        let singleCount = 0;
+        let memberLines = [];
+
+        members.forEach(m => {
+          if (m.marital === "married") { adultCount += 1; spouseCount += 1; marriedCount += 1; }
+          else { singleCount += 1; }
+          childCount += Number(m.children) || 0;
+
+          let roleClean = m.role.replace(/^[^\s]+\s*/, '');
+          let desc = (m.marital === "married") ? (m.children > 0 ? `기혼, 자녀 ${m.children}명` : "기혼, 무자녀") : "미혼";
+          memberLines.push(`• ${m.name}: ${roleClean} (${desc})`);
+        });
+
+        const totalCount = adultCount + childCount;
+        const monthlyTarget = (marriedCount * 80000) + (singleCount * 40000);
+
+        const updatedRuleText = `제1조 (명칭 및 목적)
+본 모임은 고등학교 5인 동창 간의 친목 도모와 정기적인 회합, 상호 부조를 목적으로 2019년에 결성된 곗모임이다.
+
+제2조 (회원의 자격 및 현황)
+본 회의 정회원은 아래 5인으로 영구 한정한다.
+${memberLines.join("\n")}
+
+제3조 (총무의 영구 면제권)
+장우석 총무는 공금 관리 및 행정 업무를 상시 수행하는 대가로 차기 회장 피선거권에서 영구 면제된다.
+
+제4조 (임기 및 탄핵 연동)
+① 회장 임기는 대한민국 대통령 재임 기간과 일치한다.
+② 대통령 탄핵 인용 시 회장직은 즉시 자동 박탈되며 비상 선출을 진행한다.
+③ 차기 회장은 장우석 총무를 제외한 4인(${pendingWinner.name} 현 회장 포함)을 대상으로 룰렛 추첨하며 확률은 각 25%로 균등하다. (연임 제한 없음)
+
+제5조 (장소 독점권 및 딴지 금지)
+정기·임시 모임의 장소 및 예약은 회장이 단독 결정한다. 모든 회원은 회장의 결정에 대해 일체의 불만이나 딴지를 제기할 수 없으며 오직 가족 참석 여부(RSVP)만 회신한다.
+
+제6조 (가족 동반 및 수용 상한)
+풀가동 시 최대 수용 규모는 성인 ${adultCount}명(회원 5 + 배우자 ${spouseCount}명)과 어린이 ${childCount}명을 합산한 총 ${totalCount}명으로 산정하여 단독 프라이빗 룸을 예약한다.
+
+제7조 (정기 회비 및 전환 규정)
+① 월 정기 곗돈은 기혼자 월 80,000원, 미혼자 월 40,000원으로 차등 부과한다. (월 목표 ${monthlyTarget.toLocaleString()}원: 기혼 ${marriedCount}명, 미혼 ${singleCount}명)
+② 미혼 회원이 결혼할 경우 익월부터 기혼자 요율(8만 원)로 자동 전환 적용된다.
+
+제8조 (공금 통장 용도 제한: 식대 전용)
+적립된 모임 공금 통장은 상·하반기 정기 모임 및 공식 모임의 식대, 다과비 결제에만 전액 사용하며, 개인 대여나 사적 유용은 일체 금지한다.
+
+제9조 (경조사비 개별 각출 원칙)
+회원의 결혼(50만 원), 첫돌(10만 원), 부고 등의 모든 경조사비는 공금 통장에서 지출하지 아니하고, 해당 당사자를 제외한 4인이 개별 각출하여 송금한다.
+
+제10조 (편집 요약 의무제)
+본 회칙을 개정할 때에는 개정 사유(편집 요약)를 필수로 입력해야만 판본으로 저장된다.`;
+
+        // 회칙 캐시 및 클라우드 저장
+        localStorage.setItem("alumni_wiki_content", updatedRuleText);
+
+        const revSnap = await getDocs(collection(db, "rule_revisions"));
+        const nextRev = `r${revSnap.size + 1}`;
+        const autoSummary = `[회장 선출] 4인 룰렛 추첨으로 ${pendingWinner.name} 회장 당선 (제2조·제4조 자동 갱신)`;
+
+        const newRec = { rev: nextRev, date: dateStr, author: operator, summary: autoSummary };
+
+        await setDoc(doc(db, "rule_content", "latest"), {
+          content: updatedRuleText,
+          updatedAt: dateStr,
+          author: operator,
+          rev: nextRev,
+          summary: autoSummary
+        });
+        await setDoc(doc(db, "rule_revisions", nextRev), newRec);
+
+        // 4. 역대 선출 기록 저장
+        await setDoc(doc(db, "election_history", `elec_${Date.now()}`), {
+          winner: pendingWinner.name,
+          confirmedBy: operator,
+          date: dateStr
+        });
+
+        alert(`🎉 [공식 확정] ${pendingWinner.name} 회장이 차기 회장으로 공식 취임했습니다!\n\n• 대시보드: CURRENT LEADER가 [${pendingWinner.name} 회장]으로 교체되었습니다.\n• 5인 현황: 회장 뱃지가 [${pendingWinner.name}]에게 이동했습니다.\n• 회칙(제2조, 제4조): 새 판본(${nextRev})으로 자동 갱신되었습니다.`);
+        document.getElementById("result-box").classList.add("hidden");
+      } catch (err) {
+        alert(`❌ 승계 처리 실패: ${err.message}`);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "👑 차기 회장 공식 확정 (대시보드·회칙 자동 갱신)";
+      }
     };
+
+    // 실시간 리스너 구독 (역대 선출 역사 & 현재 회장 태그)
+    try {
+      onSnapshot(doc(db, "app_state", "current_president"), (docSnap) => {
+        if (docSnap.exists()) {
+          const p = docSnap.data();
+          document.getElementById("current-leader-status-tag").innerText = `${p.presidentName} 회장 재임 중`;
+        }
+      });
+
+      onSnapshot(collection(db, "election_history"), (snapshot) => {
+        const container = document.getElementById("history-list");
+        container.innerHTML = "";
+        const list = [];
+        snapshot.forEach(d => list.push(d.data()));
+        list.sort((a, b) => b.date.localeCompare(a.date));
+
+        if (list.length === 0) {
+          container.innerHTML = `
+            <div class="p-2 bg-slate-50 rounded flex justify-between items-center">
+              <div><strong class="text-slate-800">송환오 회장</strong><span class="text-slate-400 ml-1">(모임 창립 추첨 당선)</span></div>
+              <span class="text-[10px] text-slate-400 font-mono">2019-09-07</span>
+            </div>
+          `;
+          return;
+        }
+
+        list.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "p-2 bg-indigo-50 border border-indigo-200 rounded flex justify-between items-center";
+          div.innerHTML = `
+            <div>
+              <strong class="text-indigo-900">${item.winner} 회장</strong>
+              <span class="text-[10px] text-indigo-500 block">[${item.confirmedBy}] 4인 룰렛 공식 선출 승인</span>
+            </div>
+            <span class="text-[10px] text-indigo-400 font-mono">${item.date}</span>
+          `;
+          container.appendChild(div);
+        });
+      });
+    } catch(e) {
+      console.error(e);
+    }
 
     function updateCountdown() {
       const diff = new Date("2027-05-10T00:00:00+09:00").getTime() - Date.now();
@@ -310,7 +437,6 @@
       document.getElementById("t-secs").innerText = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
     }
 
-    // 즉시 실행 (룰렛 상시 표시 보장)
     drawRoulette();
     updateCountdown();
     setInterval(updateCountdown, 1000);
