@@ -3,23 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>회장 선출소 - 5인 동창 곗모임</title>
+  <title>5인 동창 곗모임</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 모바일 헤더 -->
+  <!-- 상단 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
         <span class="text-xl">🎓</span>
         <div>
-          <h1 class="font-black text-base text-slate-900 leading-tight">회장 선출 센터</h1>
-          <span class="text-[10px] text-slate-400">대통령 임기 연동 추첨제</span>
+          <h1 class="font-black text-base text-slate-900 leading-tight">5인 동창 곗모임</h1>
+          <span class="text-[10px] text-slate-400 font-medium">Since 2019 (8년차)</span>
         </div>
       </div>
 
+      <!-- 접속자 스위처 -->
       <select id="current-user-select" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 font-semibold text-slate-700">
         <option value="user_kim_js" selected>⚙️ 김진세 (관리자)</option>
         <option value="user_song">👑 송환오 (회장)</option>
@@ -29,124 +30,96 @@
       </select>
     </div>
 
-    <!-- 메뉴 바 -->
+    <!-- 권한 연동 탭 메뉴 -->
     <nav class="flex space-x-1 border-t border-slate-100 mt-2.5 pt-2 overflow-x-auto text-xs no-scrollbar">
-      <a href="index.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">대시보드</a>
-      <a href="gathering.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">모임 & 장소</a>
-      <a href="ledger.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회비 장부</a>
-      <a href="election.html" class="py-1.5 px-3 bg-indigo-50 text-indigo-700 font-bold rounded-lg whitespace-nowrap">회장 선출</a>
+      <a href="index.html" class="py-1.5 px-3 bg-blue-50 text-blue-600 font-bold rounded-lg whitespace-nowrap">대시보드</a>
+      <a href="history.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">과거 여행/모임</a>
       <a href="wiki.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회칙</a>
+      <!-- 관리자 전용 메뉴 -->
+      <a href="settlement.html" class="admin-only py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">개별 정산</a>
+      <a href="election.html" class="admin-only py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회장 선출</a>
     </nav>
   </header>
 
+  <!-- 메인 모바일 뷰 (공금 잔액 제거) -->
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 대통령 임기 연동 전광판 -->
-    <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-4 shadow-sm space-y-3">
+    <!-- 송환오 회장 및 대통령 임기 D-day 카드 -->
+    <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-5 shadow-sm space-y-3">
       <div class="flex justify-between items-center text-xs">
-        <span class="text-[10px] bg-indigo-500/30 text-indigo-200 border border-indigo-400/40 px-2 py-0.5 rounded-full font-bold">
-          회칙 제4조 연동
-        </span>
-        <span class="text-amber-300 font-bold text-[11px]">송환오 회장 재임 중</span>
+        <span class="bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded text-[10px]">CURRENT LEADER</span>
+        <span class="text-slate-400 text-[11px]">임기 연동제</span>
       </div>
-
       <div>
-        <h2 class="text-lg font-black text-white">대한민국 대통령 임기 시계</h2>
-        <p class="text-[11px] text-slate-300">대통령 임기 만료 시 차기 회장을 선출합니다.</p>
+        <h2 class="text-xl font-black">👑 송환오 회장</h2>
+        <p class="text-xs text-slate-300 mt-1">모임 장소 및 예약 전권 단독 행사 (회칙 제5조: 딴지 불가)</p>
       </div>
-
-      <div class="grid grid-cols-4 gap-2 text-center text-xs">
-        <div class="bg-white/10 p-2 rounded-lg">
-          <div id="t-days" class="text-lg font-black text-amber-300">000</div>
-          <div class="text-[9px] text-slate-400">DAYS</div>
-        </div>
-        <div class="bg-white/10 p-2 rounded-lg">
-          <div id="t-hours" class="text-lg font-black">00</div>
-          <div class="text-[9px] text-slate-400">HOURS</div>
-        </div>
-        <div class="bg-white/10 p-2 rounded-lg">
-          <div id="t-mins" class="text-lg font-black">00</div>
-          <div class="text-[9px] text-slate-400">MINS</div>
-        </div>
-        <div class="bg-white/10 p-2 rounded-lg">
-          <div id="t-secs" class="text-lg font-black">00</div>
-          <div class="text-[9px] text-slate-400">SECS</div>
-        </div>
+      <div class="pt-2 border-t border-white/10 flex justify-between items-center text-xs">
+        <span class="text-slate-400">대통령 임기 만료까지</span>
+        <span id="president-dday" class="text-base font-black text-amber-300">D-계산중</span>
       </div>
     </div>
 
-    <!-- 룰렛 후보 목록 및 추첨기 -->
+    <!-- 빠른 바로가기 2구리드 -->
+    <div class="grid grid-cols-2 gap-2 text-xs">
+      <a href="history.html" class="p-3.5 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-slate-50 transition block space-y-1">
+        <i class="fa-solid fa-map-location-dot text-lg text-emerald-600"></i>
+        <div class="font-bold text-slate-800">과거 여행/모임</div>
+        <div class="text-[11px] text-slate-400">2019년부터 연도별 기록</div>
+      </a>
+      <a href="wiki.html" class="p-3.5 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-slate-50 transition block space-y-1">
+        <i class="fa-solid fa-book text-lg text-blue-600"></i>
+        <div class="font-bold text-slate-800">모임 합의 회칙</div>
+        <div class="text-[11px] text-slate-400">규정 및 판본 역사 열람</div>
+      </a>
+    </div>
+
+    <!-- 5인 회원 프로필 현황 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
-        <div>
-          <h3 class="font-bold text-sm text-slate-900">차기 회장 추첨 덱</h3>
-          <span class="text-[11px] text-slate-400">장우석 총무 영구 면제 (후보 4인)</span>
-        </div>
-        <span class="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded">각 25% 확률</span>
+        <h3 class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
+          <i class="fa-solid fa-users text-slate-600"></i>
+          <span>동창 5인 현황</span>
+        </h3>
+        <span class="text-[11px] text-slate-400">창립 2019년 (정원 5인)</span>
       </div>
 
-      <!-- 장우석 총무 면제 표시 -->
-      <div class="p-2.5 bg-slate-50 border border-dashed rounded-lg flex justify-between items-center text-xs opacity-60">
-        <div>
-          <span class="font-bold text-slate-700">장우석 (총무)</span>
-          <span class="text-[10px] text-slate-400 block">공금 관리 상시 전담</span>
-        </div>
-        <span class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded">영구 면제</span>
-      </div>
-
-      <!-- 4인 후보 카드 그리드 -->
-      <div class="grid grid-cols-2 gap-2 text-xs">
-        <div id="card-user_song" class="candidate-card p-2.5 border rounded-lg bg-white">
-          <div class="font-bold text-slate-800">송환오</div>
-          <span class="text-[10px] text-amber-700 font-bold">현직 (연임 가능)</span>
-        </div>
-        <div id="card-user_kim_js" class="candidate-card p-2.5 border rounded-lg bg-white">
-          <div class="font-bold text-slate-800">김진세</div>
-          <span class="text-[10px] text-slate-400">후보 25%</span>
-        </div>
-        <div id="card-user_kim_jungsoo" class="candidate-card p-2.5 border rounded-lg bg-white">
-          <div class="font-bold text-slate-800">김정수</div>
-          <span class="text-[10px] text-slate-400">후보 25%</span>
-        </div>
-        <div id="card-user_lee" class="candidate-card p-2.5 border rounded-lg bg-white">
-          <div class="font-bold text-slate-800">이해웅</div>
-          <span class="text-[10px] text-slate-400">후보 25%</span>
-        </div>
-      </div>
-
-      <!-- 추첨 결과 가안 및 [확정] 버튼 영역 -->
-      <div id="draft-result-box" class="hidden p-3.5 bg-amber-50 border border-amber-300 rounded-xl text-center space-y-2">
-        <div class="text-[11px] font-bold text-amber-800">🎲 룰렛 추첨 결과 (임시 당선)</div>
-        <div id="draft-winner-name" class="text-xl font-black text-slate-900">당선자: -</div>
-        <p class="text-[10px] text-slate-500">아래 [확정] 버튼을 눌러야 모임 회장으로 공식 등록됩니다.</p>
-        
-        <!-- 사용자가 요구한 [확정] 버튼 -->
-        <button id="btn-confirm-winner" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-lg shadow transition flex items-center justify-center gap-1.5">
-          <i class="fa-solid fa-stamp"></i>
-          <span>👑 차기 회장 공식 확정 및 DB 저장</span>
-        </button>
-      </div>
-
-      <!-- 룰렛 실행 버튼 -->
-      <button id="btn-spin" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center justify-center gap-2">
-        <i class="fa-solid fa-dice"></i>
-        <span>4인 룰렛 추첨 시작</span>
-      </button>
-    </div>
-
-    <!-- 역대 회장 이력 -->
-    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2 text-xs">
-      <div class="font-bold text-slate-900 border-b pb-1.5 flex justify-between">
-        <span>역대 회장 선출 역사</span>
-        <span class="text-[10px] text-slate-400">2019~</span>
-      </div>
-      <div id="history-list" class="space-y-1.5 text-[11px]">
-        <div class="p-2 bg-slate-50 rounded flex justify-between items-center">
+      <div class="space-y-2 text-xs" id="member-list">
+        <!-- 5인 명단 -->
+        <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg">
           <div>
-            <strong class="text-slate-800">송환오 회장</strong>
-            <span class="text-slate-400 ml-1">(모임 창립 추첨 당선)</span>
+            <strong class="text-slate-900">김진세</strong>
+            <span class="text-[10px] bg-slate-800 text-white px-1.5 py-0.5 rounded font-bold ml-1">관리자</span>
           </div>
-          <span class="text-[10px] text-slate-400">2019-09</span>
+          <span class="text-slate-500">기혼 (자녀 1명)</span>
+        </div>
+        <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg">
+          <div>
+            <strong class="text-slate-900">송환오</strong>
+            <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold ml-1">회장</span>
+          </div>
+          <span class="text-slate-500">기혼 (무자녀)</span>
+        </div>
+        <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg">
+          <div>
+            <strong class="text-slate-900">장우석</strong>
+            <span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold ml-1">총무</span>
+          </div>
+          <span class="text-slate-500">기혼 (자녀 2명)</span>
+        </div>
+        <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg">
+          <div>
+            <strong class="text-slate-900">김정수</strong>
+            <span class="text-[10px] text-slate-400 ml-1">회원</span>
+          </div>
+          <span class="text-slate-500">미혼</span>
+        </div>
+        <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg">
+          <div>
+            <strong class="text-slate-900">이해웅</strong>
+            <span class="text-[10px] text-slate-400 ml-1">회원</span>
+          </div>
+          <span class="text-slate-500">미혼</span>
         </div>
       </div>
     </div>
@@ -154,105 +127,28 @@
   </main>
 
   <script type="module">
-    import { db, doc, setDoc } from "./js/firebase.js";
+    const currentUserSelect = document.getElementById("current-user-select");
 
-    const candidates = [
-      { id: "user_song", name: "송환오" },
-      { id: "user_kim_js", name: "김진세" },
-      { id: "user_kim_jungsoo", name: "김정수" },
-      { id: "user_lee", name: "이해웅" }
-    ];
-
-    let pendingWinner = null;
-    let isSpinning = false;
-
-    // 대통령 시계
-    function updateClock() {
-      const diff = new Date("2027-05-10T00:00:00+09:00").getTime() - Date.now();
-      if (diff <= 0) return;
-      document.getElementById("t-days").innerText = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(3, '0');
-      document.getElementById("t-hours").innerText = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
-      document.getElementById("t-mins").innerText = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-      document.getElementById("t-secs").innerText = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    function highlight(cid) {
-      candidates.forEach(c => {
-        const el = document.getElementById(`card-${c.id}`);
-        if (c.id === cid) {
-          el.className = "candidate-card p-2.5 border-2 border-indigo-600 bg-indigo-50 shadow scale-[1.02] transition";
-        } else {
-          el.className = "candidate-card p-2.5 border rounded-lg bg-white opacity-40 transition";
-        }
+    // 권한별 메뉴 가시성 제어 (김진세 외에는 정산, 선출 숨김)
+    function updateMenuVisibility() {
+      const isAdmin = (currentUserSelect.value === "user_kim_js");
+      document.querySelectorAll(".admin-only").forEach(el => {
+        if (isAdmin) el.classList.remove("hidden");
+        else el.classList.add("hidden");
       });
     }
 
-    // 룰렛 추첨
-    document.getElementById("btn-spin").onclick = () => {
-      if (isSpinning) return;
-      isSpinning = true;
-      document.getElementById("btn-spin").disabled = true;
-      document.getElementById("draft-result-box").classList.add("hidden");
+    // 대통령 시계
+    function updateCountdown() {
+      const diff = new Date("2027-05-10T00:00:00+09:00").getTime() - Date.now();
+      const el = document.getElementById("president-dday");
+      if (diff <= 0) el.innerText = "임기만료";
+      else el.innerText = `D-${Math.floor(diff / (1000 * 60 * 60 * 24))}일`;
+    }
 
-      let count = 0;
-      const steps = 25 + Math.floor(Math.random() * 8);
-
-      const timer = setInterval(() => {
-        const c = candidates[count % candidates.length];
-        highlight(c.id);
-        count++;
-
-        if (count >= steps) {
-          clearInterval(timer);
-          pendingWinner = candidates[Math.floor(Math.random() * candidates.length)];
-          highlight(pendingWinner.id);
-
-          // 임시 결과창 노출
-          document.getElementById("draft-winner-name").innerText = `차기 회장: ${pendingWinner.name}`;
-          document.getElementById("draft-result-box").classList.remove("hidden");
-
-          isSpinning = false;
-          document.getElementById("btn-spin").disabled = false;
-        }
-      }, 80);
-    };
-
-    // [확정] 버튼 클릭 시 공식 등록
-    document.getElementById("btn-confirm-winner").onclick = async () => {
-      if (!pendingWinner) return;
-
-      const now = new Date();
-      const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-
-      // 역사 목록 추가
-      const list = document.getElementById("history-list");
-      const item = document.createElement("div");
-      item.className = "p-2 bg-indigo-50 border border-indigo-200 rounded flex justify-between items-center";
-      item.innerHTML = `
-        <div>
-          <strong class="text-indigo-900">${pendingWinner.name} 회장 당선 (확정)</strong>
-          <span class="text-[10px] text-indigo-500 block">정기 임기 만료 추첨 승인</span>
-        </div>
-        <span class="text-[10px] text-indigo-400 font-semibold">${dateStr}</span>
-      `;
-      list.prepend(item);
-
-      // Firestore 공식 기록
-      try {
-        await setDoc(doc(db, "app_state", "current_president"), {
-          presidentId: pendingWinner.id,
-          presidentName: pendingWinner.name,
-          confirmedAt: now.toISOString()
-        });
-        alert(`🎉 [공식 확정] ${pendingWinner.name} 회장 취임이 최종 확정 및 동기화되었습니다!`);
-      } catch (e) {
-        console.warn(e);
-      }
-
-      document.getElementById("draft-result-box").classList.add("hidden");
-    };
+    currentUserSelect.addEventListener("change", updateMenuVisibility);
+    updateMenuVisibility();
+    updateCountdown();
   </script>
 
 </body>
