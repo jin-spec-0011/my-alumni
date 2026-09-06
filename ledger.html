@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회비 장부 & 식대 출납소 - 5인 동창 곗모임</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- 공통 네비게이션 헤더 -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="text-2xl">🎓</span>
+        <a href="index.html" class="font-extrabold text-lg tracking-tight text-slate-900">5인 동창 곗모임</a>
+      </div>
+
+      <!-- 접속자 전환 셀렉터 -->
+      <div class="flex items-center space-x-2">
+        <label for="current-user-select" class="text-xs text-slate-500 hidden sm:inline">현재 접속자:</label>
+        <select id="current-user-select" class="text-sm bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium focus:ring-2 focus:ring-blue-500">
+          <option value="user_jang" selected>🛡️ 장우석 (총무, 회계 관리 권한)</option>
+          <option value="user_song">👑 송환오 (회장, 기혼)</option>
+          <option value="user_kim_js">김진세 (기혼, 1자녀)</option>
+          <option value="user_kim_jungsoo">김정수 (미혼)</option>
+          <option value="user_lee">이해웅 (미혼)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 탭 네비게이션 -->
+    <nav class="max-w-5xl mx-auto px-4 flex space-x-1 sm:space-x-4 border-t border-slate-100 text-sm overflow-x-auto">
+      <a href="index.html" class="py-2.5 px-3 text-slate-600 hover:text-slate-900 whitespace-nowrap">
+        <i class="fa-solid fa-chart-pie mr-1.5"></i>대시보드
+      </a>
+      <a href="gathering.html" class="py-2.5 px-3 text-slate-600 hover:text-slate-900 whitespace-nowrap">
+        <i class="fa-solid fa-calendar-check mr-1.5"></i>모임 & 예약
+      </a>
+      <a href="ledger.html" class="py-2.5 px-3 border-b-2 border-emerald-600 text-emerald-600 font-bold whitespace-nowrap">
+        <i class="fa-solid fa-won-sign mr-1.5"></i>회비 장부
+      </a>
+      <a href="election.html" class="py-2.5 px-3 text-slate-600 hover:text-slate-900 whitespace-nowrap">
+        <i class="fa-solid fa-check-to-slot mr-1.5"></i>회장 선출소
+      </a>
+      <a href="wiki.html" class="py-2.5 px-3 text-slate-600 hover:text-slate-900 whitespace-nowrap">
+        <i class="fa-solid fa-book mr-1.5"></i>회칙
+      </a>
+    </nav>
+  </header>
+
+  <!-- 메인 컨테이너 -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+    <!-- 회칙 원칙 안내 배너 -->
+    <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white rounded-2xl p-5 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="bg-white/20 text-emerald-100 text-xs font-bold px-2.5 py-0.5 rounded-full">회칙 제9조 · 제10조 준수</span>
+          <h2 class="text-lg sm:text-xl font-black">정기 모임 식대 전용 공금 통장</h2>
+        </div>
+        <p class="text-emerald-100/80 text-xs sm:text-sm mt-1">
+          모든 경조사비는 개별 각출 원칙이며 본 공금 통장에서 지출하지 않습니다. 적립금은 전액 정기 모임 식대로 사용됩니다.
+        </p>
+      </div>
+      <div id="treasurer-badge" class="bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-xl text-xs font-bold text-emerald-200 border border-white/10">
+        <i class="fa-solid fa-user-shield mr-1"></i>장우석 총무 관리 모드
+      </div>
+    </div>
+
+    <!-- 4대 요약 통계 카드 -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex justify-between items-center text-slate-400 mb-1">
+          <span class="text-xs font-semibold">현재 공금 총잔액</span>
+          <i class="fa-solid fa-vault text-emerald-600"></i>
+        </div>
+        <div class="text-xl sm:text-2xl font-black text-slate-900" id="stat-total-balance">2,380,000원</div>
+        <div class="text-[11px] text-slate-400 mt-1">실제 입출금 합산</div>
+      </div>
+
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex justify-between items-center text-slate-400 mb-1">
+          <span class="text-xs font-semibold">당월 수납액 (진행률)</span>
+          <i class="fa-solid fa-sack-dollar text-blue-600"></i>
+        </div>
+        <div class="text-xl sm:text-2xl font-black text-slate-900" id="stat-month-collected">280,000원</div>
+        <div class="text-[11px] text-blue-600 font-semibold mt-1" id="stat-month-rate">목표 320,000원 (87.5%)</div>
+      </div>
+
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex justify-between items-center text-slate-400 mb-1">
+          <span class="text-xs font-semibold">월 회비 규정 부과액</span>
+          <i class="fa-solid fa-receipt text-amber-500"></i>
+        </div>
+        <div class="text-xl sm:text-2xl font-black text-slate-900">320,000원</div>
+        <div class="text-[11px] text-slate-500 mt-1">기혼 3인(24만) + 미혼 2인(8만)</div>
+      </div>
+
+      <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex justify-between items-center text-slate-400 mb-1">
+          <span class="text-xs font-semibold">올해 모임 식대 총지출</span>
+          <i class="fa-solid fa-utensils text-rose-500"></i>
+        </div>
+        <div class="text-xl sm:text-2xl font-black text-rose-600" id="stat-year-expense">580,000원</div>
+        <div class="text-[11px] text-slate-400 mt-1">전반기 1회 집행 완료</div>
+      </div>
+    </div>
+
+    <!-- 2단 레이아웃: 5인 납부 관리(좌) / 식대 지출 등록(우) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- 좌측: 당월 5인 곗돈 수납 현황판 (7칸) -->
+      <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
+          <div>
+            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">2026년 9월</span>
+            <h3 class="text-lg font-black text-slate-900 mt-1">이달의 곗돈 수납 현황 (5인)</h3>
+          </div>
+          <span class="text-xs text-slate-400">장우석 총무 클릭 시 납부 상태 전환</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm border-collapse">
+            <thead class="bg-slate-50 text-slate-500 text-xs border-y">
+              <tr>
+                <th class="py-2.5 px-3">회원명</th>
+                <th class="py-2.5 px-3">구분</th>
+                <th class="py-2.5 px-3">부과 회비</th>
+                <th class="py-2.5 px-3 text-center">납부 상태</th>
+                <th class="py-2.5 px-3 text-center">상태 변경</th>
+              </tr>
+            </thead>
+            <tbody id="dues-table-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+
+        <div class="p-3 bg-slate-50 rounded-lg text-xs text-slate-500 leading-relaxed">
+          💡 <strong>회비 부과 기준:</strong> 기혼 3인(송환오, 장우석, 김진세)은 월 80,000원, 미혼 2인(김정수, 이해웅)은 월 40,000원이 부과됩니다. 미혼 회원이 결혼할 경우 익월부터 8만 원으로 자동 전환됩니다.
+        </div>
+      </div>
+
+      <!-- 우측: 정기 모임 식대 지출 등록 폼 (5칸) -->
+      <div class="lg:col-span-5 bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-4">
+        <div class="border-b pb-3">
+          <span class="text-xs font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded">EXPENSE REGISTRATION</span>
+          <h3 class="text-lg font-black text-slate-900 mt-1">모임 식대 지출 전표 등록</h3>
+          <p class="text-xs text-slate-400 mt-0.5">정기 모임 식대 및 음료 경비를 장부에 등록합니다.</p>
+        </div>
+
+        <form id="expense-form" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">모임 구분</label>
+            <select id="input-exp-category" class="w-full text-xs p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 bg-slate-50">
+              <option value="2026 하반기 정기 모임 식대">2026 하반기 정기 모임 식대</option>
+              <option value="2026 전반기 정기 모임 식대">2026 전반기 정기 모임 식대</option>
+              <option value="임시 모임 다과/음료비">임시 모임 다과/음료비</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">결제 식당 / 장소명</label>
+            <input type="text" id="input-exp-title" placeholder="예: 충북 한우 명가 (대형 룸 식대 결제)" required class="w-full text-xs p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">지출 금액 (원)</label>
+              <input type="number" id="input-exp-amount" placeholder="예: 450000" step="1000" required class="w-full text-xs p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">지출 일자</label>
+              <input type="date" id="input-exp-date" value="2026-09-06" class="w-full text-xs p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">영수증 메모 / 비고</label>
+            <input type="text" id="input-exp-memo" placeholder="예: 어른 8명, 아이 3명 식사 결제 완료" class="w-full text-xs p-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+          </div>
+
+          <button type="submit" id="btn-submit-expense" class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-lg transition shadow-sm flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-receipt"></i>
+            <span>지출 전표 등록 및 잔액 차감</span>
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- 하단 전체: 공금 통장 입출금 전체 원장 -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-4">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
+        <div>
+          <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+            <i class="fa-solid fa-book-bookmark text-emerald-600"></i>
+            <span>공금 통장 입출금 내역 (전체 거래 원장)</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">정기 회비 입금 및 모임 식대 누적 거래 내역입니다.</p>
+        </div>
+
+        <div class="inline-flex rounded-lg border border-slate-200 p-1 text-xs">
+          <button id="filter-all" class="px-3 py-1 bg-slate-100 rounded font-semibold text-slate-800">전체</button>
+          <button id="filter-deposit" class="px-3 py-1 text-slate-500 hover:text-slate-800">입금만</button>
+          <button id="filter-withdraw" class="px-3 py-1 text-slate-500 hover:text-slate-800">식대 지출만</button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead class="bg-slate-50 text-slate-500 text-xs border-y">
+            <tr>
+              <th class="py-2.5 px-3">일자</th>
+              <th class="py-2.5 px-3">구분</th>
+              <th class="py-2.5 px-3">거래 항목 및 내용</th>
+              <th class="py-2.5 px-3 text-right">거래 금액</th>
+              <th class="py-2.5 px-3 text-right">잔액</th>
+            </tr>
+          </thead>
+          <tbody id="transaction-table-body" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="max-w-5xl mx-auto w-full px-4 py-6 text-center text-xs text-slate-400">
+    <p>회칙 제9조 및 제10조에 의거하여 정기 곗돈은 식대로만 운용되며, 경조사비는 개별 각출합니다.</p>
+  </footer>
+
+  <!-- 로직 스크립트 -->
+  <script type="module">
+    import { db, doc, setDoc } from "./js/firebase.js";
+
+    // 5인 실명 데이터 및 9월 납부 상태
+    let duesMembers = [
+      { id: "user_jang", name: "장우석", marital: "married", fee: 80000, isPaid: true, paidDate: "2026-09-01" },
+      { id: "user_song", name: "송환오", marital: "married", fee: 80000, isPaid: true, paidDate: "2026-09-02" },
+      { id: "user_kim_js", name: "김진세", marital: "married", fee: 80000, isPaid: true, paidDate: "2026-09-03" },
+      { id: "user_kim_jungsoo", name: "김정수", marital: "single",  fee: 40000, isPaid: false, paidDate: "-" },
+      { id: "user_lee", name: "이해웅", marital: "single",  fee: 40000, isPaid: true, paidDate: "2026-09-05" }
+    ];
+
+    let transactions = [
+      { id: 1, date: "2026-09-05", type: "deposit", title: "이해웅 9월 회비 입금", amount: 40000, balance: 2380000 },
+      { id: 2, date: "2026-09-03", type: "deposit", title: "김진세 9월 회비 입금", amount: 80000, balance: 2340000 },
+      { id: 3, date: "2026-09-02", type: "deposit", title: "송환오 9월 회비 입금", amount: 80000, balance: 2260000 },
+      { id: 4, date: "2026-09-01", type: "deposit", title: "장우석 9월 회비 입금", amount: 80000, balance: 2180000 },
+      { id: 5, date: "2026-05-16", type: "withdraw", title: "2026 전반기 정기 모임 식대 (한우 대형 룸)", amount: 580000, balance: 2100000 },
+      { id: 6, date: "2026-05-01", type: "deposit", title: "5인 전원 5월 정기 회비 일괄 입금", amount: 320000, balance: 2680000 }
+    ];
+
+    let currentFilter = "all";
+
+    const currentUserSelect = document.getElementById("current-user-select");
+    const treasurerBadge = document.getElementById("treasurer-badge");
+    const duesTableBody = document.getElementById("dues-table-body");
+    const transactionTableBody = document.getElementById("transaction-table-body");
+    const statTotalBalance = document.getElementById("stat-total-balance");
+    const statMonthCollected = document.getElementById("stat-month-collected");
+    const statMonthRate = document.getElementById("stat-month-rate");
+    const statYearExpense = document.getElementById("stat-year-expense");
+
+    function checkUserRole() {
+      const isTreasurer = (currentUserSelect.value === "user_jang");
+      if (isTreasurer) {
+        treasurerBadge.className = "bg-emerald-600 text-white px-3 py-1 rounded-xl text-xs font-bold border border-emerald-400";
+        treasurerBadge.innerHTML = `<i class="fa-solid fa-lock-open mr-1"></i>장우석 총무 권한 활성`;
+        document.getElementById("btn-submit-expense").disabled = false;
+        document.getElementById("btn-submit-expense").classList.remove("opacity-50");
+      } else {
+        treasurerBadge.className = "bg-slate-700 text-slate-300 px-3 py-1 rounded-xl text-xs font-bold border border-slate-600";
+        treasurerBadge.innerHTML = `<i class="fa-solid fa-eye mr-1"></i>일반 회원 열람 모드`;
+        document.getElementById("btn-submit-expense").disabled = true;
+        document.getElementById("btn-submit-expense").classList.add("opacity-50");
+      }
+      renderDuesTable();
+    }
+
+    function renderDuesTable() {
+      duesTableBody.innerHTML = "";
+      const isTreasurer = (currentUserSelect.value === "user_jang");
+
+      let collectedSum = 0;
+
+      duesMembers.forEach(member => {
+        if (member.isPaid) collectedSum += member.fee;
+
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50 transition";
+
+        const maritalBadge = member.marital === 'married'
+          ? '<span class="text-[11px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-semibold">기혼 (8만)</span>'
+          : '<span class="text-[11px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-semibold">미혼 (4만)</span>';
+
+        const statusBadge = member.isPaid
+          ? '<span class="text-xs text-emerald-600 font-bold"><i class="fa-solid fa-check mr-1"></i>완납</span>'
+          : '<span class="text-xs text-rose-500 font-bold"><i class="fa-solid fa-clock mr-1"></i>미납</span>';
+
+        const actionBtn = isTreasurer
+          ? `<button class="btn-toggle-pay text-xs px-2.5 py-1 rounded border font-semibold transition ${
+              member.isPaid ? 'border-slate-300 text-slate-600 hover:bg-slate-100' : 'bg-emerald-600 text-white hover:bg-emerald-700'
+            }" data-id="${member.id}">
+              ${member.isPaid ? '미납 전환' : '입금 확인'}
+            </button>`
+          : `<span class="text-xs text-slate-400">-</span>`;
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-bold text-slate-800">${member.name}</td>
+          <td class="py-2.5 px-3">${maritalBadge}</td>
+          <td class="py-2.5 px-3 font-bold text-slate-700">${member.fee.toLocaleString()}원</td>
+          <td class="py-2.5 px-3 text-center">${statusBadge}</td>
+          <td class="py-2.5 px-3 text-center">${actionBtn}</td>
+        `;
+        duesTableBody.appendChild(tr);
+      });
+
+      statMonthCollected.innerText = `${collectedSum.toLocaleString()}원`;
+      const rate = ((collectedSum / 320000) * 100).toFixed(1);
+      statMonthRate.innerText = `목표 320,000원 (${rate}%)`;
+
+      if (isTreasurer) {
+        document.querySelectorAll(".btn-toggle-pay").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            const targetId = e.currentTarget.getAttribute("data-id");
+            togglePaymentStatus(targetId);
+          });
+        });
+      }
+    }
+
+    async function togglePaymentStatus(userId) {
+      const member = duesMembers.find(m => m.id === userId);
+      if (!member) return;
+
+      member.isPaid = !member.isPaid;
+      const today = new Date().toISOString().split("T")[0];
+
+      if (member.isPaid) {
+        member.paidDate = today;
+        const currentBalance = transactions[0] ? transactions[0].balance : 0;
+        const newTx = {
+          id: Date.now(),
+          date: today,
+          type: "deposit",
+          title: `${member.name} 9월 회비 입금`,
+          amount: member.fee,
+          balance: currentBalance + member.fee
+        };
+        transactions.unshift(newTx);
+      } else {
+        member.paidDate = "-";
+      }
+
+      renderDuesTable();
+      renderTransactions();
+      updateHeaderKPIs();
+
+      try {
+        await setDoc(doc(db, "dues_status", userId), member);
+      } catch (err) {
+        console.warn("Firestore 로컬 모드:", err);
+      }
+    }
+
+    function renderTransactions() {
+      transactionTableBody.innerHTML = "";
+
+      let filtered = transactions;
+      if (currentFilter === "deposit") filtered = transactions.filter(t => t.type === "deposit");
+      if (currentFilter === "withdraw") filtered = transactions.filter(t => t.type === "withdraw");
+
+      filtered.forEach(tx => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50 transition";
+
+        const isDeposit = (tx.type === "deposit");
+        const typeBadge = isDeposit
+          ? '<span class="text-[11px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-bold">입금</span>'
+          : '<span class="text-[11px] bg-rose-50 text-rose-700 px-2 py-0.5 rounded font-bold">식대 지출</span>';
+
+        const amountColor = isDeposit ? 'text-emerald-600' : 'text-rose-600';
+        const sign = isDeposit ? '+' : '-';
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 text-slate-500">${tx.date}</td>
+          <td class="py-2.5 px-3">${typeBadge}</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-800">${tx.title}</td>
+          <td class="py-2.5 px-3 text-right font-bold ${amountColor}">${sign}${tx.amount.toLocaleString()}원</td>
+          <td class="py-2.5 px-3 text-right font-black text-slate-900">${tx.balance.toLocaleString()}원</td>
+        `;
+        transactionTableBody.appendChild(tr);
+      });
+    }
+
+    function updateHeaderKPIs() {
+      if (transactions.length > 0) {
+        statTotalBalance.innerText = `${transactions[0].balance.toLocaleString()}원`;
+      }
+      const totalExpense = transactions
+        .filter(t => t.type === "withdraw")
+        .reduce((sum, t) => sum + t.amount, 0);
+      statYearExpense.innerText = `${totalExpense.toLocaleString()}원`;
+    }
+
+    document.getElementById("expense-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (currentUserSelect.value !== "user_jang") {
+        alert("⚠️ 지출 전표 등록은 장우석 총무만 가능합니다.");
+        return;
+      }
+
+      const title = document.getElementById("input-exp-title").value.trim();
+      const amount = parseInt(document.getElementById("input-exp-amount").value, 10);
+      const date = document.getElementById("input-exp-date").value;
+      const memo = document.getElementById("input-exp-memo").value.trim();
+
+      if (!amount || amount <= 0) {
+        alert("올바른 지출 금액을 입력해 주세요.");
+        return;
+      }
+
+      const currentBalance = transactions[0] ? transactions[0].balance : 0;
+      if (amount > currentBalance) {
+        alert("⚠️ 통장 잔액보다 지출 금액이 더 큽니다.");
+        return;
+      }
+
+      const newTx = {
+        id: Date.now(),
+        date: date,
+        type: "withdraw",
+        title: `${title} (${memo || '정기 식대'})`,
+        amount: amount,
+        balance: currentBalance - amount
+      };
+
+      transactions.unshift(newTx);
+      renderTransactions();
+      updateHeaderKPIs();
+
+      document.getElementById("input-exp-title").value = "";
+      document.getElementById("input-exp-amount").value = "";
+      document.getElementById("input-exp-memo").value = "";
+
+      alert(`🧾 [지출 전표 승인] ${title} (${amount.toLocaleString()}원) 처리가 완료되었습니다.`);
+
+      try {
+        await setDoc(doc(db, "transactions", String(newTx.id)), newTx);
+      } catch (err) {
+        console.warn("Firestore 로컬 모드:", err);
+      }
+    });
+
+    const btnAll = document.getElementById("filter-all");
+    const btnDep = document.getElementById("filter-deposit");
+    const btnWth = document.getElementById("filter-withdraw");
+
+    function setFilterActive(btn) {
+      [btnAll, btnDep, btnWth].forEach(b => {
+        b.className = "px-3 py-1 text-slate-500 hover:text-slate-800";
+      });
+      btn.className = "px-3 py-1 bg-slate-100 rounded font-semibold text-slate-800";
+    }
+
+    btnAll.addEventListener("click", () => { currentFilter = "all"; setFilterActive(btnAll); renderTransactions(); });
+    btnDep.addEventListener("click", () => { currentFilter = "deposit"; setFilterActive(btnDep); renderTransactions(); });
+    btnWth.addEventListener("click", () => { currentFilter = "withdraw"; setFilterActive(btnWth); renderTransactions(); });
+
+    currentUserSelect.addEventListener("change", checkUserRole);
+
+    checkUserRole();
+    renderTransactions();
+    updateHeaderKPIs();
+  </script>
+
+</body>
+</html>
