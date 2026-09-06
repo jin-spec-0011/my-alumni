@@ -17,7 +17,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 헤더 -->
+  <!-- 상단 공통 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
@@ -215,6 +215,8 @@
       { id: "user_lee", name: "이해웅", role: "회원", roleBadge: "text-slate-400", marital: "single", children: 0 }
     ];
 
+    let currentTermEndDateStr = "2027-05-10T00:00:00+09:00";
+
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
     btnDropdown.addEventListener("click", (e) => {
@@ -340,7 +342,6 @@ ${memberLines.join("\n")}
       return { fullContent, totalCount, monthlyTarget };
     }
 
-    // [핵심] 판본 덮어쓰기 버그 완벽 차단 & 무한 누적 저장
     document.getElementById("member-update-form").onsubmit = async (e) => {
       e.preventDefault();
       const selectedId = memberSelect.value;
@@ -358,7 +359,7 @@ ${memberLines.join("\n")}
 
       const now = new Date();
       const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-      const uniqueRevDocId = `rev_${Date.now()}`; // 고유 ID로 덮어쓰기 원천 방지
+      const uniqueRevDocId = `rev_${Date.now()}`;
 
       try {
         await setDoc(doc(db, "app_state", "members_status"), { list: membersData });
@@ -366,7 +367,6 @@ ${memberLines.join("\n")}
         const { fullContent, totalCount, monthlyTarget } = buildCompleteRuleBook(membersData);
         localStorage.setItem("alumni_wiki_content", fullContent);
 
-        // 기존 판본 중 가장 높은 번호를 찾아 무조건 +1 계산
         const revSnap = await getDocs(collection(db, "rule_revisions"));
         let maxNum = 0;
         revSnap.forEach(d => {
@@ -387,7 +387,6 @@ ${memberLines.join("\n")}
           summary: autoSummary
         });
 
-        // 덮어쓰지 않고 새 문서로 영구 추가
         await setDoc(doc(db, "rule_revisions", uniqueRevDocId), newRec);
 
         alert(`🎉 [${target.name}] 가족 현황 저장 완료!\n\n• 제2조 (회원 현황): ${target.marital === 'married' ? '기혼' : '미혼'} 갱신\n• 제6조 (참석 상한): 총 ${totalCount}명 자동 계산\n• 제7조 (월 곗돈 목표): 월 ${monthlyTarget.toLocaleString()}원 자동 변경\n• 회칙 새 판본 [${nextRev}]으로 영구 누적되었습니다.`);
@@ -402,6 +401,14 @@ ${memberLines.join("\n")}
 
     // 실시간 리스너 구독
     try {
+      // 1. 임기 만료일 리셋 동적 반영
+      onSnapshot(doc(db, "app_state", "term_config"), (docSnap) => {
+        if (docSnap.exists() && docSnap.data().targetDateStr) {
+          currentTermEndDateStr = docSnap.data().targetDateStr;
+        }
+      });
+
+      // 2. 현재 회장 실시간 연동
       onSnapshot(doc(db, "app_state", "current_president"), (docSnap) => {
         if (docSnap.exists()) {
           const p = docSnap.data();
@@ -411,6 +418,7 @@ ${memberLines.join("\n")}
         }
       });
 
+      // 3. 5인 회원 상태 연동
       onSnapshot(doc(db, "app_state", "members_status"), (docSnap) => {
         if (docSnap.exists() && docSnap.data().list) {
           membersData = docSnap.data().list;
@@ -420,6 +428,7 @@ ${memberLines.join("\n")}
         renderMembers();
       });
 
+      // 4. 모임 정보 연동
       onSnapshot(doc(db, "gathering", "latest"), (docSnap) => {
         if (docSnap.exists()) {
           const g = docSnap.data();
@@ -436,11 +445,15 @@ ${memberLines.join("\n")}
       console.error(e);
     }
 
+    // 대시보드 카운트다운 타이머 (동적 임기 만료일 기준)
     function updateCountdown() {
-      const diff = new Date("2027-05-10T00:00:00+09:00").getTime() - Date.now();
+      const diff = new Date(currentTermEndDateStr).getTime() - Date.now();
       const el = document.getElementById("president-dday");
-      if (diff <= 0) el.innerText = "임기 만료";
-      else el.innerText = `D-${Math.floor(diff / (1000 * 60 * 60 * 24))}일`;
+      if (diff <= 0) {
+        el.innerText = "임기 만료 (선출 필요)";
+      } else {
+        el.innerText = `D-${Math.floor(diff / (1000 * 60 * 60 * 24))}일`;
+      }
     }
     updateCountdown();
     setInterval(updateCountdown, 1000);
