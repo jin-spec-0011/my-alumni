@@ -56,7 +56,7 @@
     <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-4 shadow-sm space-y-3">
       <div class="flex justify-between items-center text-xs">
         <span class="text-amber-300 font-bold flex items-center gap-1">
-          <i class="fa-solid fa-chart-pie"></i> 전 기기 실시간 집계
+          <i class="fa-solid fa-chart-pie"></i> 실시간 지출 합산 집계
         </span>
         <span class="text-slate-300 font-bold text-xs" id="stat-total-grand">총 0원</span>
       </div>
@@ -79,7 +79,7 @@
       <div class="border-b pb-2 flex justify-between items-center">
         <div>
           <h2 class="font-bold text-sm text-slate-900" id="form-title">정산 내역 등록</h2>
-          <p class="text-[11px] text-slate-400">지출 시 타 디바이스에도 실시간 전송됩니다.</p>
+          <p class="text-[11px] text-slate-400">교통비, 식비 등 지출 실비를 등록합니다.</p>
         </div>
         <button id="btn-cancel-edit" class="hidden text-xs text-rose-600 font-bold px-2 py-0.5 border border-rose-200 rounded">취소</button>
       </div>
@@ -87,10 +87,23 @@
       <form id="settlement-form" class="space-y-2.5 text-xs">
         <input type="hidden" id="edit-id" value="">
 
+        <!-- 모임 구분 (연도 선택 탭 기본 탑재: 2021년~2031년) -->
         <div>
           <label class="block font-bold text-slate-700 mb-1">모임 구분 (연도 및 모임 선택)</label>
           <div class="grid grid-cols-2 gap-2">
-            <select id="select-year" class="p-2 border rounded-lg bg-white font-bold text-slate-800"></select>
+            <select id="select-year" class="p-2 border rounded-lg bg-white font-bold text-slate-800">
+              <option value="2021년">2021년</option>
+              <option value="2022년">2022년</option>
+              <option value="2023년">2023년</option>
+              <option value="2024년">2024년</option>
+              <option value="2025년">2025년</option>
+              <option value="2026년" selected>2026년</option>
+              <option value="2027년">2027년</option>
+              <option value="2028년">2028년</option>
+              <option value="2029년">2029년</option>
+              <option value="2030년">2030년</option>
+              <option value="2031년">2031년</option>
+            </select>
             <select id="select-term" class="p-2 border rounded-lg bg-white font-bold text-slate-800">
               <option value="하반기 정기 모임" selected>하반기 정기 모임</option>
               <option value="상반기 정기 모임">상반기 정기 모임</option>
@@ -122,6 +135,7 @@
           <input type="text" id="input-detail" placeholder="예: 교통비 40000원, 식비 4000원" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
         </div>
 
+        <!-- 작업자 확인 (지출자와 자동 연동) -->
         <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex justify-between items-center">
           <div>
             <span class="font-bold text-slate-700">작업자 확인</span>
@@ -137,7 +151,7 @@
         </div>
 
         <button type="submit" id="btn-submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm transition">
-          클라우드 DB 실시간 저장
+          정산 내역 저장
         </button>
       </form>
     </div>
@@ -156,8 +170,16 @@
 
   </main>
 
+  <!-- 안정적인 구글 공식 CDN 임포트 -->
   <script type="module">
-    import { db, doc, setDoc, deleteDoc, collection, onSnapshot } from "./js/firebase.js";
+    import { db } from "./js/firebase.js";
+    import { 
+      doc, 
+      setDoc, 
+      deleteDoc, 
+      collection, 
+      onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     let settlements = [];
 
@@ -169,17 +191,6 @@
       dropdownMenu.classList.toggle("hidden");
     });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
-
-    // 연도 셀렉터 (2021 ~ 2031)
-    const currentYear = 2026;
-    const yearSelect = document.getElementById("select-year");
-    for (let y = currentYear - 5; y <= currentYear + 5; y++) {
-      const opt = document.createElement("option");
-      opt.value = `${y}년`;
-      opt.innerText = `${y}년`;
-      if (y === currentYear) opt.selected = true;
-      yearSelect.appendChild(opt);
-    }
 
     // 지출자 변경 시 작업자 자동 동기화
     const inputName = document.getElementById("input-name");
@@ -266,6 +277,7 @@
         container.appendChild(card);
       });
 
+      // 수정 버튼
       document.querySelectorAll(".btn-edit").forEach(btn => {
         btn.onclick = (e) => {
           const id = e.currentTarget.getAttribute("data-id");
@@ -285,6 +297,7 @@
         };
       });
 
+      // 삭제 버튼
       document.querySelectorAll(".btn-del").forEach(btn => {
         btn.onclick = async (e) => {
           const id = e.currentTarget.getAttribute("data-id");
@@ -295,9 +308,9 @@
 
           try {
             await deleteDoc(doc(db, "settlements", id));
-            alert(`[${deleter}] 삭제 완료되었습니다.`);
+            alert(`[${deleter}] 삭제되었습니다.`);
           } catch(err) {
-            alert(`❌ 삭제 실패: Firestore 규칙을 확인하세요. (${err.message})`);
+            alert(`❌ 삭제 실패: ${err.message}`);
           }
         };
       });
@@ -305,19 +318,23 @@
       updateAggregations();
     }
 
+    // 취소 버튼
     document.getElementById("btn-cancel-edit").onclick = () => {
       document.getElementById("edit-id").value = "";
       document.getElementById("form-title").innerText = "정산 내역 등록";
-      document.getElementById("btn-submit").innerText = "클라우드 DB 실시간 저장";
+      document.getElementById("btn-submit").innerText = "정산 내역 저장";
       document.getElementById("btn-cancel-edit").classList.add("hidden");
       document.getElementById("settlement-form").reset();
-      yearSelect.value = "2026년";
+      document.getElementById("select-year").value = "2026년";
     };
 
+    // 정산 등록 폼 전송
     document.getElementById("settlement-form").onsubmit = async (e) => {
       e.preventDefault();
       const id = document.getElementById("edit-id").value || `set_${Date.now()}`;
-      const period = `${yearSelect.value} ${document.getElementById("select-term").value}`;
+      const year = document.getElementById("select-year").value;
+      const term = document.getElementById("select-term").value;
+      const period = `${year} ${term}`;
       const name = inputName.value;
       const operator = selectOperator.value;
       const now = new Date();
@@ -335,14 +352,14 @@
 
       try {
         await setDoc(doc(db, "settlements", id), newRecord);
-        alert(`🎉 [${operator}] 클라우드에 성공적으로 등록되었습니다. 모든 기기에 즉시 반영됩니다.`);
+        alert(`🎉 [${operator}] 정산 내역이 성공적으로 저장되었습니다!`);
         document.getElementById("btn-cancel-edit").click();
       } catch (err) {
-        alert(`❌ 클라우드 저장 실패! Firebase 보안 규칙을 확인하세요:\n${err.message}`);
+        alert(`❌ 클라우드 저장 실패! Firebase 콘솔에서 규칙을 확인하세요:\n${err.message}`);
       }
     };
 
-    // [핵심] Firestore 실시간 리스너 구독 (onSnapshot)
+    // 실시간 Firestore 리스너 (onSnapshot)
     try {
       onSnapshot(collection(db, "settlements"), (snapshot) => {
         const list = [];
@@ -354,7 +371,6 @@
         console.error("Firestore 구독 에러:", error);
         document.getElementById("sync-badge").className = "text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200";
         document.getElementById("sync-badge").innerText = "⚠️ DB 연결 차단됨";
-        alert("⚠️ Firebase 보안 규칙이 만료되었거나 차단되었습니다. Firebase 콘솔에서 규칙을 확인해 주세요.");
       });
     } catch (e) {
       console.error(e);
