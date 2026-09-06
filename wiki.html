@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>회칙 & 아카이브 - 5인 동창 곗모임</title>
 
-  <!-- PWA 및 모바일 단독 웹앱 설정 -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,7 +17,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 상단 공통 헤더 -->
+  <!-- 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
@@ -33,7 +32,7 @@
       </span>
     </div>
 
-    <!-- 5대 탭 네비게이션 -->
+    <!-- 네비게이션 바 -->
     <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
       <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
         <a href="index.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">대시보드</a>
@@ -83,7 +82,7 @@
           </button>
         </div>
 
-        <!-- 목차 (TOC) -->
+        <!-- 목차 -->
         <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs space-y-1">
           <div class="font-black text-slate-800 flex items-center gap-1 border-b border-slate-200 pb-1 mb-1.5">
             <i class="fa-solid fa-list-ol text-blue-600"></i>
@@ -103,24 +102,24 @@
           </div>
         </div>
 
-        <!-- 동적 렌더링 본문 (들여쓰기 제거 + 어절 단위 줄바꿈) -->
         <div id="wiki-rendered-container" class="space-y-3 text-xs text-slate-800 leading-relaxed pt-1">
           <div class="p-6 text-center text-slate-400">회칙 문서를 불러오는 중입니다...</div>
         </div>
       </div>
     </section>
 
-    <!-- 2. [개정 역사 뷰 (무제한 전체 출력)] -->
+    <!-- 2. [개정 역사 뷰 (무제한 전체 출력 보장)] -->
     <section id="view-logs" class="hidden space-y-3">
       <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
         <div class="border-b pb-2 flex justify-between items-center">
           <div>
             <h3 class="font-bold text-sm text-slate-900">회칙 개정 역사 (전체 기록)</h3>
-            <p class="text-[11px] text-slate-400">수동·자동 변경된 모든 판본이 누적 보존됩니다.</p>
+            <p class="text-[11px] text-slate-400">누적된 모든 변경 로그가 누락 없이 출력됩니다.</p>
           </div>
           <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">전체 로그</span>
         </div>
 
+        <!-- 전체 로그 렌더링 컨테이너 -->
         <div id="revisions-timeline" class="space-y-2 text-xs">
           <div class="p-6 text-center text-slate-400">로그를 동기화 중...</div>
         </div>
@@ -144,7 +143,7 @@
       </div>
     </section>
 
-    <!-- 수동 개정 모달 레이어 -->
+    <!-- 수동 개정 모달 -->
     <div id="manual-edit-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-3">
         <div class="flex justify-between items-center border-b pb-2">
@@ -200,7 +199,7 @@
     });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // 뷰 전환
+    // 탭 전환
     const viewDoc = document.getElementById("view-doc");
     const viewLogs = document.getElementById("view-logs");
     const viewHistory = document.getElementById("view-history");
@@ -230,7 +229,6 @@
 
     let currentFullText = "";
 
-    // [핵심] 들여쓰기 공백 제거 및 어절 단위 줄바꿈(break-keep) 렌더러
     function renderWikiStyle(text) {
       const container = document.getElementById("wiki-rendered-container");
       container.innerHTML = "";
@@ -242,7 +240,6 @@
         const titleLine = lines[0].trim();
         const bodyLines = lines.slice(1);
 
-        // 각 줄 앞뒤의 불필요한 공백을 완전히 제거
         const cleanedBody = bodyLines.map(line => line.trim()).filter(line => line.length > 0).join("\n");
 
         const box = document.createElement("div");
@@ -277,20 +274,23 @@
       console.error(e);
     }
 
-    // 2. 개정 로그(판본 히스토리) 실시간 리스너 (개수 제한 없이 100% 전체 노출)
+    // 2. [핵심] 개정 로그 100% 무제한 실시간 출력 (덮어쓰기 없이 모든 판본 출력)
     try {
       onSnapshot(collection(db, "rule_revisions"), (snapshot) => {
         const container = document.getElementById("revisions-timeline");
         container.innerHTML = "";
         const list = [];
-        snapshot.forEach(d => list.push(d.data()));
 
-        // 판본 번호(r4, r3, r2, r1...) 및 날짜 기준 최신순 완전 정렬
+        snapshot.forEach(d => {
+          list.push({ id: d.id, ...d.data() });
+        });
+
+        // 판본 숫자(r1, r2, r3, r4...) 역순으로 정렬
         list.sort((a, b) => {
-          const numA = parseInt((a.rev || "r0").replace(/[^0-9]/g, ''), 10) || 0;
-          const numB = parseInt((b.rev || "r0").replace(/[^0-9]/g, ''), 10) || 0;
+          const numA = parseInt(String(a.rev || "").replace(/[^0-9]/g, ''), 10) || 0;
+          const numB = parseInt(String(b.rev || "").replace(/[^0-9]/g, ''), 10) || 0;
           if (numA !== numB) return numB - numA;
-          return (b.date || "").localeCompare(a.date || "");
+          return String(b.date || "").localeCompare(String(a.date || ""));
         });
 
         document.getElementById("log-count-pill").innerText = list.length;
@@ -300,17 +300,17 @@
           return;
         }
 
-        // 제한(slice) 없이 전체 목록 렌더링
+        // 갯수 제한(slice) 없이 전체 목록 100% 렌더링
         list.forEach((r, idx) => {
           const card = document.createElement("div");
           card.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-left";
           card.innerHTML = `
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-1.5">
-                <span class="font-black px-2 py-0.5 rounded text-[10px] ${idx === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}">${r.rev}</span>
-                <strong class="text-slate-800 text-xs">${r.author}</strong>
+                <span class="font-black px-2 py-0.5 rounded text-[10px] ${idx === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}">${r.rev || 'rev'}</span>
+                <strong class="text-slate-800 text-xs">${r.author || '회원'}</strong>
               </div>
-              <span class="text-[10px] text-slate-400 font-mono">${r.date}</span>
+              <span class="text-[10px] text-slate-400 font-mono">${r.date || '-'}</span>
             </div>
             <p class="text-[11px] text-slate-600 pl-0.5 leading-relaxed break-keep">${r.summary || '사유 없음'}</p>
           `;
@@ -411,6 +411,7 @@
     };
     document.getElementById("btn-close-manual-edit").onclick = () => editModal.classList.add("hidden");
 
+    // [핵심] 수동 편집 시에도 고유 ID로 덮어쓰기 방지
     document.getElementById("manual-edit-form").onsubmit = async (e) => {
       e.preventDefault();
       const newContent = editTextarea.value.trim();
@@ -418,9 +419,16 @@
       const author = document.getElementById("select-edit-author").value;
 
       const revSnap = await getDocs(collection(db, "rule_revisions"));
-      const nextRev = `r${revSnap.size + 1}`;
+      let maxNum = 0;
+      revSnap.forEach(d => {
+        const num = parseInt(String(d.data().rev || "").replace(/[^0-9]/g, ''), 10) || 0;
+        if (num > maxNum) maxNum = num;
+      });
+      const nextRev = `r${maxNum + 1}`;
+
       const now = new Date();
       const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const uniqueId = `rev_${Date.now()}`;
 
       const newRec = { rev: nextRev, date: dateStr, author: author, summary: summary };
 
@@ -433,9 +441,10 @@
           rev: nextRev,
           summary: summary
         });
-        await setDoc(doc(db, "rule_revisions", nextRev), newRec);
+        // 덮어쓰기 방지 고유 ID 적용
+        await setDoc(doc(db, "rule_revisions", uniqueId), newRec);
 
-        alert(`🎉 회칙 개정안이 [${nextRev}] 판본으로 저장되었습니다.`);
+        alert(`🎉 회칙 개정안이 [${nextRev}] 판본으로 누적 저장되었습니다.`);
         editModal.classList.add("hidden");
         document.getElementById("manual-edit-form").reset();
       } catch (err) {
