@@ -370,6 +370,7 @@ ${memberLines.join("\n")}
 
      
           // 4. 역대 선출 기록 저장
+                // 4. 역대 선출 기록 저장
         await setDoc(doc(db, "election_history", `elec_${Date.now()}`), {
           winner: pendingWinner.name,
           confirmedBy: operator,
@@ -378,6 +379,7 @@ ${memberLines.join("\n")}
         });
 
         alert(`🎉 [공식 확정] ${pendingWinner.name} 회장이 차기 회장으로 공식 취임했습니다!...`);
+
 
 
         alert(`🎉 [공식 확정] ${pendingWinner.name} 회장이 차기 회장으로 공식 취임했습니다!\n\n• 대시보드: CURRENT LEADER가 [${pendingWinner.name} 회장]으로 교체되었습니다.\n• 5인 현황: 회장 뱃지가 [${pendingWinner.name}]에게 이동했습니다.\n• 회칙(제2조, 제4조): 새 판본(${nextRev})으로 자동 갱신되었습니다.`);
