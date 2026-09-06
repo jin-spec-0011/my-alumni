@@ -9,20 +9,20 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 공통 상단 헤더 -->
+  <!-- 공통 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
         <span class="text-xl">📸</span>
         <div>
           <h1 class="font-black text-base text-slate-900 leading-tight">과거 여행 & 모임</h1>
-          <span class="text-[10px] text-slate-400 font-medium">자유 등록 & 사진 아카이브 (Since 2019)</span>
+          <span class="text-[10px] text-slate-400 font-medium">동창 추억 아카이브 (Since 2019)</span>
         </div>
       </div>
-      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border">자율 수정 모드</span>
+      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">자율 참여 모드</span>
     </div>
 
-    <!-- 5대 메인 탭 + 더보기 콤보박스 -->
+    <!-- 5대 메인 탭 + 부가기능 콤보박스 -->
     <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
       <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
         <a href="index.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">대시보드</a>
@@ -36,7 +36,7 @@
         <button id="btn-dropdown" type="button" class="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg whitespace-nowrap flex items-center gap-1 border border-slate-200">
           <span>더보기 ▾</span>
         </button>
-        <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
+        <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
           <a href="gathering.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
             <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i><span>모임 & 예약</span>
           </a>
@@ -50,12 +50,12 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 여행/모임 등록 및 수정 폼 (누구나 가능) -->
+    <!-- 여행/모임 등록 & 수정 폼 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
         <div>
-          <h2 class="font-bold text-sm text-slate-900" id="form-title">새 여행/모임 추억 등록</h2>
-          <p class="text-[11px] text-slate-400">누구나 등록·수정 가능 (작업자 실명/시간 기록)</p>
+          <h2 class="font-bold text-sm text-slate-900" id="form-title">여행 / 모임 추억 등록</h2>
+          <p class="text-[11px] text-slate-400">누구나 등록 및 수정 가능 (작업자 실명/시간 자동 기록)</p>
         </div>
         <button id="btn-cancel-edit" class="hidden text-xs text-rose-600 font-bold px-2 py-0.5 border border-rose-200 rounded">취소</button>
       </div>
@@ -66,32 +66,32 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-bold text-slate-700 mb-1">여행지 / 장소</label>
-            <input type="text" id="input-place" placeholder="예: 제주 서귀포, 속초 해변" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <input type="text" id="input-place" placeholder="예: 충북 한우 명가, 제주 여행" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">날짜</label>
-            <input type="date" id="input-date" value="2026-09-06" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <input type="date" id="input-date" value="2026-09-07" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
           </div>
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">메모 / 후기</label>
-          <textarea id="input-memo" rows="2" placeholder="모임 후기, 맛집 평가, 에피소드를 적어주세요." class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+          <textarea id="input-memo" rows="2" placeholder="모임 이야기, 식당 후기 등을 자유롭게 작성하세요." class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
         </div>
 
-        <!-- 사진 첨부 (자동 압축 기능) -->
+        <!-- 사진 첨부 (자동 400px 압축) -->
         <div>
-          <label class="block font-bold text-slate-700 mb-1">사진 첨부 (자동 리사이즈 압축)</label>
-          <input type="file" id="input-photo" accept="image/*" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+          <label class="block font-bold text-slate-700 mb-1">사진 첨부 (자동 최적화 압축)</label>
+          <input type="file" id="input-photo" accept="image/*" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700">
           <div id="photo-preview-box" class="hidden mt-2 relative inline-block">
             <img id="photo-preview" class="w-24 h-24 object-cover rounded-lg border">
             <button type="button" id="btn-del-photo" class="absolute -top-1.5 -right-1.5 bg-rose-600 text-white rounded-full w-5 h-5 text-[10px] flex items-center justify-center">✕</button>
           </div>
         </div>
 
-        <!-- 작성자 선택 (실명 타임스탬프용) -->
+        <!-- 작업자 본인 선택 -->
         <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex justify-between items-center">
-          <span class="font-bold text-slate-700">작업자 본인 선택</span>
+          <span class="font-bold text-slate-700">작업자 (본인 이름)</span>
           <select id="select-author" class="p-1.5 border rounded bg-white font-bold text-slate-800">
             <option value="김진세" selected>김진세</option>
             <option value="송환오">송환오</option>
@@ -119,60 +119,45 @@
       </div>
     </div>
 
-    <!-- 과거 모임 카드 목록 -->
+    <!-- 모임 카드 목록 -->
     <div id="history-cards-container" class="space-y-3 text-xs"></div>
 
   </main>
 
   <script type="module">
-    import { db, doc, setDoc, getDocs, collection, deleteDoc } from "./js/firebase.js";
+    import { db } from "./js/firebase.js";
+    import { doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     let historyList = [];
     let currentYearFilter = "all";
     let compressedPhotoBase64 = "";
 
-    const form = document.getElementById("history-form");
-    const editIdInput = document.getElementById("edit-id");
-    const inputPlace = document.getElementById("input-place");
-    const inputDate = document.getElementById("input-date");
-    const inputMemo = document.getElementById("input-memo");
-    const inputPhoto = document.getElementById("input-photo");
-    const selectAuthor = document.getElementById("select-author");
-    const photoPreviewBox = document.getElementById("photo-preview-box");
-    const photoPreview = document.getElementById("photo-preview");
-    const btnCancelEdit = document.getElementById("btn-cancel-edit");
-    const formTitle = document.getElementById("form-title");
-    const btnSubmit = document.getElementById("btn-submit");
-
-    // 드롭다운 토글
+    // 콤보박스 클릭 이벤트
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
-    btnDropdown.onclick = (e) => { e.stopPropagation(); dropdownMenu.classList.toggle("hidden"); };
+    btnDropdown.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle("hidden");
+    });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // 이미지 500px Canvas 압축 (Firestore 용량 최적화)
-    inputPhoto.addEventListener("change", (e) => {
+    // 사진 400px 압축
+    document.getElementById("input-photo").addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = (event) => {
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement("canvas");
-          const maxWidth = 500;
           let w = img.width, h = img.height;
-          if (w > maxWidth) {
-            h = Math.round((h * maxWidth) / w);
-            w = maxWidth;
-          }
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, w, h);
-          compressedPhotoBase64 = canvas.toDataURL("image/jpeg", 0.6); // 작은 사이즈 압축
-          photoPreview.src = compressedPhotoBase64;
-          photoPreviewBox.classList.remove("hidden");
+          const max = 400;
+          if (w > max) { h = Math.round((h * max) / w); w = max; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          compressedPhotoBase64 = canvas.toDataURL("image/jpeg", 0.6);
+          document.getElementById("photo-preview").src = compressedPhotoBase64;
+          document.getElementById("photo-preview-box").classList.remove("hidden");
         };
         img.src = event.target.result;
       };
@@ -181,8 +166,8 @@
 
     document.getElementById("btn-del-photo").onclick = () => {
       compressedPhotoBase64 = "";
-      inputPhoto.value = "";
-      photoPreviewBox.classList.add("hidden");
+      document.getElementById("input-photo").value = "";
+      document.getElementById("photo-preview-box").classList.add("hidden");
     };
 
     function renderCards() {
@@ -191,7 +176,7 @@
 
       const filtered = (currentYearFilter === "all")
         ? historyList
-        : historyList.filter(item => item.date.startsWith(currentYearFilter));
+        : historyList.filter(item => String(item.date).startsWith(currentYearFilter));
 
       document.getElementById("record-count").innerText = `총 ${filtered.length}건`;
 
@@ -223,41 +208,43 @@
           </div>
 
           <div class="text-[10px] text-slate-400 pt-1 border-t flex justify-between">
-            <span>기록: <strong>${item.author || '회원'}</strong></span>
+            <span>기록자: <strong>${item.author || '회원'}</strong></span>
             <span>${item.updatedAt || item.date}</span>
           </div>
         `;
         container.appendChild(card);
       });
 
-      // 수정 클릭 이벤트
+      // 수정 이벤트
       document.querySelectorAll(".btn-edit").forEach(btn => {
         btn.onclick = (e) => {
           const id = e.currentTarget.getAttribute("data-id");
           const target = historyList.find(h => h.id === id);
           if (!target) return;
 
-          editIdInput.value = target.id;
-          inputPlace.value = target.place;
-          inputDate.value = target.date;
-          inputMemo.value = target.memo || "";
+          document.getElementById("edit-id").value = target.id;
+          document.getElementById("input-place").value = target.place;
+          document.getElementById("input-date").value = target.date;
+          document.getElementById("input-memo").value = target.memo || "";
+          document.getElementById("select-author").value = target.author || "김진세";
+
           if (target.photo) {
             compressedPhotoBase64 = target.photo;
-            photoPreview.src = target.photo;
-            photoPreviewBox.classList.remove("hidden");
+            document.getElementById("photo-preview").src = target.photo;
+            document.getElementById("photo-preview-box").classList.remove("hidden");
           } else {
             compressedPhotoBase64 = "";
-            photoPreviewBox.classList.add("hidden");
+            document.getElementById("photo-preview-box").classList.add("hidden");
           }
 
-          formTitle.innerText = "여행/모임 기록 수정";
-          btnSubmit.innerText = "수정 완료 (기록자 반영)";
-          btnCancelEdit.classList.remove("hidden");
+          document.getElementById("form-title").innerText = "추억 기록 수정";
+          document.getElementById("btn-submit").innerText = "수정 완료 (이력 갱신)";
+          document.getElementById("btn-cancel-edit").classList.remove("hidden");
           window.scrollTo({ top: 0, behavior: 'smooth' });
         };
       });
 
-      // 삭제 클릭 이벤트 (누가 삭제했는지 기록)
+      // 삭제 이벤트
       document.querySelectorAll(".btn-del").forEach(btn => {
         btn.onclick = async (e) => {
           const id = e.currentTarget.getAttribute("data-id");
@@ -267,40 +254,41 @@
           if (!confirm(`[${deleter}] 님이 이 기록을 영구 삭제하시겠습니까?`)) return;
 
           historyList = historyList.filter(h => h.id !== id);
+          localStorage.setItem("alumni_history", JSON.stringify(historyList));
           renderCards();
 
           try {
             await deleteDoc(doc(db, "gatherings_history", id));
-            alert(`[${deleter}] 삭제 완료되었습니다.`);
           } catch (err) {
-            console.warn(err);
+            console.warn("DB 삭제 에러(로컬 삭제 완료):", err);
           }
+          alert(`[${deleter}] 기록이 삭제되었습니다.`);
         };
       });
     }
 
-    btnCancelEdit.onclick = () => {
-      editIdInput.value = "";
-      formTitle.innerText = "새 여행/모임 추억 등록";
-      btnSubmit.innerText = "추억 기록 저장";
-      btnCancelEdit.classList.add("hidden");
-      form.reset();
+    document.getElementById("btn-cancel-edit").onclick = () => {
+      document.getElementById("edit-id").value = "";
+      document.getElementById("form-title").innerText = "여행 / 모임 추억 등록";
+      document.getElementById("btn-submit").innerText = "추억 기록 저장";
+      document.getElementById("btn-cancel-edit").classList.add("hidden");
+      document.getElementById("history-form").reset();
       compressedPhotoBase64 = "";
-      photoPreviewBox.classList.add("hidden");
+      document.getElementById("photo-preview-box").classList.add("hidden");
     };
 
-    form.onsubmit = async (e) => {
+    document.getElementById("history-form").onsubmit = async (e) => {
       e.preventDefault();
-      const id = editIdInput.value || `hist_${Date.now()}`;
-      const author = selectAuthor.value;
+      const id = document.getElementById("edit-id").value || `hist_${Date.now()}`;
+      const author = document.getElementById("select-author").value;
       const now = new Date();
       const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
       const newRecord = {
         id,
-        place: inputPlace.value.trim(),
-        date: inputDate.value,
-        memo: inputMemo.value.trim(),
+        place: document.getElementById("input-place").value.trim(),
+        date: document.getElementById("input-date").value,
+        memo: document.getElementById("input-memo").value.trim(),
         photo: compressedPhotoBase64,
         author: author,
         updatedAt: timeStr
@@ -311,18 +299,18 @@
       else historyList.unshift(newRecord);
 
       historyList.sort((a, b) => b.date.localeCompare(a.date));
+      localStorage.setItem("alumni_history", JSON.stringify(historyList));
       renderCards();
-      btnCancelEdit.click();
+      document.getElementById("btn-cancel-edit").click();
 
       try {
         await setDoc(doc(db, "gatherings_history", id), newRecord);
-        alert(`🎉 [${author}] 기록이 성공적으로 저장되었습니다.`);
       } catch (err) {
-        console.warn(err);
+        console.warn("DB 저장 에러(로컬 저장 완료):", err);
       }
+      alert(`🎉 [${author}] 추억 기록이 저장되었습니다.`);
     };
 
-    // 연도 필터 버튼
     document.querySelectorAll(".year-btn").forEach(btn => {
       btn.onclick = (e) => {
         document.querySelectorAll(".year-btn").forEach(b => b.className = "year-btn px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold");
@@ -333,6 +321,11 @@
     });
 
     async function loadData() {
+      const local = localStorage.getItem("alumni_history");
+      if (local) {
+        try { historyList = JSON.parse(local); renderCards(); } catch(e){}
+      }
+
       try {
         const snap = await getDocs(collection(db, "gatherings_history"));
         if (!snap.empty) {
@@ -340,18 +333,20 @@
           snap.forEach(d => list.push(d.data()));
           list.sort((a, b) => b.date.localeCompare(a.date));
           historyList = list;
-        } else {
-          // 최초 시드
+          localStorage.setItem("alumni_history", JSON.stringify(list));
+        } else if (!local) {
           historyList = [
-            { id: "hist_1", place: "충북 참숯 한우마을", date: "2026-05-16", memo: "아이들과 단독 룸에서 상반기 모임 완료", author: "송환오", updatedAt: "2026-05-16 20:00" },
-            { id: "hist_2", place: "오창 호수공원 일식 다이닝", date: "2025-12-13", memo: "연말 송년회 및 가족 동반", author: "김진세", updatedAt: "2025-12-13 19:30" },
+            { id: "hist_1", place: "충북 한우 명가", date: "2026-05-16", memo: "어른 8명 아이 3명 상반기 정기 모임", author: "송환오", updatedAt: "2026-05-16 20:00" },
+            { id: "hist_2", place: "오창 호수공원 일식 다이닝", date: "2025-12-13", memo: "연말 정기 결산 가족 동반", author: "김진세", updatedAt: "2025-12-13 19:30" },
             { id: "hist_3", place: "모교 앞 고깃집 본점", date: "2019-09-07", memo: "5인 동창 곗모임 최초 결성식", author: "장우석", updatedAt: "2019-09-07 18:00" }
           ];
           for (const item of historyList) {
             await setDoc(doc(db, "gatherings_history", item.id), item);
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn("DB 로드 생략(로컬 모드 유지):", e);
+      }
       renderCards();
     }
 
