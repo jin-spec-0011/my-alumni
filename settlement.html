@@ -9,20 +9,20 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 공통 상단 헤더 -->
+  <!-- 공통 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
         <span class="text-xl">🧾</span>
         <div>
           <h1 class="font-black text-base text-slate-900 leading-tight">모임 개별 정산소</h1>
-          <span class="text-[10px] text-slate-400 font-medium">모임별 & 개인별 지출 집계</span>
+          <span class="text-[10px] text-slate-400 font-medium">모임별 & 개인별 실비 정산</span>
         </div>
       </div>
-      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border">자율 수정 모드</span>
+      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">자율 참여 모드</span>
     </div>
 
-    <!-- 5대 메인 탭 + 더보기 콤보박스 -->
+    <!-- 5대 메인 탭 + 부가기능 콤보박스 -->
     <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
       <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
         <a href="index.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">대시보드</a>
@@ -36,7 +36,7 @@
         <button id="btn-dropdown" type="button" class="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg whitespace-nowrap flex items-center gap-1 border border-slate-200">
           <span>더보기 ▾</span>
         </button>
-        <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
+        <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
           <a href="gathering.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
             <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i><span>모임 & 예약</span>
           </a>
@@ -50,53 +50,61 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- [핵심 기능] 모임 구분 & 지출자별 실시간 합산 대시보드 -->
+    <!-- 실시간 합산 대시보드 (모임구분별 & 인원별) -->
     <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-4 shadow-sm space-y-3">
       <div class="flex justify-between items-center text-xs">
         <span class="text-amber-300 font-bold flex items-center gap-1">
           <i class="fa-solid fa-chart-pie"></i> 실시간 지출 합산 집계
         </span>
-        <span class="text-slate-400 text-[11px]" id="stat-total-grand">총 합계: 0원</span>
+        <span class="text-slate-300 font-bold text-xs" id="stat-total-grand">총 0원</span>
       </div>
 
       <!-- 1. 지출자 본인별 합산 그리드 -->
       <div class="space-y-1">
-        <span class="text-[11px] text-slate-300 font-semibold block">👥 회원별 청구 누적</span>
-        <div class="grid grid-cols-5 gap-1 text-center" id="stat-by-person">
-          <!-- JS 렌더링 -->
-        </div>
+        <span class="text-[10px] text-slate-400 block font-semibold">👥 5인 회원별 지출 합산</span>
+        <div class="grid grid-cols-5 gap-1 text-center" id="stat-by-person"></div>
       </div>
 
       <!-- 2. 모임 구분별 합산 바 -->
       <div class="pt-2 border-t border-white/10 space-y-1">
-        <span class="text-[11px] text-slate-300 font-semibold block">📅 모임 구분별 합계</span>
-        <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs" id="stat-by-period">
-          <!-- JS 렌더링 -->
-        </div>
+        <span class="text-[10px] text-slate-400 block font-semibold">📅 모임 구분별 합계</span>
+        <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs" id="stat-by-period"></div>
       </div>
     </div>
 
-    <!-- 정산 등록 / 수정 카드 -->
+    <!-- 정산 등록 / 수정 폼 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
         <div>
           <h2 class="font-bold text-sm text-slate-900" id="form-title">정산 내역 등록</h2>
-          <p class="text-[11px] text-slate-400">지출 실비를 입력하면 상단에 자동 합산됩니다.</p>
+          <p class="text-[11px] text-slate-400">교통비, 식비 등 지출 실비를 등록합니다.</p>
         </div>
-        <button id="btn-cancel-edit" class="hidden text-xs text-rose-600 font-bold px-2 py-0.5 border border-rose-200 rounded">수정 취소</button>
+        <button id="btn-cancel-edit" class="hidden text-xs text-rose-600 font-bold px-2 py-0.5 border border-rose-200 rounded">취소</button>
       </div>
 
       <form id="settlement-form" class="space-y-2.5 text-xs">
         <input type="hidden" id="edit-id" value="">
 
+        <!-- 모임 구분 (±5년 연도 선택 + 모임 종류) -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">모임 구분 (연도 및 모임 선택)</label>
+          <div class="grid grid-cols-2 gap-2">
+            <select id="select-year" class="p-2 border rounded-lg bg-white font-bold text-slate-800">
+              <!-- JS로 2021~2031 자동 생성 (2026 기본 선택) -->
+            </select>
+            <select id="select-term" class="p-2 border rounded-lg bg-white font-bold text-slate-800">
+              <option value="하반기 정기 모임" selected>하반기 정기 모임</option>
+              <option value="상반기 정기 모임">상반기 정기 모임</option>
+              <option value="임시 번개 모임">임시 번개 모임</option>
+              <option value="가족 나들이 여행">가족 나들이 여행</option>
+            </select>
+          </div>
+        </div>
+
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">모임 구분</label>
-            <input type="text" id="input-period" placeholder="예: 26년 하반기, 26년 9월모임" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-          </div>
-          <div>
             <label class="block font-bold text-slate-700 mb-1">지출자 본인</label>
-            <select id="input-name" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white font-bold">
+            <select id="input-name" class="w-full p-2 border rounded-lg bg-white font-bold text-slate-800">
               <option value="김진세" selected>김진세</option>
               <option value="송환오">송환오</option>
               <option value="장우석">장우석</option>
@@ -104,11 +112,10 @@
               <option value="이해웅">이해웅</option>
             </select>
           </div>
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">금액 (원)</label>
-          <input type="number" id="input-amount" placeholder="예: 44000" step="100" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 font-bold text-sm">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">금액 (원)</label>
+            <input type="number" id="input-amount" placeholder="예: 44000" step="100" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 font-bold">
+          </div>
         </div>
 
         <div>
@@ -116,10 +123,13 @@
           <input type="text" id="input-detail" placeholder="예: 교통비 40000원, 식비 4000원" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
         </div>
 
-        <!-- 수정자/등록자 선택 (타임스탬프) -->
-        <div class="p-2.5 bg-slate-50 border rounded-lg flex justify-between items-center">
-          <span class="font-bold text-slate-700">작업자 확인</span>
-          <select id="select-operator" class="p-1 border rounded bg-white font-bold text-slate-800">
+        <!-- 작업자 확인 (지출자 선택 시 자동 연동) -->
+        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex justify-between items-center">
+          <div>
+            <span class="font-bold text-slate-700">작업자 확인</span>
+            <span class="text-[10px] text-slate-400 block">지출자와 자동 동기화</span>
+          </div>
+          <select id="select-operator" class="p-1.5 border rounded bg-white font-bold text-slate-800">
             <option value="김진세" selected>김진세</option>
             <option value="송환오">송환오</option>
             <option value="장우석">장우석</option>
@@ -134,7 +144,7 @@
       </form>
     </div>
 
-    <!-- 정산 내역 목록 리스트 -->
+    <!-- 정산 목록 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
         <h3 class="font-bold text-sm text-slate-900">전체 정산 목록</h3>
@@ -147,28 +157,39 @@
   </main>
 
   <script type="module">
-    import { db, doc, setDoc, getDocs, collection, deleteDoc } from "./js/firebase.js";
+    import { db } from "./js/firebase.js";
+    import { doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     let settlements = [];
 
-    const form = document.getElementById("settlement-form");
-    const editIdInput = document.getElementById("edit-id");
-    const inputPeriod = document.getElementById("input-period");
-    const inputName = document.getElementById("input-name");
-    const inputAmount = document.getElementById("input-amount");
-    const inputDetail = document.getElementById("input-detail");
-    const selectOperator = document.getElementById("select-operator");
-    const formTitle = document.getElementById("form-title");
-    const btnSubmit = document.getElementById("btn-submit");
-    const btnCancelEdit = document.getElementById("btn-cancel-edit");
-
-    // 드롭다운 제어
+    // 콤보박스 클릭
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
-    btnDropdown.onclick = (e) => { e.stopPropagation(); dropdownMenu.classList.toggle("hidden"); };
+    btnDropdown.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle("hidden");
+    });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // 상단 집계 통계 업데이트
+    // 모임구분 연도 생성 (현재 2026년 기준 앞뒤 5년: 2021 ~ 2031)
+    const currentYear = 2026;
+    const yearSelect = document.getElementById("select-year");
+    for (let y = currentYear - 5; y <= currentYear + 5; y++) {
+      const opt = document.createElement("option");
+      opt.value = `${y}년`;
+      opt.innerText = `${y}년`;
+      if (y === currentYear) opt.selected = true;
+      yearSelect.appendChild(opt);
+    }
+
+    // 지출자 본인 선택 시 작업자 확인 자동 연동
+    const inputName = document.getElementById("input-name");
+    const selectOperator = document.getElementById("select-operator");
+    inputName.addEventListener("change", () => {
+      selectOperator.value = inputName.value;
+    });
+
+    // 실시간 합산 통계 집계
     function updateAggregations() {
       let grandTotal = 0;
       const byPerson = { "김진세": 0, "송환오": 0, "장우석": 0, "김정수": 0, "이해웅": 0 };
@@ -177,21 +198,17 @@
       settlements.forEach(item => {
         const amt = Number(item.amount) || 0;
         grandTotal += amt;
-
-        if (byPerson[item.name] !== undefined) {
-          byPerson[item.name] += amt;
-        } else {
-          byPerson[item.name] = amt;
-        }
+        if (byPerson[item.name] !== undefined) byPerson[item.name] += amt;
+        else byPerson[item.name] = amt;
 
         byPeriod[item.period] = (byPeriod[item.period] || 0) + amt;
       });
 
-      document.getElementById("stat-total-grand").innerText = `총 합계: ${grandTotal.toLocaleString()}원`;
+      document.getElementById("stat-total-grand").innerText = `총 ${grandTotal.toLocaleString()}원`;
 
-      // 인원별 합산 렌더링
-      const personContainer = document.getElementById("stat-by-person");
-      personContainer.innerHTML = "";
+      // 회원별 합산 렌더링
+      const personBox = document.getElementById("stat-by-person");
+      personBox.innerHTML = "";
       Object.keys(byPerson).forEach(name => {
         const div = document.createElement("div");
         div.className = "bg-white/10 p-1.5 rounded-lg";
@@ -199,17 +216,17 @@
           <div class="text-[10px] text-slate-300 font-bold">${name}</div>
           <div class="text-[11px] font-black text-amber-300">${byPerson[name].toLocaleString()}</div>
         `;
-        personContainer.appendChild(div);
+        personBox.appendChild(div);
       });
 
       // 모임 구분별 합산 렌더링
-      const periodContainer = document.getElementById("stat-by-period");
-      periodContainer.innerHTML = "";
+      const periodBox = document.getElementById("stat-by-period");
+      periodBox.innerHTML = "";
       Object.keys(byPeriod).forEach(p => {
-        const span = document.createElement("div");
-        span.className = "bg-white/10 px-2 py-1 rounded text-[11px] whitespace-nowrap";
-        span.innerHTML = `<strong>${p}:</strong> <span class="text-emerald-400 font-black">${byPeriod[p].toLocaleString()}원</span>`;
-        periodContainer.appendChild(span);
+        const div = document.createElement("div");
+        div.className = "bg-white/10 px-2 py-1 rounded text-[11px] whitespace-nowrap";
+        div.innerHTML = `<strong>${p}:</strong> <span class="text-emerald-400 font-black">${byPeriod[p].toLocaleString()}원</span>`;
+        periodBox.appendChild(div);
       });
     }
 
@@ -242,7 +259,7 @@
 
           <div class="flex justify-between items-center text-xs pt-1">
             <span class="text-slate-700 font-medium">${item.detail}</span>
-            <span class="font-black text-slate-900 text-sm text-emerald-700">${Number(item.amount).toLocaleString()}원</span>
+            <span class="font-black text-emerald-700 text-sm">${Number(item.amount).toLocaleString()}원</span>
           </div>
 
           <div class="text-[10px] text-slate-400 pt-1 border-t flex justify-between">
@@ -253,71 +270,75 @@
         container.appendChild(card);
       });
 
-      // 수정 이벤트
+      // 수정
       document.querySelectorAll(".btn-edit").forEach(btn => {
         btn.onclick = (e) => {
           const id = e.currentTarget.getAttribute("data-id");
           const target = settlements.find(s => s.id === id);
           if (!target) return;
 
-          editIdInput.value = target.id;
-          inputPeriod.value = target.period;
+          document.getElementById("edit-id").value = target.id;
           inputName.value = target.name;
-          inputAmount.value = target.amount;
-          inputDetail.value = target.detail;
+          selectOperator.value = target.operator || target.name;
+          document.getElementById("input-amount").value = target.amount;
+          document.getElementById("input-detail").value = target.detail;
 
-          formTitle.innerText = "정산 내역 수정";
-          btnSubmit.innerText = "수정 완료 (이력 갱신)";
-          btnCancelEdit.classList.remove("hidden");
+          document.getElementById("form-title").innerText = "정산 내역 수정";
+          document.getElementById("btn-submit").innerText = "수정 완료 (이력 갱신)";
+          document.getElementById("btn-cancel-edit").classList.remove("hidden");
           window.scrollTo({ top: 0, behavior: 'smooth' });
         };
       });
 
-      // 삭제 이벤트 (누가 삭제했는지 기록)
+      // 삭제
       document.querySelectorAll(".btn-del").forEach(btn => {
         btn.onclick = async (e) => {
           const id = e.currentTarget.getAttribute("data-id");
           const deleter = prompt("삭제자 본인 이름을 입력하세요 (김진세, 송환오, 장우석, 김정수, 이해웅):");
           if (!deleter) return;
 
-          if (!confirm(`[${deleter}] 님이 이 정산 건을 영구 삭제하시겠습니까?`)) return;
+          if (!confirm(`[${deleter}] 님이 이 정산 내역을 삭제하시겠습니까?`)) return;
 
           settlements = settlements.filter(s => s.id !== id);
+          localStorage.setItem("alumni_settlements", JSON.stringify(settlements));
           renderList();
 
           try {
             await deleteDoc(doc(db, "settlements", id));
-            alert(`[${deleter}] 정산 내역이 삭제되었습니다.`);
-          } catch (err) {
-            console.warn(err);
+          } catch(err) {
+            console.warn("DB 삭제 에러(로컬 삭제 완료):", err);
           }
+          alert(`[${deleter}] 삭제되었습니다.`);
         };
       });
 
       updateAggregations();
     }
 
-    btnCancelEdit.onclick = () => {
-      editIdInput.value = "";
-      formTitle.innerText = "정산 내역 등록";
-      btnSubmit.innerText = "정산 내역 저장";
-      btnCancelEdit.classList.add("hidden");
-      form.reset();
+    document.getElementById("btn-cancel-edit").onclick = () => {
+      document.getElementById("edit-id").value = "";
+      document.getElementById("form-title").innerText = "정산 내역 등록";
+      document.getElementById("btn-submit").innerText = "정산 내역 저장";
+      document.getElementById("btn-cancel-edit").classList.add("hidden");
+      document.getElementById("settlement-form").reset();
+      yearSelect.value = "2026년";
     };
 
-    form.onsubmit = async (e) => {
+    document.getElementById("settlement-form").onsubmit = async (e) => {
       e.preventDefault();
-      const id = editIdInput.value || `set_${Date.now()}`;
+      const id = document.getElementById("edit-id").value || `set_${Date.now()}`;
+      const period = `${yearSelect.value} ${document.getElementById("select-term").value}`;
+      const name = inputName.value;
       const operator = selectOperator.value;
       const now = new Date();
       const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
       const newRecord = {
         id,
-        period: inputPeriod.value.trim(),
-        name: inputName.value,
-        amount: parseInt(inputAmount.value, 10) || 0,
-        detail: inputDetail.value.trim(),
+        period: period,
+        name: name,
+        amount: parseInt(document.getElementById("input-amount").value, 10) || 0,
+        detail: document.getElementById("input-detail").value.trim(),
         operator: operator,
         updatedAt: timeStr
       };
@@ -326,33 +347,40 @@
       if (idx > -1) settlements[idx] = newRecord;
       else settlements.unshift(newRecord);
 
+      localStorage.setItem("alumni_settlements", JSON.stringify(settlements));
       renderList();
-      btnCancelEdit.click();
+      document.getElementById("btn-cancel-edit").click();
 
       try {
         await setDoc(doc(db, "settlements", id), newRecord);
-        alert(`🎉 [${operator}] 정산 저장이 완료되었습니다.`);
       } catch (err) {
-        console.warn(err);
+        console.warn("DB 저장 에러(로컬 저장 완료):", err);
       }
+      alert(`🎉 [${operator}] 정산이 저장되었습니다.`);
     };
 
     async function loadData() {
+      const local = localStorage.getItem("alumni_settlements");
+      if (local) {
+        try { settlements = JSON.parse(local); renderList(); } catch(e){}
+      }
+
       try {
         const snap = await getDocs(collection(db, "settlements"));
         if (!snap.empty) {
           const list = [];
           snap.forEach(d => list.push(d.data()));
           settlements = list;
-        } else {
+          localStorage.setItem("alumni_settlements", JSON.stringify(list));
+        } else if (!local) {
           settlements = [
-            { id: "set_init_1", period: "26년 하반기", name: "김진세", amount: 44000, detail: "교통비 40000원, 식비 4000원", operator: "김진세", updatedAt: "2026-09-06 21:00" }
+            { id: "set_init_1", period: "2026년 하반기 정기 모임", name: "김진세", amount: 44000, detail: "교통비 40000원, 식비 4000원", operator: "김진세", updatedAt: "2026-09-06 21:00" }
           ];
           for (const item of settlements) {
             await setDoc(doc(db, "settlements", item.id), item);
           }
         }
-      } catch (e) {}
+      } catch(e){}
       renderList();
     }
 
