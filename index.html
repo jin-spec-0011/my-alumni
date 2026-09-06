@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>5인 동창 곗모임 대시보드</title>
+  <title>5인 동창 곗모임</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome Icons -->
@@ -11,7 +11,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 모바일 상단 네비게이션 헤더 -->
+  <!-- 모바일 최적화 상단 네비게이션 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
@@ -22,238 +22,283 @@
         </div>
       </div>
 
-      <!-- 접속자 스위처 (관리자: 김진세) -->
-      <select id="current-user-select" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 font-semibold text-slate-700">
-        <option value="user_kim_js" selected>⚙️ 김진세 (관리자)</option>
-        <option value="user_song">👑 송환오 (회장)</option>
-        <option value="user_jang">🛡️ 장우석 (총무)</option>
-        <option value="user_kim_jungsoo">김정수 (회원)</option>
-        <option value="user_lee">이해웅 (회원)</option>
-      </select>
+      <!-- 관리자 로그인 인증 뱃지 -->
+      <div id="admin-status-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+        일반 회원 모드
+      </div>
     </div>
 
-    <!-- 모바일 가로 스크롤 탭 메뉴 -->
-    <nav class="flex space-x-1 border-t border-slate-100 mt-2.5 pt-2 overflow-x-auto text-xs no-scrollbar">
-      <a href="index.html" class="py-1.5 px-3 bg-blue-50 text-blue-600 font-bold rounded-lg whitespace-nowrap">대시보드</a>
-      <a href="gathering.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">모임 & 장소</a>
-      <a href="ledger.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회비 장부</a>
-      <a href="election.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회장 선출</a>
-      <a href="wiki.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회칙</a>
+    <!-- 1. 기본 페이지 탭 4종 + 콤보박스(더보기) 드롭다운 -->
+    <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
+      <!-- 4대 고정 탭 -->
+      <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
+        <a href="index.html" class="py-1.5 px-2.5 bg-blue-50 text-blue-600 rounded-lg whitespace-nowrap">
+          대시보드
+        </a>
+        <a href="history.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">
+          과거 여행/모임
+        </a>
+        <a href="wiki.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">
+          회칙
+        </a>
+        <a href="election.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">
+          회장 선출소
+        </a>
+      </div>
+
+      <!-- 콤보박스 (나머지 페이지 및 관리자 로그인) -->
+      <div class="relative inline-block text-left ml-1">
+        <button id="btn-dropdown" type="button" class="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg whitespace-nowrap flex items-center gap-1 border border-slate-200">
+          <span>더보기 ▾</span>
+        </button>
+
+        <!-- 드롭다운 메뉴 레이어 -->
+        <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
+          <div class="px-3 py-1 text-[10px] text-slate-400 font-bold border-b border-slate-100 mb-1">
+            부가 기능 페이지
+          </div>
+          <a href="settlement.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+            <i class="fa-solid fa-receipt text-emerald-600 w-3.5"></i>
+            <span>개별 정산소</span>
+          </a>
+          <a href="gathering.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+            <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i>
+            <span>모임 & 예약</span>
+          </a>
+          <a href="ledger.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+            <i class="fa-solid fa-won-sign text-amber-600 w-3.5"></i>
+            <span>회비 장부</span>
+          </a>
+
+          <div class="border-t border-slate-100 my-1"></div>
+
+          <!-- 관리자 로그인 / 로그아웃 버튼 -->
+          <button id="btn-admin-auth" type="button" class="w-full text-left px-3 py-2 text-slate-800 hover:bg-slate-50 flex items-center gap-2 font-bold">
+            <i class="fa-solid fa-key text-indigo-600 w-3.5"></i>
+            <span id="admin-auth-text">관리자 로그인 (김진세)</span>
+          </button>
+        </div>
+      </div>
     </nav>
   </header>
 
   <!-- 메인 모바일 컨테이너 -->
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 통장 잔액 카드 (26년 9월 4일 기준 1,765,851원 실시간 연동) -->
+    <!-- 2. CURRENT LEADER 배너 (송환오 회장 & 대통령 임기 연동 시계) -->
     <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-5 shadow-sm space-y-3">
-      <div class="flex justify-between items-center text-xs text-slate-300">
-        <span class="flex items-center gap-1.5">
-          <i class="fa-solid fa-vault text-emerald-400"></i>
-          <span>모임 공금 통장 잔액</span>
-        </span>
-        <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-slate-300 font-medium">식대 전용</span>
+      <div class="flex justify-between items-center text-xs">
+        <span class="bg-amber-400 text-slate-950 font-black px-2.5 py-0.5 rounded text-[10px] tracking-wider uppercase">CURRENT LEADER</span>
+        <span class="text-indigo-300 font-bold text-[11px]">회칙 제4조 연동</span>
       </div>
+
       <div>
-        <div id="account-balance" class="text-3xl font-black tracking-tight text-white">1,765,851원</div>
-        <div class="text-[11px] text-slate-400 mt-1">2026-09-04 기준 실시간 잔액 동기화</div>
+        <h2 class="text-xl font-black flex items-center gap-1.5">
+          <span>👑 송환오 회장</span>
+        </h2>
+        <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+          정기·임시 모임의 장소 및 예약은 송환오 회장이 단독 결정합니다. (회칙 제5조: 딴지 및 반대 불가)
+        </p>
       </div>
-      <div class="pt-2.5 border-t border-white/10 flex justify-between items-center text-xs text-slate-300">
-        <span>당월 회비 목표액</span>
-        <span class="font-bold text-amber-400">320,000원 (100% 완납)</span>
+
+      <div class="pt-2.5 border-t border-white/10 flex justify-between items-center text-xs">
+        <span class="text-slate-400">대통령 임기 만료까지</span>
+        <span id="president-dday" class="text-base font-black text-amber-300 tracking-wide">D-계산중</span>
       </div>
     </div>
 
-    <!-- 송환오 회장 독점 장소권 & 임기 D-day 배너 -->
-    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2">
-      <div class="flex justify-between items-start">
-        <div>
-          <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold">CURRENT LEADER</span>
-          <h2 class="text-base font-bold text-slate-900 mt-1">👑 송환오 회장 (장소 독점권)</h2>
-        </div>
-        <div class="text-right">
-          <div class="text-[10px] text-slate-400 font-medium">대통령 임기 만료</div>
-          <div id="president-dday" class="text-base font-black text-indigo-600">D-계산중</div>
-        </div>
-      </div>
-      <p class="text-xs text-slate-500 leading-relaxed">
-        회칙 제5조에 따라 정기/임시 모임의 장소와 예약은 송환오 회장이 단독 결정합니다. (딴지 불가)
-      </p>
-    </div>
-
-    <!-- 당월 5인 곗돈 수납 현황 (100% 기본 완납 리스트) -->
+    <!-- 3. 다음 정기 모임 상세 안내 표 (실시간 DB 연동) -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
-      <div class="flex justify-between items-center border-b pb-2.5">
-        <div>
-          <h3 class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
-            <i class="fa-solid fa-users text-blue-600"></i>
-            <span>당월 곗돈 수납 현황</span>
-          </h3>
-          <span class="text-[11px] text-slate-400">월 320,000원 정액 부과</span>
+      <div class="flex justify-between items-center border-b pb-2">
+        <div class="flex items-center gap-1.5">
+          <i class="fa-solid fa-bell text-blue-600"></i>
+          <h3 class="font-bold text-sm text-slate-900">다음 정기 모임 안내</h3>
         </div>
-        <span id="collection-rate" class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">100% (5/5명)</span>
+        <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">하반기 정기</span>
       </div>
 
-      <div id="member-cards-container" class="space-y-2 text-xs">
-        <!-- 스크립트에서 자동 렌더링 -->
-      </div>
+      <!-- 모임 상세 정보 표 -->
+      <table class="w-full text-xs text-left border-collapse">
+        <tbody class="divide-y divide-slate-100">
+          <tr>
+            <th class="py-2.5 px-2 bg-slate-50 font-bold text-slate-600 w-24 rounded-l">확정 장소</th>
+            <td class="py-2.5 px-3 font-black text-slate-900" id="dash-place-name">
+              충북 한우 명가 (대형 단독 룸)
+            </td>
+          </tr>
+          <tr>
+            <th class="py-2.5 px-2 bg-slate-50 font-bold text-slate-600">모임 일시</th>
+            <td class="py-2.5 px-3 font-semibold text-slate-800" id="dash-meeting-date">
+              2026-11-14 (토) 18:00
+            </td>
+          </tr>
+          <tr>
+            <th class="py-2.5 px-2 bg-slate-50 font-bold text-slate-600">참석 규모</th>
+            <td class="py-2.5 px-3 text-slate-700">
+              <strong class="text-blue-600 font-bold">총 11명 (풀가동)</strong>
+              <div class="text-[10px] text-slate-400 mt-0.5">성인 8명 + 어린이 3명 (유아의자 2개)</div>
+            </td>
+          </tr>
+          <tr>
+            <th class="py-2.5 px-2 bg-slate-50 font-bold text-slate-600 align-top pt-2.5 rounded-l">회장 지침</th>
+            <td class="py-2.5 px-3 text-[11px] text-slate-600 leading-relaxed" id="dash-meeting-note">
+              아이들과 함께 편하게 식사할 수 있도록 대형 룸으로 예약 완료했습니다. 이동 동선과 주차가 편리한 곳이니 딴지 없이 전원 참석 바랍니다.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <a href="gathering.html" class="block w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-center text-xs font-bold rounded-lg transition">
+        참석 여부(RSVP) 및 가족 인원 체크
+      </a>
     </div>
 
-    <!-- 다음 정기 모임 프리뷰 (모임&예약 페이지 수정 내용 실시간 반영) -->
+    <!-- 4. 동창 5인 현황 카드 (공금·수납 제외) -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2.5">
-      <div class="flex justify-between items-center">
-        <span class="text-xs font-bold text-slate-900">다음 정기 모임</span>
-        <span class="text-[11px] text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded">총 11명 (풀가동)</span>
+      <div class="border-b pb-2 flex justify-between items-center">
+        <h3 class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
+          <i class="fa-solid fa-user-group text-slate-500"></i>
+          <span>동창 5인 회원 현황</span>
+        </h3>
+        <span class="text-[11px] text-slate-400">정원 5인 한정</span>
       </div>
-      <div class="p-3 bg-slate-50 rounded-lg space-y-1 text-xs">
-        <div id="dashboard-meeting-place" class="font-bold text-slate-800 text-sm">
-          충북 한우 명가 (대형 단독 룸)
+
+      <div class="space-y-1.5 text-xs">
+        <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+          <div>
+            <strong class="text-slate-900">송환오</strong>
+            <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold ml-1">👑 회장</span>
+          </div>
+          <span class="text-slate-500">기혼 (무자녀)</span>
         </div>
-        <div id="dashboard-meeting-date" class="text-slate-500">
-          2026-11-14 (토) 18:00
+
+        <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+          <div>
+            <strong class="text-slate-900">장우석</strong>
+            <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-bold ml-1">🛡️ 총무</span>
+          </div>
+          <span class="text-slate-500">기혼 (자녀 2명)</span>
         </div>
-        <div id="dashboard-meeting-note" class="text-[11px] text-slate-400 leading-snug">
-          아이들과 함께 편하게 식사할 수 있도록 룸으로 예약 완료했습니다. 딴지 없이 전원 참석 바랍니다.
+
+        <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+          <div>
+            <strong class="text-slate-900">김진세</strong>
+            <span class="text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-bold ml-1">⚙️ 관리자</span>
+          </div>
+          <span class="text-slate-500">기혼 (자녀 1명)</span>
+        </div>
+
+        <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+          <div>
+            <strong class="text-slate-900">김정수</strong>
+            <span class="text-[10px] text-slate-400 ml-1">회원</span>
+          </div>
+          <span class="text-slate-500">미혼</span>
+        </div>
+
+        <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
+          <div>
+            <strong class="text-slate-900">이해웅</strong>
+            <span class="text-[10px] text-slate-400 ml-1">회원</span>
+          </div>
+          <span class="text-slate-500">미혼</span>
         </div>
       </div>
-      <a href="gathering.html" class="block w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-center text-xs font-bold rounded-lg transition">
-        참석 인원 및 상세 예약 확인
-      </a>
     </div>
 
   </main>
 
-  <!-- Firestore 실시간 연동 및 무인 자동 초기화 스크립트 -->
+  <!-- 실시간 Firestore 동기화 & 로그인 인증 스크립트 -->
   <script type="module">
-    import { db, doc, setDoc, getDoc, onSnapshot } from "./js/firebase.js";
+    import { db, doc, onSnapshot } from "./js/firebase.js";
 
-    // 5인 실명 기본 데이터 (기본 100% 완납 설정)
-    let membersData = [
-      { id: "user_kim_js", name: "김진세", role: "admin", marital: "married", children: 1, fee: 80000, isPaid: true },
-      { id: "user_song", name: "송환오", role: "president", marital: "married", children: 0, fee: 80000, isPaid: true },
-      { id: "user_jang", name: "장우석", role: "treasurer", marital: "married", children: 2, fee: 80000, isPaid: true },
-      { id: "user_kim_jungsoo", name: "김정수", role: "general", marital: "single", children: 0, fee: 40000, isPaid: true },
-      { id: "user_lee", name: "이해웅", role: "general", marital: "single", children: 0, fee: 40000, isPaid: true }
-    ];
+    // 1. 관리자 인증 상태 확인 (기본값: 항상 일반 회원)
+    const adminBadge = document.getElementById("admin-status-badge");
+    const adminAuthBtn = document.getElementById("btn-admin-auth");
+    const adminAuthText = document.getElementById("admin-auth-text");
 
-    function renderMembers(data) {
-      const container = document.getElementById("member-cards-container");
-      container.innerHTML = "";
+    function checkAuthStatus() {
+      const isAdmin = (sessionStorage.getItem("alumni_admin_auth") === "true");
 
-      let paidCount = 0;
-      let totalCollected = 0;
-
-      data.forEach(m => {
-        if (m.isPaid) {
-          paidCount++;
-          totalCollected += m.fee;
-        }
-
-        let badge = "";
-        if (m.role === 'admin') badge = '<span class="text-[10px] bg-slate-800 text-white px-1.5 py-0.5 rounded font-bold">관리자</span>';
-        else if (m.role === 'president') badge = '<span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">👑 회장</span>';
-        else if (m.role === 'treasurer') badge = '<span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold">총무</span>';
-
-        const card = document.createElement("div");
-        card.className = "flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-lg";
-        card.innerHTML = `
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-slate-900">${m.name}</span>
-            ${badge}
-            <span class="text-[11px] text-slate-400">${m.marital === 'married' ? '기혼' : '미혼'}</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="font-bold text-slate-700">${m.fee.toLocaleString()}원</span>
-            ${m.isPaid 
-              ? '<span class="text-[11px] text-emerald-600 font-bold"><i class="fa-solid fa-circle-check mr-1"></i>완납</span>'
-              : '<span class="text-[11px] text-rose-500 font-bold"><i class="fa-solid fa-clock mr-1"></i>미납</span>'}
-          </div>
-        `;
-        container.appendChild(card);
-      });
-
-      const rate = Math.round((totalCollected / 320000) * 100);
-      const rateEl = document.getElementById("collection-rate");
-      rateEl.innerText = `${rate}% (${paidCount}/5명)`;
-      rateEl.className = rate === 100
-        ? "text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded"
-        : "text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded";
-    }
-
-    function updateCountdown() {
-      const diff = new Date("2027-05-10T00:00:00+09:00").getTime() - Date.now();
-      const el = document.getElementById("president-dday");
-      if (diff <= 0) el.innerText = "임기만료";
-      else el.innerText = `D-${Math.floor(diff / (1000 * 60 * 60 * 24))}일`;
-    }
-
-    // 접속 시 DB 검사 후 자동 초기 데이터 세팅
-    async function autoInitDatabase() {
-      try {
-        const balanceRef = doc(db, "app_state", "balance");
-        const balanceSnap = await getDoc(balanceRef);
-
-        if (!balanceSnap.exists()) {
-          await setDoc(balanceRef, { currentBalance: 1765851, updatedAt: "2026-09-04" });
-        }
-
-        for (const m of membersData) {
-          const mRef = doc(db, "dues_status", m.id);
-          const mSnap = await getDoc(mRef);
-          if (!mSnap.exists()) {
-            await setDoc(mRef, m);
-          }
-        }
-      } catch (err) {
-        console.warn("DB 자동 동기화 대기 중:", err);
+      if (isAdmin) {
+        adminBadge.className = "text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
+        adminBadge.innerText = "⚙️ 관리자(김진세) 모드";
+        adminAuthText.innerText = "관리자 로그아웃";
+      } else {
+        adminBadge.className = "text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200";
+        adminBadge.innerText = "일반 회원 모드";
+        adminAuthText.innerText = "관리자 로그인 (비번: 0000)";
       }
     }
 
-    // 실시간 Firestore 데이터 구독
-    try {
-      // 1. 공금 잔액 실시간 동기화
-      onSnapshot(doc(db, "app_state", "balance"), (docSnap) => {
-        if (docSnap.exists()) {
-          const bal = docSnap.data().currentBalance;
-          document.getElementById("account-balance").innerText = `${Number(bal).toLocaleString()}원`;
+    // 콤보박스 드롭다운 토글
+    const btnDropdown = document.getElementById("btn-dropdown");
+    const dropdownMenu = document.getElementById("dropdown-menu");
+
+    btnDropdown.onclick = (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle("hidden");
+    };
+
+    // 외부 클릭 시 드롭다운 닫기
+    document.addEventListener("click", () => {
+      dropdownMenu.classList.add("hidden");
+    });
+
+    // 2. 관리자 로그인 (비밀번호: 0000)
+    adminAuthBtn.onclick = () => {
+      const isAdmin = (sessionStorage.getItem("alumni_admin_auth") === "true");
+
+      if (isAdmin) {
+        if (confirm("관리자 모드에서 로그아웃하시겠습니까?")) {
+          sessionStorage.removeItem("alumni_admin_auth");
+          alert("일반 회원 모드로 전환되었습니다.");
+          checkAuthStatus();
         }
-      });
+      } else {
+        const inputPw = prompt("김진세 관리자 비밀번호를 입력하세요:");
+        if (inputPw === "0000") {
+          sessionStorage.setItem("alumni_admin_auth", "true");
+          alert("🎉 김진세 관리자로 인증되었습니다.\n관리자 권한이 활성화됩니다.");
+          checkAuthStatus();
+        } else if (inputPw !== null) {
+          alert("❌ 비밀번호가 올바르지 않습니다.");
+        }
+      }
+    };
 
-      // 2. 5인 곗돈 납부 상태 실시간 동기화
-      membersData.forEach((member, idx) => {
-        onSnapshot(doc(db, "dues_status", member.id), (docSnap) => {
-          if (docSnap.exists()) {
-            membersData[idx] = { ...membersData[idx], ...docSnap.data() };
-            renderMembers(membersData);
-          }
-        });
-      });
+    // 3. 대통령 임기 카운트다운
+    function updateCountdown() {
+      const diff = new Date("2027-05-10T00:00:00+09:00").getTime() - Date.now();
+      const el = document.getElementById("president-dday");
+      if (diff <= 0) {
+        el.innerText = "임기 만료";
+      } else {
+        el.innerText = `D-${Math.floor(diff / (1000 * 60 * 60 * 24))}일`;
+      }
+    }
 
-      // 3. 정기 모임 장소 및 일정 실시간 동기화
+    // 4. 모임 장소 및 일정 실시간 동기화 (Firestore)
+    try {
       onSnapshot(doc(db, "gathering", "latest"), (docSnap) => {
         if (docSnap.exists()) {
           const g = docSnap.data();
-          const placeEl = document.getElementById("dashboard-meeting-place");
-          const dateEl = document.getElementById("dashboard-meeting-date");
-          const noteEl = document.getElementById("dashboard-meeting-note");
-
-          if (placeEl && g.placeName) placeEl.innerText = g.placeName;
-          if (dateEl && g.dateStr) {
+          if (g.placeName) document.getElementById("dash-place-name").innerText = g.placeName;
+          if (g.dateStr) {
             const d = new Date(g.dateStr);
             const days = ['일', '월', '화', '수', '목', '금', '토'];
-            dateEl.innerText = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} (${days[d.getDay()]}) ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+            document.getElementById("dash-meeting-date").innerText = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} (${days[d.getDay()]}) ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
           }
-          if (noteEl && g.note) noteEl.innerText = g.note;
+          if (g.note) document.getElementById("dash-meeting-note").innerText = g.note;
         }
       });
     } catch (e) {
-      console.warn("실시간 리스너 로컬 모드:", e);
+      console.warn("로컬 모드 유지:", e);
     }
 
-    // 초기 실행
-    renderMembers(membersData);
+    // 초기화
+    checkAuthStatus();
     updateCountdown();
-    autoInitDatabase();
   </script>
 
 </body>
