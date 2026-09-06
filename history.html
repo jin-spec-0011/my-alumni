@@ -6,10 +6,24 @@
   <title>과거 여행 & 모임 - 5인 동창 곗모임</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* 아이폰(iOS Safari) 날짜 입력창 잘림 및 정렬 방지 */
+    input[type="date"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      min-height: 42px;
+      line-height: normal;
+    }
+    input[type="date"]::-webkit-date-and-time-value {
+      text-align: left;
+      line-height: normal;
+    }
+  </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 공통 헤더 -->
+  <!-- 공통 상단 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
@@ -57,43 +71,45 @@
       <div class="border-b pb-2 flex justify-between items-center">
         <div>
           <h2 class="font-bold text-sm text-slate-900" id="form-title">여행 / 모임 추억 등록</h2>
-          <p class="text-[11px] text-slate-400">등록 즉시 모든 동창들의 스마트폰에 실시간 노출됩니다.</p>
+          <p class="text-[11px] text-slate-400">등록 즉시 모든 동창 스마트폰에 실시간 공유됩니다.</p>
         </div>
         <button id="btn-cancel-edit" class="hidden text-xs text-rose-600 font-bold px-2 py-0.5 border border-rose-200 rounded">취소</button>
       </div>
 
-      <form id="history-form" class="space-y-2.5 text-xs">
+      <form id="history-form" class="space-y-3 text-xs">
         <input type="hidden" id="edit-id" value="">
 
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">여행지 / 장소</label>
-            <input type="text" id="input-place" placeholder="예: 충북 한우 명가, 속초 바다" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">날짜</label>
-            <input type="date" id="input-date" value="2026-09-07" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-          </div>
+        <!-- 여행지 / 장소 (단독 100% 너비) -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">여행지 / 장소</label>
+          <input type="text" id="input-place" placeholder="예: 충북 한우 명가, 속초 해변" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-xs">
+        </div>
+
+        <!-- 방문 날짜 (아이폰 잘림 방지: 100% 너비 및 전용 스타일) -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">방문 날짜</label>
+          <input type="date" id="input-date" value="2026-09-07" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-xs font-semibold text-slate-800">
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">메모 / 후기</label>
-          <textarea id="input-memo" rows="2" placeholder="식당 평가나 재밌던 에피소드를 남겨주세요." class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+          <textarea id="input-memo" rows="2" placeholder="식당 평가나 재밌던 에피소드를 남겨주세요." class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"></textarea>
         </div>
 
-        <!-- 사진 첨부 (300px 초경량 압축으로 DB 전송 보장) -->
+        <!-- 사진 첨부 (300px 압축) -->
         <div>
           <label class="block font-bold text-slate-700 mb-1">사진 첨부 (자동 최적화 압축)</label>
-          <input type="file" id="input-photo" accept="image/*" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700">
+          <input type="file" id="input-photo" accept="image/*" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700">
           <div id="photo-preview-box" class="hidden mt-2 relative inline-block">
             <img id="photo-preview" class="w-24 h-24 object-cover rounded-lg border">
-            <button type="button" id="btn-del-photo" class="absolute -top-1.5 -right-1.5 bg-rose-600 text-white rounded-full w-5 h-5 text-[10px] flex items-center justify-center">✕</button>
+            <button type="button" id="btn-del-photo" class="absolute -top-1.5 -right-1.5 bg-rose-600 text-white rounded-full w-5 h-5 text-[10px] flex items-center justify-center font-bold">✕</button>
           </div>
         </div>
 
+        <!-- 작업자 선택 -->
         <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex justify-between items-center">
           <span class="font-bold text-slate-700">작업자 (본인 이름)</span>
-          <select id="select-author" class="p-1.5 border rounded bg-white font-bold text-slate-800">
+          <select id="select-author" class="p-1.5 border rounded-lg bg-white font-bold text-slate-800">
             <option value="김진세" selected>김진세</option>
             <option value="송환오">송환오</option>
             <option value="장우석">장우석</option>
@@ -142,7 +158,7 @@
     });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // 사진 300px 초경량 압축 (Firestore 1MB 한도 완전 회피)
+    // 사진 300px 초경량 압축
     document.getElementById("input-photo").addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -190,12 +206,12 @@
         const card = document.createElement("div");
         card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2.5";
         card.innerHTML = `
-          <div class="flex justify-between items-start border-b pb-2">
-            <div>
-              <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">${item.date.substring(0, 4)}년</span>
-              <strong class="text-sm font-black text-slate-900 ml-1.5">${item.place}</strong>
+          <div class="flex justify-between items-start border-b pb-2 gap-2">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="flex-shrink-0 text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">${item.date ? item.date.substring(0, 4) : ''}년</span>
+              <strong class="text-sm font-black text-slate-900">${item.place}</strong>
             </div>
-            <div class="flex gap-1.5">
+            <div class="flex gap-1.5 flex-shrink-0">
               <button class="btn-edit text-[11px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 font-bold" data-id="${item.id}">수정</button>
               <button class="btn-del text-[11px] text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 font-bold" data-id="${item.id}">삭제</button>
             </div>
@@ -204,13 +220,17 @@
           ${item.photo ? `<div><img src="${item.photo}" class="w-full max-h-48 object-cover rounded-lg border"></div>` : ''}
 
           <div class="space-y-1 text-slate-600 text-[11px]">
-            <div>📅 <strong>일시:</strong> ${item.date}</div>
-            ${item.memo ? `<div class="p-2 bg-slate-50 border rounded-lg text-slate-600 leading-relaxed">${item.memo}</div>` : ''}
+            <div class="flex items-center gap-1">
+              <span>📅</span>
+              <strong>일시:</strong>
+              <span class="text-slate-800 font-bold whitespace-nowrap">${item.date}</span>
+            </div>
+            ${item.memo ? `<div class="p-2.5 bg-slate-50 border rounded-lg text-slate-600 leading-relaxed text-xs">${item.memo}</div>` : ''}
           </div>
 
-          <div class="text-[10px] text-slate-400 pt-1 border-t flex justify-between">
-            <span>기록자: <strong>${item.author || '회원'}</strong></span>
-            <span>${item.updatedAt || item.date}</span>
+          <div class="text-[10px] text-slate-400 pt-1.5 border-t flex items-center justify-between gap-2">
+            <span class="truncate">기록자: <strong class="text-slate-600">${item.author || '회원'}</strong></span>
+            <span class="flex-shrink-0 font-mono">${item.updatedAt || item.date}</span>
           </div>
         `;
         container.appendChild(card);
@@ -256,7 +276,7 @@
             await deleteDoc(doc(db, "gatherings_history", id));
             alert(`[${deleter}] 기록이 삭제되었습니다.`);
           } catch (err) {
-            alert(`❌ 삭제 실패: Firebase 보안 규칙을 확인하세요. (${err.message})`);
+            alert(`❌ 삭제 실패: Firestore 규칙을 확인하세요. (${err.message})`);
           }
         };
       });
@@ -291,10 +311,10 @@
 
       try {
         await setDoc(doc(db, "gatherings_history", id), newRecord);
-        alert(`🎉 [${author}] 추억 기록이 클라우드에 저장되었습니다. 모든 디바이스에 즉시 노출됩니다.`);
+        alert(`🎉 [${author}] 추억 기록이 클라우드에 저장되었습니다.`);
         document.getElementById("btn-cancel-edit").click();
       } catch (err) {
-        alert(`❌ 클라우드 저장 실패! Firebase 보안 규칙을 확인하세요:\n${err.message}`);
+        alert(`❌ 클라우드 저장 실패! Firebase 규칙을 확인하세요:\n${err.message}`);
       }
     };
 
@@ -307,19 +327,18 @@
       };
     });
 
-    // [핵심] Firestore 실시간 리스너 구독 (onSnapshot)
+    // Firestore 실시간 리스너 구독
     try {
       onSnapshot(collection(db, "gatherings_history"), (snapshot) => {
         const list = [];
         snapshot.forEach(d => list.push(d.data()));
-        list.sort((a, b) => b.date.localeCompare(a.date));
+        list.sort((a, b) => String(b.date).localeCompare(String(a.date)));
         historyList = list;
         renderCards();
       }, (error) => {
         console.error("Firestore 구독 에러:", error);
         document.getElementById("sync-badge").className = "text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200";
         document.getElementById("sync-badge").innerText = "⚠️ DB 연결 차단됨";
-        alert("⚠️ Firebase 보안 규칙이 만료되었거나 차단되었습니다. Firebase 콘솔에서 규칙을 확인해 주세요.");
       });
     } catch (e) {
       console.error(e);
