@@ -181,11 +181,13 @@
         img.onload = () => {
           const canvas = document.createElement("canvas");
           let w = img.width, h = img.height;
-          const max = 300;
+          
+          const max = 200; // 가로 폭을 200px로 축소
           if (w > max) { h = Math.round((h * max) / w); w = max; }
           canvas.width = w; canvas.height = h;
           canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-          compressedPhotoBase64 = canvas.toDataURL("image/jpeg", 0.5);
+          compressedPhotoBase64 = canvas.toDataURL("image/jpeg", 0.3); // 화질을 30%로 낮춤
+
           document.getElementById("photo-preview").src = compressedPhotoBase64;
           document.getElementById("photo-preview-box").classList.remove("hidden");
         };
