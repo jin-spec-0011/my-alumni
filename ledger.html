@@ -231,11 +231,11 @@
     <p>회칙 제9조 및 제10조에 의거하여 정기 곗돈은 식대로만 운용되며, 경조사비는 개별 각출합니다.</p>
   </footer>
 
-  <!-- 로직 스크립트 -->
+ <!-- 로직 스크립트 -->
   <script type="module">
-    import { db, doc, setDoc } from "./js/firebase.js";
+    import { db, doc, setDoc, getDocs, collection } from "./js/firebase.js";
 
-    // 5인 실명 데이터 및 9월 납부 상태
+    // 5인 기본 데이터
     let duesMembers = [
       { id: "user_jang", name: "장우석", marital: "married", fee: 80000, isPaid: true, paidDate: "2026-09-01" },
       { id: "user_song", name: "송환오", marital: "married", fee: 80000, isPaid: true, paidDate: "2026-09-02" },
@@ -245,12 +245,11 @@
     ];
 
     let transactions = [
-      { id: 1, date: "2026-09-05", type: "deposit", title: "이해웅 9월 회비 입금", amount: 40000, balance: 2380000 },
-      { id: 2, date: "2026-09-03", type: "deposit", title: "김진세 9월 회비 입금", amount: 80000, balance: 2340000 },
-      { id: 3, date: "2026-09-02", type: "deposit", title: "송환오 9월 회비 입금", amount: 80000, balance: 2260000 },
-      { id: 4, date: "2026-09-01", type: "deposit", title: "장우석 9월 회비 입금", amount: 80000, balance: 2180000 },
-      { id: 5, date: "2026-05-16", type: "withdraw", title: "2026 전반기 정기 모임 식대 (한우 대형 룸)", amount: 580000, balance: 2100000 },
-      { id: 6, date: "2026-05-01", type: "deposit", title: "5인 전원 5월 정기 회비 일괄 입금", amount: 320000, balance: 2680000 }
+      { id: "tx_1", date: "2026-09-05", type: "deposit", title: "이해웅 9월 회비 입금", amount: 40000, balance: 2380000 },
+      { id: "tx_2", date: "2026-09-03", type: "deposit", title: "김진세 9월 회비 입금", amount: 80000, balance: 2340000 },
+      { id: "tx_3", date: "2026-09-02", type: "deposit", title: "송환오 9월 회비 입금", amount: 80000, balance: 2260000 },
+      { id: "tx_4", date: "2026-09-01", type: "deposit", title: "장우석 9월 회비 입금", amount: 80000, balance: 2180000 },
+      { id: "tx_5", date: "2026-05-16", type: "withdraw", title: "2026 전반기 정기 모임 식대 (한우 대형 룸)", amount: 580000, balance: 2100000 }
     ];
 
     let currentFilter = "all";
@@ -263,6 +262,34 @@
     const statMonthCollected = document.getElementById("stat-month-collected");
     const statMonthRate = document.getElementById("stat-month-rate");
     const statYearExpense = document.getElementById("stat-year-expense");
+
+    // Firestore 데이터 동기화
+    async function loadDataFromDB() {
+      try {
+        const duesSnap = await getDocs(collection(db, "dues_status"));
+        if (!duesSnap.empty) {
+          const dbMembers = [];
+          duesSnap.forEach(d => dbMembers.push(d.data()));
+          duesMembers = duesMembers.map(m => {
+            const found = dbMembers.find(item => item.id === m.id);
+            return found || m;
+          });
+        }
+
+        const txSnap = await getDocs(collection(db, "transactions"));
+        if (!txSnap.empty) {
+          const dbTx = [];
+          txSnap.forEach(d => dbTx.push(d.data()));
+          dbTx.sort((a, b) => b.id.localeCompare(a.id));
+          transactions = dbTx;
+        }
+      } catch (e) {
+        console.warn("DB 로드 생략 (로컬 모드 유지):", e);
+      }
+      renderDuesTable();
+      renderTransactions();
+      updateHeaderKPIs();
+    }
 
     function checkUserRole() {
       const isTreasurer = (currentUserSelect.value === "user_jang");
@@ -283,7 +310,6 @@
     function renderDuesTable() {
       duesTableBody.innerHTML = "";
       const isTreasurer = (currentUserSelect.value === "user_jang");
-
       let collectedSum = 0;
 
       duesMembers.forEach(member => {
@@ -324,10 +350,10 @@
 
       if (isTreasurer) {
         document.querySelectorAll(".btn-toggle-pay").forEach(btn => {
-          btn.addEventListener("click", (e) => {
+          btn.onclick = (e) => {
             const targetId = e.currentTarget.getAttribute("data-id");
             togglePaymentStatus(targetId);
-          });
+          };
         });
       }
     }
@@ -343,7 +369,7 @@
         member.paidDate = today;
         const currentBalance = transactions[0] ? transactions[0].balance : 0;
         const newTx = {
-          id: Date.now(),
+          id: `tx_${Date.now()}`,
           date: today,
           type: "deposit",
           title: `${member.name} 9월 회비 입금`,
@@ -351,6 +377,7 @@
           balance: currentBalance + member.fee
         };
         transactions.unshift(newTx);
+        try { await setDoc(doc(db, "transactions", newTx.id), newTx); } catch(e){}
       } else {
         member.paidDate = "-";
       }
@@ -362,13 +389,12 @@
       try {
         await setDoc(doc(db, "dues_status", userId), member);
       } catch (err) {
-        console.warn("Firestore 로컬 모드:", err);
+        console.warn("Firestore 저장 실패:", err);
       }
     }
 
     function renderTransactions() {
       transactionTableBody.innerHTML = "";
-
       let filtered = transactions;
       if (currentFilter === "deposit") filtered = transactions.filter(t => t.type === "deposit");
       if (currentFilter === "withdraw") filtered = transactions.filter(t => t.type === "withdraw");
@@ -376,20 +402,16 @@
       filtered.forEach(tx => {
         const tr = document.createElement("tr");
         tr.className = "hover:bg-slate-50 transition";
-
         const isDeposit = (tx.type === "deposit");
         const typeBadge = isDeposit
           ? '<span class="text-[11px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-bold">입금</span>'
           : '<span class="text-[11px] bg-rose-50 text-rose-700 px-2 py-0.5 rounded font-bold">식대 지출</span>';
 
-        const amountColor = isDeposit ? 'text-emerald-600' : 'text-rose-600';
-        const sign = isDeposit ? '+' : '-';
-
         tr.innerHTML = `
           <td class="py-2.5 px-3 text-slate-500">${tx.date}</td>
           <td class="py-2.5 px-3">${typeBadge}</td>
           <td class="py-2.5 px-3 font-semibold text-slate-800">${tx.title}</td>
-          <td class="py-2.5 px-3 text-right font-bold ${amountColor}">${sign}${tx.amount.toLocaleString()}원</td>
+          <td class="py-2.5 px-3 text-right font-bold ${isDeposit ? 'text-emerald-600' : 'text-rose-600'}">${isDeposit ? '+' : '-'}${tx.amount.toLocaleString()}원</td>
           <td class="py-2.5 px-3 text-right font-black text-slate-900">${tx.balance.toLocaleString()}원</td>
         `;
         transactionTableBody.appendChild(tr);
@@ -418,11 +440,6 @@
       const date = document.getElementById("input-exp-date").value;
       const memo = document.getElementById("input-exp-memo").value.trim();
 
-      if (!amount || amount <= 0) {
-        alert("올바른 지출 금액을 입력해 주세요.");
-        return;
-      }
-
       const currentBalance = transactions[0] ? transactions[0].balance : 0;
       if (amount > currentBalance) {
         alert("⚠️ 통장 잔액보다 지출 금액이 더 큽니다.");
@@ -430,7 +447,7 @@
       }
 
       const newTx = {
-        id: Date.now(),
+        id: `tx_${Date.now()}`,
         date: date,
         type: "withdraw",
         title: `${title} (${memo || '정기 식대'})`,
@@ -446,12 +463,12 @@
       document.getElementById("input-exp-amount").value = "";
       document.getElementById("input-exp-memo").value = "";
 
-      alert(`🧾 [지출 전표 승인] ${title} (${amount.toLocaleString()}원) 처리가 완료되었습니다.`);
+      alert(`🧾 [지출 전표 등록 완료] ${title} 처리되었습니다.`);
 
       try {
-        await setDoc(doc(db, "transactions", String(newTx.id)), newTx);
+        await setDoc(doc(db, "transactions", newTx.id), newTx);
       } catch (err) {
-        console.warn("Firestore 로컬 모드:", err);
+        console.warn("Firestore 저장 실패:", err);
       }
     });
 
@@ -460,9 +477,7 @@
     const btnWth = document.getElementById("filter-withdraw");
 
     function setFilterActive(btn) {
-      [btnAll, btnDep, btnWth].forEach(b => {
-        b.className = "px-3 py-1 text-slate-500 hover:text-slate-800";
-      });
+      [btnAll, btnDep, btnWth].forEach(b => b.className = "px-3 py-1 text-slate-500 hover:text-slate-800");
       btn.className = "px-3 py-1 bg-slate-100 rounded font-semibold text-slate-800";
     }
 
@@ -473,8 +488,7 @@
     currentUserSelect.addEventListener("change", checkUserRole);
 
     checkUserRole();
-    renderTransactions();
-    updateHeaderKPIs();
+    loadDataFromDB();
   </script>
 
 </body>
