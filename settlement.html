@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>개별 정산 - 5인 동창 곗모임</title>
+  <title>개별 지출 정산소 - 5인 동창 곗모임</title>
 
   <!-- PWA & 단독 웹앱 설정 -->
   <link rel="manifest" href="manifest.json">
@@ -18,22 +18,22 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 공통 상단 헤더 -->
+  <!-- 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
-        <span class="text-xl">🧮</span>
+        <span class="text-xl">🧾</span>
         <div>
-          <h1 class="font-black text-base text-slate-900 leading-tight">개별 정산 계산기</h1>
-          <span class="text-[10px] text-slate-400 font-medium">1원 단위 정밀 N분의 1 정산</span>
+          <h1 class="font-black text-base text-slate-900 leading-tight">개별 지출 정산소</h1>
+          <span class="text-[10px] text-slate-400 font-medium">공금 통장 환급 지급 연동</span>
         </div>
       </div>
-      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-        <i class="fa-solid fa-coins mr-1"></i>1원 단위 지원
+      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <i class="fa-solid fa-rotate mr-1"></i>실시간 연동
       </span>
     </div>
 
-    <!-- 5대 메인 탭 네비게이션 -->
+    <!-- 5대 탭 네비게이션 -->
     <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
       <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
         <a href="index.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">대시보드</a>
@@ -58,99 +58,139 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 정산 금액 입력 카드 -->
+    <!-- 1. 정산 시즌 선택 (현재 연도/반기 자동 인식) -->
+    <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm flex items-center justify-between text-xs">
+      <span class="font-bold text-slate-700 flex items-center gap-1.5">
+        <i class="fa-regular fa-calendar-check text-blue-600"></i>
+        <span>정산 대상 시즌</span>
+      </span>
+      <div class="flex items-center gap-1.5">
+        <select id="season-year" class="p-1.5 border rounded-lg bg-slate-50 font-bold text-slate-800">
+          <option value="2025">2025년</option>
+          <option value="2026">2026년</option>
+          <option value="2027">2027년</option>
+          <option value="2028">2028년</option>
+        </select>
+        <select id="season-half" class="p-1.5 border rounded-lg bg-slate-50 font-bold text-slate-800">
+          <option value="H1">전반기</option>
+          <option value="H2">하반기</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 2. 지출 내역 직접 등록 카드 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
         <h2 class="font-black text-sm text-slate-900 flex items-center gap-1.5">
-          <i class="fa-solid fa-receipt text-blue-600"></i>
-          <span>정산 금액 입력</span>
+          <i class="fa-solid fa-receipt text-amber-600"></i>
+          <span>선결제 지출 등록 (공금 청구)</span>
         </h2>
-        <span class="text-[10px] text-slate-400">식대/추가경비 개별 각출</span>
+        <span class="text-[10px] text-slate-400 font-mono">1원 단위 가능</span>
       </div>
 
-      <div class="space-y-2.5 text-xs">
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">총 결제 금액 (1원 단위)</label>
-          <div class="relative">
-            <input type="number" id="input-total-amount" step="1" min="0" placeholder="예: 187350"
-                   class="w-full p-2.5 pl-3 pr-8 border rounded-lg font-mono font-bold text-slate-900 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            <span class="absolute right-3 top-2.5 font-bold text-slate-400 text-xs">원</span>
+      <form id="expense-form" class="space-y-3 text-xs">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">결제자 (입금받을 회원)</label>
+            <select id="exp-author" class="w-full p-2 border rounded-lg bg-slate-50 font-bold text-slate-800 text-xs">
+              <option value="송환오">송환오</option>
+              <option value="장우석">장우석 (총무)</option>
+              <option value="김진세">김진세</option>
+              <option value="김정수">김정수</option>
+              <option value="이해웅">이해웅</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">지출 금액 (1원 단위)</label>
+            <div class="relative">
+              <input type="number" id="exp-amount" step="1" min="1" placeholder="예: 28450" required
+                     class="w-full p-2 pr-6 border rounded-lg font-mono font-bold text-slate-900 text-xs focus:ring-2 focus:ring-blue-500">
+              <span class="absolute right-2 top-2 text-slate-400 font-bold text-[11px]">원</span>
+            </div>
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1">모임/정산 명목</label>
-          <input type="text" id="input-settle-title" placeholder="예: 2026 하반기 정기 모임 2차 호프 식대"
-                 class="w-full p-2.5 border rounded-lg font-medium text-slate-800 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          <label class="block font-bold text-slate-700 mb-1">지출 내용 (항목)</label>
+          <div class="flex gap-1.5">
+            <input type="text" id="exp-desc" placeholder="예: 택시비, 카페, 유류비 등" required
+                   class="flex-1 p-2 border rounded-lg font-medium text-slate-800 text-xs focus:ring-2 focus:ring-blue-500">
+            <!-- 빠른 태그 -->
+            <button type="button" class="btn-tag px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[11px] font-bold">택시비</button>
+            <button type="button" class="btn-tag px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[11px] font-bold">카페</button>
+            <button type="button" class="btn-tag px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[11px] font-bold">유류비</button>
+          </div>
         </div>
 
+        <button type="submit" id="btn-submit-expense" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">
+          공금 청구 영수증 등록
+        </button>
+      </form>
+    </div>
+
+    <!-- 3. 공금 통장 출금 및 지급표 (핵심 정산 화면) -->
+    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
+      <div class="border-b pb-2 flex justify-between items-center">
         <div>
-          <label class="block font-bold text-slate-700 mb-1">선결제자 (입금받을 계좌 주인)</label>
-          <select id="select-payer" class="w-full p-2.5 border rounded-lg bg-slate-50 font-bold text-slate-800 text-xs">
-            <option value="장우석">장우석 (총무)</option>
-            <option value="송환오">송환오</option>
-            <option value="김진세">김진세</option>
-            <option value="김정수">김정수</option>
-            <option value="이해웅">이해웅</option>
-          </select>
+          <h3 class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
+            <i class="fa-solid fa-wallet text-emerald-600"></i>
+            <span>공금 통장 지급표 (총무 송금용)</span>
+          </h3>
+          <p class="text-[10px] text-slate-400 mt-0.5">총무는 아래 금액을 공금 통장에서 각 회원에게 이체합니다.</p>
         </div>
-      </div>
-    </div>
-
-    <!-- 정산 참여 대상자 선택 (체크박스) -->
-    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
-          <i class="fa-solid fa-users text-slate-600"></i>
-          <span>정산 참여 인원</span>
-        </h3>
-        <span class="text-[11px] font-bold text-blue-600" id="participant-count-text">5명 선택됨</span>
-      </div>
-
-      <div class="grid grid-cols-1 gap-2 text-xs" id="participants-container">
-        <!-- JS 동적 렌더링 -->
-      </div>
-    </div>
-
-    <!-- 계산 결과 카드 -->
-    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-sm text-slate-900">정산 계산 결과</h3>
         <span class="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded border border-emerald-200">
-          오차 0원 검증 완료
+          공금 출금
         </span>
       </div>
 
-      <div class="p-3 bg-slate-50 rounded-xl space-y-1.5 text-xs">
-        <div class="flex justify-between items-center text-slate-600">
-          <span>기본 1인당 배부액:</span>
-          <span class="font-bold font-mono text-slate-900" id="res-base-amount">0원</span>
+      <!-- 시즌 총 지출액 배너 -->
+      <div class="p-3 bg-slate-900 text-white rounded-xl space-y-1 text-xs">
+        <div class="flex justify-between items-center text-slate-300">
+          <span>시즌 공금 총 출금액:</span>
+          <strong id="summary-total-spent" class="text-base font-black text-amber-300 font-mono">0원</strong>
         </div>
-        <div class="flex justify-between items-center text-slate-600">
-          <span>자투리 잔여액(1원 단위):</span>
-          <span class="font-bold font-mono text-amber-600" id="res-remainder-amount">0원</span>
-        </div>
-        <div class="text-[10px] text-slate-400 pt-1 border-t border-slate-200">
-          * N등분 후 남은 자투리 1원은 선결제자/첫 번째 정산 인원에게 공평하게 귀속되어 1원의 오차도 없습니다.
+        <div class="text-[10px] text-slate-400 pt-1 border-t border-white/10">
+          * 장우석 총무 공금 계좌에서 1원 단위 그대로 실비 지급
         </div>
       </div>
 
-      <!-- 멤버별 실 청구액 목록 -->
-      <div class="space-y-1.5 text-xs" id="result-breakdown-list">
-        <div class="text-center text-slate-400 py-3">금액을 입력하면 1원 단위 정산표가 계산됩니다.</div>
+      <!-- 5인 회원별 실지급액 카드 -->
+      <div id="members-settlement-list" class="space-y-1.5 text-xs">
+        <div class="text-center text-slate-400 py-4">지출 내역을 불러오는 중...</div>
       </div>
 
-      <!-- 카카오톡 복사용 텍스트 버튼 -->
-      <button id="btn-copy-summary" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
+      <!-- 단톡방 공금 정산 보고 복사 버튼 -->
+      <button id="btn-copy-settle-report" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
         <i class="fa-regular fa-copy"></i>
-        <span>1원 정산 결과 카톡 공유용 복사</span>
+        <span>공금 출금 지급표 카톡 복사 (1원 단위)</span>
       </button>
+    </div>
+
+    <!-- 4. 상세 영수증 목록 (삭제 가능) -->
+    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2 text-xs">
+      <div class="border-b pb-1.5 flex justify-between items-center">
+        <span class="font-bold text-slate-900">시즌 영수증 내역</span>
+        <span class="text-[10px] text-slate-400" id="receipt-count-label">총 0건</span>
+      </div>
+      <div id="receipt-items-container" class="space-y-1.5 text-[11px]">
+        <div class="text-center text-slate-400 py-3">등록된 영수증이 없습니다.</div>
+      </div>
     </div>
 
   </main>
 
   <script type="module">
-    // 드롭다운 토글
+    import { db } from "./js/firebase.js";
+    import { 
+      doc, 
+      setDoc, 
+      deleteDoc,
+      collection, 
+      onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // 드롭다운 메뉴 토글
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
     btnDropdown.addEventListener("click", (e) => {
@@ -160,130 +200,224 @@
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
     const members = ["송환오", "장우석", "김진세", "김정수", "이해웅"];
-    let selectedMembers = [...members];
+    let currentSeasonExpenses = [];
 
-    // 참여자 체크박스 생성
-    const participantsContainer = document.getElementById("participants-container");
-    members.forEach(name => {
-      const label = document.createElement("label");
-      label.className = "flex items-center justify-between p-2.5 bg-slate-50 hover:bg-slate-100 rounded-lg cursor-pointer transition border border-slate-100";
-      label.innerHTML = `
-        <div class="flex items-center gap-2">
-          <input type="checkbox" value="${name}" checked class="member-checkbox w-4 h-4 text-blue-600 rounded focus:ring-0">
-          <strong class="text-slate-800">${name}</strong>
-        </div>
-        <span class="text-[10px] text-slate-400 font-medium">정산 대상</span>
-      `;
-      participantsContainer.appendChild(label);
+    // [핵심 1] 접속 시점 기준 연도/반기 자동 인식
+    const selectYear = document.getElementById("season-year");
+    const selectHalf = document.getElementById("season-half");
+
+    function initAutoSeason() {
+      const now = new Date();
+      const year = String(now.getFullYear());
+      const month = now.getMonth() + 1;
+      const half = (month <= 6) ? "H1" : "H2";
+
+      selectYear.value = year;
+      selectHalf.value = half;
+    }
+    initAutoSeason();
+
+    function getSeasonKey() {
+      return `${selectYear.value}_${selectHalf.value}`;
+    }
+
+    // 빠른 태그 버튼
+    document.querySelectorAll(".btn-tag").forEach(btn => {
+      btn.onclick = () => {
+        document.getElementById("exp-desc").value = btn.innerText;
+      };
     });
 
-    // 체크박스 이벤트
-    const checkboxes = document.querySelectorAll(".member-checkbox");
-    checkboxes.forEach(cb => {
-      cb.addEventListener("change", () => {
-        selectedMembers = Array.from(checkboxes).filter(c => c.checked).map(c => c.value);
-        document.getElementById("participant-count-text").innerText = `${selectedMembers.length}명 선택됨`;
-        calculateSettlement();
-      });
-    });
+    // [핵심 2] 지출 등록 처리
+    const expenseForm = document.getElementById("expense-form");
+    expenseForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const author = document.getElementById("exp-author").value;
+      const amount = parseInt(document.getElementById("exp-amount").value, 10);
+      const desc = document.getElementById("exp-desc").value.trim();
 
-    const inputTotal = document.getElementById("input-total-amount");
-    const selectPayer = document.getElementById("select-payer");
-    const inputTitle = document.getElementById("input-settle-title");
-
-    inputTotal.addEventListener("input", calculateSettlement);
-    selectPayer.addEventListener("change", calculateSettlement);
-    inputTitle.addEventListener("input", calculateSettlement);
-
-    let calculatedDetails = [];
-
-    // [핵심] 1원 단위 정밀 N등분 및 자투리 보정 연산
-    function calculateSettlement() {
-      const rawTotal = parseInt(inputTotal.value, 10);
-      const breakdownContainer = document.getElementById("result-breakdown-list");
-
-      if (isNaN(rawTotal) || rawTotal <= 0 || selectedMembers.length === 0) {
-        document.getElementById("res-base-amount").innerText = "0원";
-        document.getElementById("res-remainder-amount").innerText = "0원";
-        breakdownContainer.innerHTML = `<div class="text-center text-slate-400 py-3">금액을 입력하면 1원 단위 정산표가 계산됩니다.</div>`;
-        calculatedDetails = [];
+      if (isNaN(amount) || amount <= 0) {
+        alert("금액을 올바른 숫자로 입력해 주세요.");
         return;
       }
 
-      const count = selectedMembers.length;
-      const baseShare = Math.floor(rawTotal / count); // 1원 단위 내림
-      const remainder = rawTotal % count;            // 남는 자투리 1~4원
+      const seasonKey = getSeasonKey();
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const docId = `exp_${seasonKey}_${Date.now()}`;
 
-      document.getElementById("res-base-amount").innerText = `${baseShare.toLocaleString()}원`;
-      document.getElementById("res-remainder-amount").innerText = `${remainder.toLocaleString()}원`;
-
-      breakdownContainer.innerHTML = "";
-      calculatedDetails = [];
-
-      const payer = selectPayer.value;
-
-      selectedMembers.forEach((name, index) => {
-        // 남는 자투리 1원은 앞쪽 인원부터 1원씩 공평 배분 (합계 100% 일치)
-        const myExtra = index < remainder ? 1 : 0;
-        const myFinalAmount = baseShare + myExtra;
-        const isPayer = (name === payer);
-
-        calculatedDetails.push({
-          name,
-          amount: myFinalAmount,
-          isPayer
+      try {
+        await setDoc(doc(db, "settlement_expenses", docId), {
+          seasonKey,
+          author,
+          amount,
+          desc,
+          date: dateStr,
+          createdAt: Date.now()
         });
 
+        document.getElementById("exp-amount").value = "";
+        document.getElementById("exp-desc").value = "";
+      } catch (err) {
+        alert(`저장 실패: ${err.message}`);
+      }
+    };
+
+    // [핵심 3] 공금 출금형 회원별 합산 렌더링
+    function calculateAndRender() {
+      const spentMap = {};
+      members.forEach(m => spentMap[m] = 0);
+
+      let grandTotal = 0;
+      currentSeasonExpenses.forEach(item => {
+        if (spentMap[item.author] !== undefined) {
+          spentMap[item.author] += item.amount;
+        } else {
+          spentMap[item.author] = item.amount;
+        }
+        grandTotal += item.amount;
+      });
+
+      document.getElementById("summary-total-spent").innerText = `${grandTotal.toLocaleString()}원`;
+
+      // 회원별 지급액 목록
+      const settleListContainer = document.getElementById("members-settlement-list");
+      settleListContainer.innerHTML = "";
+
+      members.forEach(name => {
+        const mySpent = spentMap[name] || 0;
         const div = document.createElement("div");
-        div.className = `flex justify-between items-center p-2.5 rounded-lg border ${
-          isPayer ? "bg-amber-50 border-amber-200" : "bg-slate-50 border-slate-100"
+        div.className = `flex justify-between items-center p-2.5 rounded-xl border ${
+          mySpent > 0 ? "bg-emerald-50/70 border-emerald-200" : "bg-slate-50 border-slate-200 opacity-60"
         }`;
+
+        let statusHtml = "";
+        if (mySpent > 0) {
+          statusHtml = `<span class="font-mono font-black text-emerald-700 text-sm">공금에서 ${mySpent.toLocaleString()}원 지급</span>`;
+        } else {
+          statusHtml = `<span class="font-mono font-medium text-slate-400 text-xs">지출 내역 없음</span>`;
+        }
+
         div.innerHTML = `
-          <div class="flex items-center gap-1.5">
+          <div>
             <strong class="text-slate-900">${name}</strong>
-            ${isPayer ? '<span class="text-[9px] bg-amber-200 text-amber-900 font-bold px-1.5 py-0.2 rounded">선결제</span>' : ''}
+            <span class="text-[10px] text-slate-400 block">${name === '장우석' ? '🛡️ 총무 계좌 관리' : '선결제 정산 대상'}</span>
           </div>
           <div class="text-right">
-            <span class="font-mono font-black text-sm ${isPayer ? 'text-amber-800' : 'text-blue-600'}">
-              ${myFinalAmount.toLocaleString()}원
-            </span>
-            ${myExtra > 0 ? '<span class="text-[9px] text-slate-400 block font-sans">+잔여 1원 조정</span>' : ''}
+            ${statusHtml}
           </div>
         `;
-        breakdownContainer.appendChild(div);
+        settleListContainer.appendChild(div);
+      });
+
+      // 영수증 목록 렌더링
+      const receiptContainer = document.getElementById("receipt-items-container");
+      document.getElementById("receipt-count-label").innerText = `총 ${currentSeasonExpenses.length}건`;
+      receiptContainer.innerHTML = "";
+
+      if (currentSeasonExpenses.length === 0) {
+        receiptContainer.innerHTML = `<div class="text-center text-slate-400 py-3">해당 시즌에 등록된 영수증이 없습니다.</div>`;
+        return;
+      }
+
+      currentSeasonExpenses.forEach(item => {
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "flex justify-between items-center p-2 bg-slate-50 border border-slate-100 rounded-lg";
+        itemDiv.innerHTML = `
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold text-slate-800">${item.author}</span>
+            <span class="text-slate-400">•</span>
+            <span class="text-slate-600">${item.desc}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-mono font-bold text-slate-900">${item.amount.toLocaleString()}원</span>
+            <button class="btn-del-exp text-slate-400 hover:text-rose-600 p-1" data-id="${item.id}" title="삭제">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+          </div>
+        `;
+        receiptContainer.appendChild(itemDiv);
+      });
+
+      document.querySelectorAll(".btn-del-exp").forEach(btn => {
+        btn.onclick = async (e) => {
+          const docId = e.currentTarget.getAttribute("data-id");
+          if (!confirm("이 영수증 내역을 삭제하시겠습니까?")) return;
+          try {
+            await deleteDoc(doc(db, "settlement_expenses", docId));
+          } catch(err) {
+            alert(`삭제 실패: ${err.message}`);
+          }
+        };
       });
     }
 
-    // 카카오톡 공유용 복사 버튼
-    document.getElementById("btn-copy-summary").onclick = () => {
-      if (calculatedDetails.length === 0) {
-        alert("먼저 정산 금액을 입력해 주세요.");
-        return;
+    // Firestore 리스너 연동
+    let unsubscribe = null;
+    function subscribeSeasonData() {
+      if (unsubscribe) unsubscribe();
+
+      const currentKey = getSeasonKey();
+      try {
+        unsubscribe = onSnapshot(collection(db, "settlement_expenses"), (snapshot) => {
+          const list = [];
+          snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            if (data.seasonKey === currentKey) {
+              list.push({ id: docSnap.id, ...data });
+            }
+          });
+          list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+          currentSeasonExpenses = list;
+          calculateAndRender();
+        });
+      } catch (err) {
+        console.error("Firestore 연결 에러:", err);
       }
+    }
 
-      const total = parseInt(inputTotal.value, 10).toLocaleString();
-      const title = inputTitle.value.trim() || "모임 정산";
-      const payer = selectPayer.value;
+    selectYear.addEventListener("change", subscribeSeasonData);
+    selectHalf.addEventListener("change", subscribeSeasonData);
+    subscribeSeasonData();
 
-      let msg = `[5인 동창 곗모임 정산 안내 (1원 단위)]\n`;
-      msg += `📌 명목: ${title}\n`;
-      msg += `💰 총 결제액: ${total}원 (${selectedMembers.length}명 참여)\n`;
-      msg += `💳 결제자: ${payer}\n`;
-      msg += `---------------------------------\n`;
+    // [카카오톡 공금 출금 내역 복사]
+    document.getElementById("btn-copy-settle-report").onclick = () => {
+      const year = selectYear.value;
+      const halfName = selectHalf.value === "H1" ? "전반기" : "하반기";
 
-      calculatedDetails.forEach(item => {
-        if (item.isPayer) {
-          msg += `• ${item.name} (선결제): ${item.amount.toLocaleString()}원\n`;
-        } else {
-          msg += `• ${item.name}: ${item.amount.toLocaleString()}원 송금 필요\n`;
+      let grandTotal = 0;
+      const spentMap = {};
+      members.forEach(m => spentMap[m] = 0);
+
+      currentSeasonExpenses.forEach(item => {
+        spentMap[item.author] = (spentMap[item.author] || 0) + item.amount;
+        grandTotal += item.amount;
+      });
+
+      let msg = `[5인 동창회 ${year}년 ${halfName} 공금 출금 정산서]\n`;
+      msg += `💰 공금 총 출금액: ${grandTotal.toLocaleString()}원\n`;
+      msg += `🏦 출금 계좌: 모임 공금 통장 (장우석 총무)\n`;
+      msg += `------------------------------------\n`;
+      msg += `[회원별 개인 계좌 지급액]\n`;
+
+      let hasPayout = false;
+      members.forEach(name => {
+        const mySpent = spentMap[name] || 0;
+        if (mySpent > 0) {
+          hasPayout = true;
+          msg += `• ${name}: ${mySpent.toLocaleString()}원 입금 필요\n`;
         }
       });
 
-      msg += `---------------------------------\n`;
-      msg += `💡 1원 단위 오차 없이 계산되었습니다. 확인 후 입금 부탁드립니다!`;
+      if (!hasPayout) {
+        msg += `(등록된 지출 내역이 없습니다.)\n`;
+      }
+
+      msg += `------------------------------------\n`;
+      msg += `📌 장우석 총무님은 확인 후 위 금액을 각 회원 계좌로 이체해 주세요! (1원 단위 정확 반영)`;
 
       navigator.clipboard.writeText(msg).then(() => {
-        alert("📋 1원 단위 정산 내역이 클립보드에 복사되었습니다!\n카카오톡 단톡방에 붙여넣기 하세요.");
+        alert("📋 공금 출금 지급표가 복사되었습니다!\n단톡방에 붙여넣어 총무님께 이체를 요청하세요.");
       }).catch(err => {
         alert("복사 실패: " + err);
       });
