@@ -246,15 +246,19 @@
         box.id = `sec-${idx + 1}`;
         box.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 scroll-mt-24";
 
+                // 앞뒤 불필요한 빈칸 및 공백 들여쓰기 제거
+        const cleanedBody = bodyLines.split('\n').map(line => line.trim()).join('\n');
+
         box.innerHTML = `
           <div class="font-black text-slate-900 text-xs border-b border-slate-200 pb-1 flex items-center justify-between">
             <span class="text-blue-700">${titleLine}</span>
             <span class="text-[10px] text-slate-400">§ ${idx + 1}</span>
           </div>
-          <div class="text-[11px] text-slate-700 leading-relaxed whitespace-pre-wrap font-sans pl-0.5">
-            ${bodyLines.replace(/•/g, '<span class="text-blue-500 font-bold">•</span>')}
+          <div class="text-[11px] text-slate-700 leading-relaxed whitespace-pre-line break-keep font-sans text-left">
+            ${cleanedBody.replace(/•/g, '<span class="text-blue-500 font-bold">•</span>')}
           </div>
         `;
+
         container.appendChild(box);
       });
     }
