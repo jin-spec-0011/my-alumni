@@ -9,41 +9,61 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 상단 헤더 -->
+  <!-- 공통 통합 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
         <span class="text-xl">📸</span>
         <div>
           <h1 class="font-black text-base text-slate-900 leading-tight">과거 모임 & 여행 행적</h1>
-          <span class="text-[10px] text-slate-400">Since 2019 연도별 추억 기록</span>
+          <span class="text-[10px] text-slate-400 font-medium">Since 2019 연도별 추억 기록</span>
         </div>
       </div>
 
-      <!-- 접속자 전환 셀렉터 -->
-      <select id="current-user-select" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 font-semibold text-slate-700">
-        <option value="user_kim_js" selected>⚙️ 김진세 (관리자)</option>
-        <option value="user_song">👑 송환오 (회장)</option>
-        <option value="user_jang">🛡️ 장우석 (총무)</option>
-        <option value="user_kim_jungsoo">김정수 (회원)</option>
-        <option value="user_lee">이해웅 (회원)</option>
-      </select>
+      <!-- 관리자 로그인 뱃지 (기본: 일반 회원 모드) -->
+      <div id="admin-status-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+        일반 회원 모드
+      </div>
     </div>
 
-    <!-- 네비게이션 메뉴 바 -->
-    <nav class="flex space-x-1 border-t border-slate-100 mt-2.5 pt-2 overflow-x-auto text-xs no-scrollbar">
-      <a href="index.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">대시보드</a>
-      <a href="history.html" class="py-1.5 px-3 bg-emerald-50 text-emerald-700 font-bold rounded-lg whitespace-nowrap">과거 여행/모임</a>
-      <a href="wiki.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회칙</a>
-      <a href="settlement.html" class="admin-only py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">개별 정산</a>
-      <a href="election.html" class="admin-only py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회장 선출</a>
+    <!-- 5대 메인 탭 + 더보기 콤보박스 -->
+    <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
+      <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
+        <a href="index.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">대시보드</a>
+        <a href="history.html" class="py-1.5 px-2 bg-blue-50 text-blue-600 rounded-lg whitespace-nowrap">과거 여행</a>
+        <a href="wiki.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">회칙</a>
+        <a href="settlement.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">개별 정산</a>
+        <a href="election.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">회장 선출</a>
+      </div>
+
+      <!-- 콤보박스 (더보기) -->
+      <div class="relative inline-block text-left ml-1 flex-shrink-0">
+        <button id="btn-dropdown" type="button" class="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg whitespace-nowrap flex items-center gap-1 border border-slate-200">
+          <span>더보기 ▾</span>
+        </button>
+
+        <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
+          <div class="px-3 py-1 text-[10px] text-slate-400 font-bold border-b border-slate-100 mb-1">부가 기능</div>
+          <a href="gathering.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+            <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i><span>모임 & 예약</span>
+          </a>
+          <a href="ledger.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+            <i class="fa-solid fa-won-sign text-amber-600 w-3.5"></i><span>회비 장부</span>
+          </a>
+          <div class="border-t border-slate-100 my-1"></div>
+          <button id="btn-admin-auth" type="button" class="w-full text-left px-3 py-2 text-slate-800 hover:bg-slate-50 flex items-center gap-2 font-bold">
+            <i class="fa-solid fa-key text-indigo-600 w-3.5"></i>
+            <span id="admin-auth-text">관리자 로그인 (비번:0000)</span>
+          </button>
+        </div>
+      </div>
     </nav>
   </header>
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- [관리자 전용] 모임/여행 기록 등록 & 수정 폼 -->
-    <div id="admin-form-card" class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
+    <!-- 관리자 로그인 시에만 노출되는 모임 등록/수정 폼 -->
+    <div id="admin-form-card" class="hidden bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
         <div>
           <h2 class="font-bold text-sm text-slate-900" id="form-title">새 모임/여행 기록 등록</h2>
@@ -58,36 +78,36 @@
         <div class="grid grid-cols-3 gap-2">
           <div>
             <label class="block font-bold text-slate-700 mb-1">연도</label>
-            <input type="number" id="input-year" value="2026" min="2019" max="2035" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+            <input type="number" id="input-year" value="2026" min="2019" max="2035" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
           </div>
           <div class="col-span-2">
             <label class="block font-bold text-slate-700 mb-1">모임 / 여행 제목</label>
-            <input type="text" id="input-title" placeholder="예: 2026 상반기 정기 모임" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+            <input type="text" id="input-title" placeholder="예: 2026 상반기 정기 모임" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-bold text-slate-700 mb-1">일시 (날짜/요일)</label>
-            <input type="text" id="input-date" placeholder="예: 2026-05-16 (토)" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+            <input type="text" id="input-date" placeholder="예: 2026-05-16 (토)" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">방문 장소 / 식당</label>
-            <input type="text" id="input-place" placeholder="예: 충북 참숯 한우마을" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+            <input type="text" id="input-place" placeholder="예: 충북 참숯 한우마을" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
           </div>
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">참석 인원 및 명단</label>
-          <input type="text" id="input-attendees" placeholder="예: 어른 8명, 아이 2명 (총 10명)" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+          <input type="text" id="input-attendees" placeholder="예: 어른 8명, 아이 2명 (총 10명)" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">추억 메모 / 후기</label>
-          <textarea id="input-note" rows="2" placeholder="모임 후기, 숙소/식당 평가, 특이사항을 적어두세요." class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"></textarea>
+          <textarea id="input-note" rows="2" placeholder="모임 후기, 특이사항을 적어두세요." class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
         </div>
 
-        <button type="submit" id="btn-submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-sm transition">
+        <button type="submit" id="btn-submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm transition">
           기록 저장 (DB 등록)
         </button>
       </form>
@@ -97,7 +117,7 @@
     <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
       <div class="flex justify-between items-center text-[11px] font-bold text-slate-500">
         <span>연도별 모임 기록 열람</span>
-        <span id="record-count" class="text-emerald-600">총 0건</span>
+        <span id="record-count" class="text-blue-600">총 0건</span>
       </div>
       <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs font-bold" id="year-filter-buttons">
         <button class="year-btn px-3 py-1.5 bg-slate-900 text-white rounded-lg whitespace-nowrap" data-year="all">전체</button>
@@ -108,18 +128,16 @@
       </div>
     </div>
 
-    <!-- 연도별 모임 카드 리스트 컨테이너 -->
+    <!-- 연도별 모임 카드 리스트 -->
     <div id="history-cards-container" class="space-y-3 text-xs">
-      <!-- 동적 카드 렌더링 -->
+      <!-- 렌더링 영역 -->
     </div>
 
   </main>
 
-  <!-- Firestore 연동 로직 스크립트 -->
   <script type="module">
     import { db, doc, setDoc, getDocs, collection, deleteDoc } from "./js/firebase.js";
 
-    // 기본 시드 데이터 (DB가 비었을 때 자동 등록)
     const initialSeed = [
       {
         id: "hist_2026_01",
@@ -162,7 +180,6 @@
     let historyList = [];
     let currentFilterYear = "all";
 
-    const currentUserSelect = document.getElementById("current-user-select");
     const adminFormCard = document.getElementById("admin-form-card");
     const formTitle = document.getElementById("form-title");
     const editIdInput = document.getElementById("edit-id");
@@ -176,32 +193,57 @@
     const inputAttendees = document.getElementById("input-attendees");
     const inputNote = document.getElementById("input-note");
 
-    // 1. 관리자 권한 UI 전환
-    function updateRoleUI() {
-      const isAdmin = (currentUserSelect.value === "user_kim_js");
+    // 공통 인증 체크
+    const adminBadge = document.getElementById("admin-status-badge");
+    const adminAuthText = document.getElementById("admin-auth-text");
 
-      // 등록 폼은 관리자(김진세)에게만 노출
+    function checkAuth() {
+      const isAdmin = (sessionStorage.getItem("alumni_admin_auth") === "true");
       if (isAdmin) {
+        adminBadge.className = "text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
+        adminBadge.innerText = "⚙️ 관리자(김진세) 모드";
+        adminAuthText.innerText = "관리자 로그아웃";
         adminFormCard.classList.remove("hidden");
       } else {
+        adminBadge.className = "text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200";
+        adminBadge.innerText = "일반 회원 모드";
+        adminAuthText.innerText = "관리자 로그인 (비번:0000)";
         adminFormCard.classList.add("hidden");
       }
-
-      // 관리자 전용 네비게이션 제어
-      document.querySelectorAll(".admin-only").forEach(el => {
-        if (isAdmin) el.classList.remove("hidden");
-        else el.classList.add("hidden");
-      });
-
       renderCards();
     }
 
-    // 2. 카드 목록 렌더링 (수정/삭제 버튼 관리자 제어)
+    // 콤보박스 드롭다운 제어
+    const btnDropdown = document.getElementById("btn-dropdown");
+    const dropdownMenu = document.getElementById("dropdown-menu");
+    btnDropdown.onclick = (e) => { e.stopPropagation(); dropdownMenu.classList.toggle("hidden"); };
+    document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
+
+    // 관리자 로그인 토글 (비번 0000)
+    document.getElementById("btn-admin-auth").onclick = () => {
+      const isAdmin = (sessionStorage.getItem("alumni_admin_auth") === "true");
+      if (isAdmin) {
+        if (confirm("관리자 모드에서 로그아웃하시겠습니까?")) {
+          sessionStorage.removeItem("alumni_admin_auth");
+          alert("일반 회원 모드로 전환되었습니다.");
+          checkAuth();
+        }
+      } else {
+        const pw = prompt("김진세 관리자 비밀번호를 입력하세요:");
+        if (pw === "0000") {
+          sessionStorage.setItem("alumni_admin_auth", "true");
+          alert("🎉 김진세 관리자로 인증되었습니다.");
+          checkAuth();
+        } else if (pw !== null) {
+          alert("❌ 비밀번호가 올바르지 않습니다.");
+        }
+      }
+    };
+
     function renderCards() {
       const container = document.getElementById("history-cards-container");
       container.innerHTML = "";
-
-      const isAdmin = (currentUserSelect.value === "user_kim_js");
+      const isAdmin = (sessionStorage.getItem("alumni_admin_auth") === "true");
 
       const filtered = (currentFilterYear === "all") 
         ? historyList 
@@ -210,7 +252,7 @@
       document.getElementById("record-count").innerText = `총 ${filtered.length}건`;
 
       if (filtered.length === 0) {
-        container.innerHTML = `<div class="p-6 text-center text-slate-400 bg-white rounded-xl border border-slate-200">해당 연도의 등록된 모임 기록이 없습니다.</div>`;
+        container.innerHTML = `<div class="p-6 text-center text-slate-400 bg-white rounded-xl border border-slate-200">해당 연도의 모임 기록이 없습니다.</div>`;
         return;
       }
 
@@ -220,7 +262,7 @@
         card.innerHTML = `
           <div class="flex justify-between items-start border-b pb-2">
             <div>
-              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">${item.year}년</span>
+              <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">${item.year}년</span>
               <strong class="text-sm font-black text-slate-900 ml-1.5">${item.title}</strong>
             </div>
             ${isAdmin ? `
@@ -246,7 +288,6 @@
         container.appendChild(card);
       });
 
-      // 수정 버튼 이벤트
       if (isAdmin) {
         document.querySelectorAll(".btn-edit").forEach(btn => {
           btn.onclick = (e) => {
@@ -265,33 +306,22 @@
             formTitle.innerText = "모임 기록 수정";
             btnSubmit.innerText = "수정사항 저장";
             btnCancelEdit.classList.remove("hidden");
-
-            // 폼으로 부드럽게 스크롤
             adminFormCard.scrollIntoView({ behavior: 'smooth' });
           };
         });
 
-        // 삭제 버튼 이벤트
         document.querySelectorAll(".btn-del").forEach(btn => {
           btn.onclick = async (e) => {
             const id = e.currentTarget.getAttribute("data-id");
-            if (!confirm("이 모임 기록을 영구 삭제하시겠습니까?")) return;
-
+            if (!confirm("이 기록을 삭제하시겠습니까?")) return;
             historyList = historyList.filter(h => h.id !== id);
             renderCards();
-
-            try {
-              await deleteDoc(doc(db, "gatherings_history", id));
-              alert("모임 기록이 삭제되었습니다.");
-            } catch (err) {
-              console.warn(err);
-            }
+            try { await deleteDoc(doc(db, "gatherings_history", id)); } catch (err) {}
           };
         });
       }
     }
 
-    // 3. 수정 취소 버튼
     btnCancelEdit.onclick = () => {
       editIdInput.value = "";
       formTitle.innerText = "새 모임/여행 기록 등록";
@@ -301,10 +331,8 @@
       inputYear.value = "2026";
     };
 
-    // 4. 폼 등록 및 수정 제출 이벤트
     document.getElementById("history-form").onsubmit = async (e) => {
       e.preventDefault();
-
       const id = editIdInput.value || `hist_${Date.now()}`;
       const year = inputYear.value.trim();
       const title = inputTitle.value.trim();
@@ -314,17 +342,11 @@
       const note = inputNote.value.trim();
 
       const newRecord = { id, year, title, date, place, attendees, note };
+      const idx = historyList.findIndex(h => h.id === id);
+      if (idx > -1) historyList[idx] = newRecord;
+      else historyList.unshift(newRecord);
 
-      const existingIndex = historyList.findIndex(h => h.id === id);
-      if (existingIndex > -1) {
-        historyList[existingIndex] = newRecord;
-      } else {
-        historyList.unshift(newRecord);
-      }
-
-      // 연도 내림차순 정렬
       historyList.sort((a, b) => b.year.localeCompare(a.year));
-
       renderCards();
       btnCancelEdit.click();
 
@@ -332,11 +354,10 @@
         await setDoc(doc(db, "gatherings_history", id), newRecord);
         alert(`🎉 [${year}년 ${title}] 기록이 저장되었습니다.`);
       } catch (err) {
-        console.warn("Firestore 저장 에러:", err);
+        console.warn(err);
       }
     };
 
-    // 5. 연도 필터 버튼 클릭 이벤트
     document.querySelectorAll(".year-btn").forEach(btn => {
       btn.onclick = (e) => {
         document.querySelectorAll(".year-btn").forEach(b => {
@@ -348,7 +369,6 @@
       };
     });
 
-    // 6. DB 로드 및 최초 자동 시드 데이터 생성
     async function loadHistoryData() {
       try {
         const snap = await getDocs(collection(db, "gatherings_history"));
@@ -358,20 +378,17 @@
           list.sort((a, b) => b.year.localeCompare(a.year));
           historyList = list;
         } else {
-          // DB가 비어있다면 2019~2026 기본 데이터 1회 자동 생성
           historyList = [...initialSeed];
           for (const item of initialSeed) {
             await setDoc(doc(db, "gatherings_history", item.id), item);
           }
         }
       } catch (e) {
-        console.warn("로컬 모드 유지:", e);
         historyList = [...initialSeed];
       }
-      updateRoleUI();
+      checkAuth();
     }
 
-    currentUserSelect.addEventListener("change", updateRoleUI);
     loadHistoryData();
   </script>
 
