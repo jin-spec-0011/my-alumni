@@ -9,7 +9,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 공통 헤더 -->
+  <!-- 공통 상단 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
@@ -19,7 +19,7 @@
           <span class="text-[10px] text-slate-400 font-medium">Since 2019 합의 계칙</span>
         </div>
       </div>
-      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">자율 참여 모드</span>
+      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">자율 개정 모드</span>
     </div>
 
     <!-- 5대 메인 탭 + 부가기능 콤보박스 -->
@@ -69,82 +69,21 @@
       </div>
     </div>
 
-    <!-- 1. [열람 패널] -->
+    <!-- 1. [열람 패널: 실시간 자동 렌더링 영역] -->
     <div id="panel-view" class="space-y-3 text-xs leading-relaxed">
-      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm space-y-1">
-        <strong class="text-slate-900 text-sm"><span class="text-teal-600 font-black">1.</span> 제1조 (명칭 및 목적)</strong>
-        <p class="text-slate-600 pt-1">본 모임은 고등학교 5인 동창 간의 친목 도모와 정기적인 회합, 상호 부조를 목적으로 2019년에 결성된 곗모임이다.</p>
-      </div>
-
-      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm space-y-1.5">
-        <strong class="text-slate-900 text-sm"><span class="text-teal-600 font-black">2.</span> 제2조 (회원의 자격 및 현황)</strong>
-        <p class="text-slate-600">본 회의 정회원은 아래 5인으로 영구 한정한다.</p>
-        <div class="bg-slate-50 p-2.5 rounded-lg space-y-1 text-[11px] text-slate-700 border border-slate-100">
-          <div>• <strong>김진세:</strong> 일반 회원 (기혼, 자녀 1명)</div>
-          <div>• <strong>송환오:</strong> 회장 (기혼, 무자녀)</div>
-          <div>• <strong>장우석:</strong> 총무 (기혼, 자녀 2명)</div>
-          <div>• <strong>김정수:</strong> 일반 회원 (미혼)</div>
-          <div>• <strong>이해웅:</strong> 일반 회원 (미혼)</div>
-        </div>
-      </div>
-
-      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm space-y-1">
-        <strong class="text-slate-900 text-sm"><span class="text-teal-600 font-black">3.</span> 제3조 (총무의 영구 면제권)</strong>
-        <p class="text-slate-600 pt-1">장우석 총무는 공금 관리 및 행정 업무를 상시 수행하는 대가로 <strong>차기 회장 피선거권에서 영구 면제</strong>된다.</p>
-      </div>
-
-      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm space-y-1">
-        <strong class="text-slate-900 text-sm"><span class="text-teal-600 font-black">4.</span> 제4조 (임기 및 탄핵 연동)</strong>
-        <p class="text-slate-600 pt-1">
-          ① 회장 임기는 <strong>대한민국 대통령 재임 기간과 일치</strong>한다.<br>
-          ② 대통령 탄핵 인용 시 회장직은 즉시 자동 박탈되며 비상 선출을 진행한다.<br>
-          ③ 차기 회장은 장우석 총무를 제외한 <strong>4인(송환오 현 회장 포함)을 대상으로 룰렛 추첨</strong>하며 확률은 각 25%로 균등하다. (연임 제한 없음)
-        </p>
-      </div>
-
-      <div class="bg-amber-50/70 border border-amber-300 rounded-xl p-3.5 shadow-sm space-y-1">
-        <strong class="text-amber-950 text-sm"><span class="text-amber-600 font-black">5.</span> 제5조 (장소 독점권 및 딴지 금지)</strong>
-        <p class="text-amber-900 pt-1">
-          정기·임시 모임의 장소 및 예약은 <strong>회장이 단독 결정</strong>한다. 모든 회원은 회장의 결정에 대해 일체의 불만이나 딴지를 제기할 수 없으며 오직 가족 참석 여부(RSVP)만 회신한다.
-        </p>
-      </div>
-
-      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm space-y-1">
-        <strong class="text-slate-900 text-sm"><span class="text-teal-600 font-black">6.</span> 제6조 (가족 동반 및 수용 상한)</strong>
-        <p class="text-slate-600 pt-1">풀가동 시 최대 수용 규모는 <strong>성인 8명(회원 5 + 배우자 3)과 어린이 3명(장우석 2, 김진세 1)을 합산한 총 11명</strong>으로 산정하여 단독 프라이빗 룸을 예약한다.</p>
-      </div>
-
-      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm space-y-1">
-        <strong class="text-slate-900 text-sm"><span class="text-teal-600 font-black">7.</span> 제7조 (정기 회비 및 전환 규정)</strong>
-        <p class="text-slate-600 pt-1">
-          ① 월 정기 곗돈은 기혼자 월 80,000원, 미혼자 월 40,000원으로 차등 부과한다. (월 목표 320,000원)<br>
-          ② 미혼 회원이 결혼할 경우 익월부터 기혼자 요율(8만 원)로 자동 전환 적용된다.
-        </p>
-      </div>
-
-      <div class="bg-rose-50/70 border border-rose-300 rounded-xl p-3.5 shadow-sm space-y-1">
-        <strong class="text-rose-950 text-sm"><span class="text-rose-600 font-black">8.</span> 제8조·제9조 (경조사비 개별 각출 원칙)</strong>
-        <p class="text-rose-900 pt-1">
-          모임 공금은 <strong>정기 모임 식대 전용</strong>이며, 회원의 결혼, 돌잔치, 부고 등 모든 경조사비는 <strong>공금에서 지출하지 않고 당사자를 제외한 4인이 개별 각출</strong>하여 송금한다.
-        </p>
-      </div>
-
-      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm space-y-1">
-        <strong class="text-slate-900 text-sm"><span class="text-teal-600 font-black">9.</span> 제10조 (편집 요약 의무제)</strong>
-        <p class="text-slate-600 pt-1">본 회칙을 개정할 때에는 개정 사유(편집 요약)를 필수로 입력해야만 판본으로 저장된다.</p>
-      </div>
+      <!-- 자바스크립트가 현재 확정된 회칙 본문을 카드로 자동 생성합니다 -->
     </div>
 
-    <!-- 2. [개정 패널] -->
+    <!-- 2. [개정 패널: 에디터] -->
     <div id="panel-edit" class="hidden bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
         <h3 class="font-bold text-sm text-slate-900">회칙 조항 개정 편집창</h3>
-        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">자율 개정</span>
+        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">수정 후 즉시 반영</span>
       </div>
 
       <div class="space-y-2 text-xs">
-        <label class="block font-bold text-slate-700">개정 본문 텍스트</label>
-        <textarea id="edit-content" rows="12" class="w-full p-2.5 border rounded-lg font-mono text-[11px] leading-relaxed bg-slate-50 focus:ring-2 focus:ring-teal-500"></textarea>
+        <label class="block font-bold text-slate-700">개정 본문 텍스트 (자유롭게 수정 가능)</label>
+        <textarea id="edit-content" rows="14" class="w-full p-2.5 border rounded-lg font-mono text-[11px] leading-relaxed bg-slate-50 focus:ring-2 focus:ring-teal-500"></textarea>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
@@ -159,13 +98,13 @@
           </div>
           <div>
             <label class="block font-bold text-teal-900 mb-1">편집 요약 (개정 사유) *</label>
-            <input type="text" id="edit-summary" placeholder="예: 제2조 회원 자격 현황 정정" class="w-full p-2 border border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-xs">
+            <input type="text" id="edit-summary" placeholder="예: 제2조 회원 현황 수정" class="w-full p-2 border border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-xs">
           </div>
         </div>
 
         <div class="flex gap-2 justify-end pt-2">
           <button type="button" id="btn-cancel-edit" class="px-3 py-1.5 border rounded font-semibold text-slate-600">취소</button>
-          <button type="button" id="btn-save-edit" class="px-4 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded font-bold">개정안 저장 (새 판본 등록)</button>
+          <button type="button" id="btn-save-edit" class="px-4 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded font-bold">개정안 저장 (열람 화면 갱신)</button>
         </div>
       </div>
     </div>
@@ -184,7 +123,45 @@
 
   <script type="module">
     import { db } from "./js/firebase.js";
-    import { doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { doc, setDoc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // 기본 표준 회칙 텍스트 (초기 데이터)
+    const defaultRuleText = `제1조 (명칭 및 목적)
+본 모임은 고등학교 5인 동창 간의 친목 도모와 정기적인 회합, 상호 부조를 목적으로 2019년에 결성된 곗모임이다.
+
+제2조 (회원의 자격 및 현황)
+본 회의 정회원은 아래 5인으로 영구 한정한다.
+• 김진세: 일반 회원 (기혼, 자녀 1명)
+• 송환오: 회장 (기혼, 무자녀)
+• 장우석: 총무 (기혼, 자녀 2명)
+• 김정수: 일반 회원 (미혼)
+• 이해웅: 일반 회원 (미혼)
+
+제3조 (총무의 영구 면제권)
+장우석 총무는 공금 관리 및 행정 업무를 상시 수행하는 대가로 차기 회장 피선거권에서 영구 면제된다.
+
+제4조 (임기 및 탄핵 연동)
+① 회장 임기는 대한민국 대통령 재임 기간과 일치한다.
+② 대통령 탄핵 인용 시 회장직은 즉시 자동 박탈되며 비상 선출을 진행한다.
+③ 차기 회장은 장우석 총무를 제외한 4인(송환오 현 회장 포함)을 대상으로 룰렛 추첨하며 확률은 각 25%로 균등하다. (연임 제한 없음)
+
+제5조 (장소 독점권 및 딴지 금지)
+정기·임시 모임의 장소 및 예약은 회장이 단독 결정한다. 모든 회원은 회장의 결정에 대해 일체의 불만이나 딴지를 제기할 수 없으며 오직 가족 참석 여부(RSVP)만 회신한다.
+
+제6조 (가족 동반 및 수용 상한)
+풀가동 시 최대 수용 규모는 성인 8명(회원 5 + 배우자 3)과 어린이 3명(장우석 2, 김진세 1)을 합산한 총 11명으로 산정하여 단독 프라이빗 룸을 예약한다.
+
+제7조 (정기 회비 및 전환 규정)
+① 월 정기 곗돈은 기혼자 월 80,000원, 미혼자 월 40,000원으로 차등 부과한다. (월 목표 320,000원)
+② 미혼 회원이 결혼할 경우 익월부터 기혼자 요율(8만 원)로 자동 전환 적용된다.
+
+제8조·제9조 (경조사비 개별 각출 원칙)
+모임 공금은 정기 모임 식대 전용이며, 회원의 결혼, 돌잔치, 부고 등 모든 경조사비는 공금에서 지출하지 않고 당사자를 제외한 4인이 개별 각출하여 송금한다.
+
+제10조 (편집 요약 의무제)
+본 회칙을 개정할 때에는 개정 사유(편집 요약)를 필수로 입력해야만 판본으로 저장된다.`;
+
+    let currentRuleText = defaultRuleText;
 
     let revisions = [
       { rev: "r3", date: "2026-09-07 00:00", author: "김진세", summary: "모바일 최적화 및 5대 탭 통합 개정" },
@@ -192,7 +169,7 @@
       { rev: "r1", date: "2019-09-07 18:00", author: "송환오", summary: "5인 동창 곗모임 최초 회칙 제정" }
     ];
 
-    // 콤보박스 클릭
+    // 콤보박스 제어
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
     btnDropdown.addEventListener("click", (e) => {
@@ -201,7 +178,70 @@
     });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // 탭 전환 (누구나 자유롭게 개정 가능)
+    // [핵심] 회칙 텍스트를 파싱하여 열람(View) 패널에 카드 형태로 실시간 그리기
+    function renderRuleText(rawText) {
+      const container = document.getElementById("panel-view");
+      container.innerHTML = "";
+
+      if (!rawText || !rawText.trim()) {
+        container.innerHTML = `<div class="p-6 text-center text-slate-400 bg-white rounded-xl border">등록된 회칙 내용이 없습니다.</div>`;
+        return;
+      }
+
+      // '제X조' 단위로 나누어 각각 깔끔한 카드로 생성
+      const sections = rawText.split(/(?=제\s*[0-9]+(?:\s*[·,]\s*제\s*[0-9]+)*\s*조)/g).map(s => s.trim()).filter(Boolean);
+
+      if (sections.length === 0) {
+        const card = document.createElement("div");
+        card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm whitespace-pre-wrap leading-relaxed";
+        card.textContent = rawText;
+        container.appendChild(card);
+        return;
+      }
+
+      sections.forEach((sec, idx) => {
+        const card = document.createElement("div");
+        const firstLineEnd = sec.indexOf("\n");
+        let title = sec;
+        let body = "";
+
+        if (firstLineEnd !== -1) {
+          title = sec.substring(0, firstLineEnd).trim();
+          body = sec.substring(firstLineEnd + 1).trim();
+        }
+
+        const isWarning = title.includes("5조") || title.includes("장소");
+        const isDanger = title.includes("8조") || title.includes("9조") || title.includes("경조사");
+
+        let borderBg = "bg-white border-slate-200";
+        let titleColor = "text-slate-900";
+        let numColor = "text-teal-600";
+        let bodyColor = "text-slate-600";
+
+        if (isWarning) {
+          borderBg = "bg-amber-50/70 border-amber-300";
+          titleColor = "text-amber-950";
+          numColor = "text-amber-600";
+          bodyColor = "text-amber-900";
+        } else if (isDanger) {
+          borderBg = "bg-rose-50/70 border-rose-300";
+          titleColor = "text-rose-950";
+          numColor = "text-rose-600";
+          bodyColor = "text-rose-900";
+        }
+
+        card.className = `${borderBg} border rounded-xl p-3.5 shadow-sm space-y-1.5`;
+        card.innerHTML = `
+          <strong class="${titleColor} text-sm flex items-center gap-1.5">
+            <span class="${numColor} font-black">${idx + 1}.</span> ${title}
+          </strong>
+          <div class="${bodyColor} whitespace-pre-wrap leading-relaxed text-xs pt-0.5">${body}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // 탭 전환
     const tabView = document.getElementById("tab-view");
     const tabEdit = document.getElementById("tab-edit");
     const tabHist = document.getElementById("tab-hist");
@@ -216,10 +256,11 @@
       if (tab === "view") {
         tabView.className = "py-1.5 bg-white text-slate-900 rounded shadow-sm";
         panelView.classList.remove("hidden");
+        renderRuleText(currentRuleText);
       } else if (tab === "edit") {
         tabEdit.className = "py-1.5 bg-white text-slate-900 rounded shadow-sm";
         panelEdit.classList.remove("hidden");
-        document.getElementById("edit-content").value = panelView.innerText;
+        document.getElementById("edit-content").value = currentRuleText;
       } else if (tab === "hist") {
         tabHist.className = "py-1.5 bg-white text-slate-900 rounded shadow-sm";
         panelHist.classList.remove("hidden");
@@ -254,55 +295,106 @@
       }
     }
 
-    // 새 판본 저장
+    // [핵심] 개정안 저장 처리 (본문 저장 + 열람 화면 즉시 갱신 + 열람 탭으로 이동)
     document.getElementById("btn-save-edit").onclick = async () => {
+      const newContent = document.getElementById("edit-content").value.trim();
       const summary = document.getElementById("edit-summary").value.trim();
       const author = document.getElementById("edit-author").value;
 
+      if (!newContent) {
+        alert("⚠️ 회칙 본문 내용이 비어있습니다.");
+        return;
+      }
       if (!summary) {
-        alert("⚠️ [편집 요약 필수] 개정 사유를 반드시 입력해야 합니다.");
+        alert("⚠️ [편집 요약 필수] 개정 사유(편집 요약)를 반드시 입력해야 합니다.");
         return document.getElementById("edit-summary").focus();
       }
 
+      // 1. 현재 본문 교체 및 로컬 저장
+      currentRuleText = newContent;
+      localStorage.setItem("alumni_wiki_content", currentRuleText);
+
+      // 2. 판본 번호 및 날짜 생성
       const nextRev = `r${revisions.length + 1}`;
       const now = new Date();
       const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
+      // 3. 역사 리스트에 추가
       const newRec = { rev: nextRev, date: dateStr, author: author, summary: summary };
       revisions.unshift(newRec);
       localStorage.setItem("alumni_wiki_revs", JSON.stringify(revisions));
 
+      // 4. 열람 화면 즉시 갱신 & 판본 뱃지 수정
+      renderRuleText(currentRuleText);
+      document.getElementById("wiki-rev-badge").innerText = `${nextRev} 판본`;
       document.getElementById("edit-summary").value = "";
-      alert(`🎉 [${author}] 새로운 판본(${nextRev})으로 등록되었습니다.`);
-      setTab("hist");
 
+      // 5. 열람(View) 화면으로 자동 전환
+      setTab("view");
+      alert(`🎉 [${author}] 개정안(${nextRev})이 열람 화면에 즉각 반영되고 역사에 기록되었습니다!`);
+
+      // 6. Firestore 클라우드 영구 동기화
       try {
+        await setDoc(doc(db, "rule_content", "latest"), {
+          content: currentRuleText,
+          updatedAt: dateStr,
+          author: author,
+          rev: nextRev,
+          summary: summary
+        });
         await setDoc(doc(db, "rule_revisions", nextRev), newRec);
       } catch (err) {
-        console.warn("DB 저장 생략(로컬 저장 완료):", err);
+        console.warn("DB 저장 에러 (로컬 반영 완료):", err);
       }
     };
 
-    async function loadRevisions() {
-      const local = localStorage.getItem("alumni_wiki_revs");
-      if (local) {
-        try { revisions = JSON.parse(local); renderHistory(); } catch(e){}
+    // 초기 데이터 로드 (로컬스토리지 우선 로드 후 Firestore 동기화)
+    async function loadWikiData() {
+      // 1. 로컬 저장소 우선 확인
+      const localContent = localStorage.getItem("alumni_wiki_content");
+      if (localContent) {
+        currentRuleText = localContent;
+      }
+      renderRuleText(currentRuleText);
+
+      const localRevs = localStorage.getItem("alumni_wiki_revs");
+      if (localRevs) {
+        try { revisions = JSON.parse(localRevs); } catch(e){}
+      }
+      renderHistory();
+
+      // 2. Firestore 최신 본문 확인
+      try {
+        const contentSnap = await getDoc(doc(db, "rule_content", "latest"));
+        if (contentSnap.exists()) {
+          const data = contentSnap.data();
+          if (data.content) {
+            currentRuleText = data.content;
+            localStorage.setItem("alumni_wiki_content", currentRuleText);
+            renderRuleText(currentRuleText);
+          }
+        }
+      } catch(e) {
+        console.warn("Firestore rule content load skipped:", e);
       }
 
+      // 3. Firestore 역사 판본 확인
       try {
-        const snap = await getDocs(collection(db, "rule_revisions"));
-        if (!snap.empty) {
+        const revSnap = await getDocs(collection(db, "rule_revisions"));
+        if (!revSnap.empty) {
           const list = [];
-          snap.forEach(d => list.push(d.data()));
+          revSnap.forEach(d => list.push(d.data()));
           list.sort((a, b) => b.rev.localeCompare(a.rev, undefined, { numeric: true }));
           revisions = list;
           localStorage.setItem("alumni_wiki_revs", JSON.stringify(list));
+          renderHistory();
         }
-      } catch(e){}
-      renderHistory();
+      } catch(e) {
+        console.warn("Firestore revisions load skipped:", e);
+      }
     }
 
-    loadRevisions();
+    loadWikiData();
   </script>
 
 </body>
