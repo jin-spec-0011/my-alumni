@@ -16,10 +16,11 @@
         <span class="text-xl">📸</span>
         <div>
           <h1 class="font-black text-base text-slate-900 leading-tight">과거 모임 & 여행 행적</h1>
-          <span class="text-[10px] text-slate-400">Since 2019 동창 추억 아카이브</span>
+          <span class="text-[10px] text-slate-400">Since 2019 연도별 추억 기록</span>
         </div>
       </div>
 
+      <!-- 접속자 전환 셀렉터 -->
       <select id="current-user-select" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 font-semibold text-slate-700">
         <option value="user_kim_js" selected>⚙️ 김진세 (관리자)</option>
         <option value="user_song">👑 송환오 (회장)</option>
@@ -29,7 +30,7 @@
       </select>
     </div>
 
-    <!-- 네비게이션 바 -->
+    <!-- 네비게이션 메뉴 바 -->
     <nav class="flex space-x-1 border-t border-slate-100 mt-2.5 pt-2 overflow-x-auto text-xs no-scrollbar">
       <a href="index.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">대시보드</a>
       <a href="history.html" class="py-1.5 px-3 bg-emerald-50 text-emerald-700 font-bold rounded-lg whitespace-nowrap">과거 여행/모임</a>
@@ -41,28 +42,87 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 연도별 필터 버튼 바 -->
+    <!-- [관리자 전용] 모임/여행 기록 등록 & 수정 폼 -->
+    <div id="admin-form-card" class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
+      <div class="border-b pb-2 flex justify-between items-center">
+        <div>
+          <h2 class="font-bold text-sm text-slate-900" id="form-title">새 모임/여행 기록 등록</h2>
+          <p class="text-[11px] text-slate-400">김진세 관리자 전용 작성창 (수정/저장 시 DB 반영)</p>
+        </div>
+        <button id="btn-cancel-edit" class="hidden text-xs text-rose-600 font-bold px-2 py-0.5 border border-rose-200 rounded">수정 취소</button>
+      </div>
+
+      <form id="history-form" class="space-y-2.5 text-xs">
+        <input type="hidden" id="edit-id" value="">
+
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">연도</label>
+            <input type="number" id="input-year" value="2026" min="2019" max="2035" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div class="col-span-2">
+            <label class="block font-bold text-slate-700 mb-1">모임 / 여행 제목</label>
+            <input type="text" id="input-title" placeholder="예: 2026 상반기 정기 모임" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">일시 (날짜/요일)</label>
+            <input type="text" id="input-date" placeholder="예: 2026-05-16 (토)" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">방문 장소 / 식당</label>
+            <input type="text" id="input-place" placeholder="예: 충북 참숯 한우마을" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">참석 인원 및 명단</label>
+          <input type="text" id="input-attendees" placeholder="예: 어른 8명, 아이 2명 (총 10명)" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">추억 메모 / 후기</label>
+          <textarea id="input-note" rows="2" placeholder="모임 후기, 숙소/식당 평가, 특이사항을 적어두세요." class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500"></textarea>
+        </div>
+
+        <button type="submit" id="btn-submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-sm transition">
+          기록 저장 (DB 등록)
+        </button>
+      </form>
+    </div>
+
+    <!-- 연도별 필터 버튼 영역 -->
     <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
-      <div class="text-[11px] font-bold text-slate-500">연도별 모임 기록 열람</div>
+      <div class="flex justify-between items-center text-[11px] font-bold text-slate-500">
+        <span>연도별 모임 기록 열람</span>
+        <span id="record-count" class="text-emerald-600">총 0건</span>
+      </div>
       <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs font-bold" id="year-filter-buttons">
         <button class="year-btn px-3 py-1.5 bg-slate-900 text-white rounded-lg whitespace-nowrap" data-year="all">전체</button>
         <button class="year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap" data-year="2026">2026년</button>
         <button class="year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap" data-year="2025">2025년</button>
         <button class="year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap" data-year="2024">2024년</button>
-        <button class="year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap" data-year="2019">2019년(창립)</button>
+        <button class="year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap" data-year="2019">2019년</button>
       </div>
     </div>
 
-    <!-- 연도별 모임 카드 리스트 -->
+    <!-- 연도별 모임 카드 리스트 컨테이너 -->
     <div id="history-cards-container" class="space-y-3 text-xs">
-      <!-- 렌더링 영역 -->
+      <!-- 동적 카드 렌더링 -->
     </div>
 
   </main>
 
+  <!-- Firestore 연동 로직 스크립트 -->
   <script type="module">
-    const gatherings = [
+    import { db, doc, setDoc, getDocs, collection, deleteDoc } from "./js/firebase.js";
+
+    // 기본 시드 데이터 (DB가 비었을 때 자동 등록)
+    const initialSeed = [
       {
+        id: "hist_2026_01",
         year: "2026",
         title: "2026 상반기 정기 모임",
         date: "2026-05-16 (토)",
@@ -71,6 +131,7 @@
         note: "송환오 회장 주재 상반기 모임. 아이들 동반 룸으로 쾌적하게 진행 완료."
       },
       {
+        id: "hist_2025_01",
         year: "2025",
         title: "2025 연말 송년 가족 모임",
         date: "2025-12-13 (토)",
@@ -79,6 +140,7 @@
         note: "연말 정기 결산 및 가족 동반 송년회 완료."
       },
       {
+        id: "hist_2024_01",
         year: "2024",
         title: "2024 가을 단풍 가족 나들이 모임",
         date: "2024-10-19 (토)",
@@ -87,6 +149,7 @@
         note: "야외 테라스 바베큐 파티 및 동창 교류."
       },
       {
+        id: "hist_2019_01",
         year: "2019",
         title: "5인 동창 곗모임 최초 결성",
         date: "2019-09-07 (토)",
@@ -96,62 +159,220 @@
       }
     ];
 
-    let currentYear = "all";
+    let historyList = [];
+    let currentFilterYear = "all";
 
-    function renderGatherings() {
+    const currentUserSelect = document.getElementById("current-user-select");
+    const adminFormCard = document.getElementById("admin-form-card");
+    const formTitle = document.getElementById("form-title");
+    const editIdInput = document.getElementById("edit-id");
+    const btnCancelEdit = document.getElementById("btn-cancel-edit");
+    const btnSubmit = document.getElementById("btn-submit");
+
+    const inputYear = document.getElementById("input-year");
+    const inputTitle = document.getElementById("input-title");
+    const inputDate = document.getElementById("input-date");
+    const inputPlace = document.getElementById("input-place");
+    const inputAttendees = document.getElementById("input-attendees");
+    const inputNote = document.getElementById("input-note");
+
+    // 1. 관리자 권한 UI 전환
+    function updateRoleUI() {
+      const isAdmin = (currentUserSelect.value === "user_kim_js");
+
+      // 등록 폼은 관리자(김진세)에게만 노출
+      if (isAdmin) {
+        adminFormCard.classList.remove("hidden");
+      } else {
+        adminFormCard.classList.add("hidden");
+      }
+
+      // 관리자 전용 네비게이션 제어
+      document.querySelectorAll(".admin-only").forEach(el => {
+        if (isAdmin) el.classList.remove("hidden");
+        else el.classList.add("hidden");
+      });
+
+      renderCards();
+    }
+
+    // 2. 카드 목록 렌더링 (수정/삭제 버튼 관리자 제어)
+    function renderCards() {
       const container = document.getElementById("history-cards-container");
       container.innerHTML = "";
 
-      const filtered = (currentYear === "all") 
-        ? gatherings 
-        : gatherings.filter(g => g.year === currentYear);
+      const isAdmin = (currentUserSelect.value === "user_kim_js");
 
-      filtered.forEach(g => {
+      const filtered = (currentFilterYear === "all") 
+        ? historyList 
+        : historyList.filter(item => String(item.year) === String(currentFilterYear));
+
+      document.getElementById("record-count").innerText = `총 ${filtered.length}건`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="p-6 text-center text-slate-400 bg-white rounded-xl border border-slate-200">해당 연도의 등록된 모임 기록이 없습니다.</div>`;
+        return;
+      }
+
+      filtered.forEach(item => {
         const card = document.createElement("div");
-        card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2";
+        card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2.5";
         card.innerHTML = `
-          <div class="flex justify-between items-center border-b pb-2">
-            <span class="font-black text-slate-900 text-sm">${g.title}</span>
-            <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">${g.year}년</span>
+          <div class="flex justify-between items-start border-b pb-2">
+            <div>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">${item.year}년</span>
+              <strong class="text-sm font-black text-slate-900 ml-1.5">${item.title}</strong>
+            </div>
+            ${isAdmin ? `
+              <div class="flex gap-1.5">
+                <button class="btn-edit text-[11px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 font-semibold" data-id="${item.id}">수정</button>
+                <button class="btn-del text-[11px] text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 font-semibold" data-id="${item.id}">삭제</button>
+              </div>
+            ` : ''}
           </div>
+
           <div class="space-y-1 text-slate-600 text-[11px]">
-            <div>📍 <strong>장소:</strong> ${g.place}</div>
-            <div>📅 <strong>일시:</strong> ${g.date}</div>
-            <div>👥 <strong>참석:</strong> ${g.attendees}</div>
+            <div>📍 <strong>장소:</strong> ${item.place}</div>
+            <div>📅 <strong>일시:</strong> ${item.date}</div>
+            <div>👥 <strong>참석:</strong> ${item.attendees}</div>
           </div>
-          <div class="p-2 bg-slate-50 rounded text-[11px] text-slate-500 leading-relaxed">
-            ${g.note}
-          </div>
+
+          ${item.note ? `
+            <div class="p-2.5 bg-slate-50 border border-slate-100 rounded-lg text-[11px] text-slate-500 leading-relaxed">
+              ${item.note}
+            </div>
+          ` : ''}
         `;
         container.appendChild(card);
       });
+
+      // 수정 버튼 이벤트
+      if (isAdmin) {
+        document.querySelectorAll(".btn-edit").forEach(btn => {
+          btn.onclick = (e) => {
+            const id = e.currentTarget.getAttribute("data-id");
+            const target = historyList.find(h => h.id === id);
+            if (!target) return;
+
+            editIdInput.value = target.id;
+            inputYear.value = target.year;
+            inputTitle.value = target.title;
+            inputDate.value = target.date;
+            inputPlace.value = target.place;
+            inputAttendees.value = target.attendees;
+            inputNote.value = target.note || "";
+
+            formTitle.innerText = "모임 기록 수정";
+            btnSubmit.innerText = "수정사항 저장";
+            btnCancelEdit.classList.remove("hidden");
+
+            // 폼으로 부드럽게 스크롤
+            adminFormCard.scrollIntoView({ behavior: 'smooth' });
+          };
+        });
+
+        // 삭제 버튼 이벤트
+        document.querySelectorAll(".btn-del").forEach(btn => {
+          btn.onclick = async (e) => {
+            const id = e.currentTarget.getAttribute("data-id");
+            if (!confirm("이 모임 기록을 영구 삭제하시겠습니까?")) return;
+
+            historyList = historyList.filter(h => h.id !== id);
+            renderCards();
+
+            try {
+              await deleteDoc(doc(db, "gatherings_history", id));
+              alert("모임 기록이 삭제되었습니다.");
+            } catch (err) {
+              console.warn(err);
+            }
+          };
+        });
+      }
     }
 
-    // 연도 필터 버튼 클릭
+    // 3. 수정 취소 버튼
+    btnCancelEdit.onclick = () => {
+      editIdInput.value = "";
+      formTitle.innerText = "새 모임/여행 기록 등록";
+      btnSubmit.innerText = "기록 저장 (DB 등록)";
+      btnCancelEdit.classList.add("hidden");
+      document.getElementById("history-form").reset();
+      inputYear.value = "2026";
+    };
+
+    // 4. 폼 등록 및 수정 제출 이벤트
+    document.getElementById("history-form").onsubmit = async (e) => {
+      e.preventDefault();
+
+      const id = editIdInput.value || `hist_${Date.now()}`;
+      const year = inputYear.value.trim();
+      const title = inputTitle.value.trim();
+      const date = inputDate.value.trim();
+      const place = inputPlace.value.trim();
+      const attendees = inputAttendees.value.trim();
+      const note = inputNote.value.trim();
+
+      const newRecord = { id, year, title, date, place, attendees, note };
+
+      const existingIndex = historyList.findIndex(h => h.id === id);
+      if (existingIndex > -1) {
+        historyList[existingIndex] = newRecord;
+      } else {
+        historyList.unshift(newRecord);
+      }
+
+      // 연도 내림차순 정렬
+      historyList.sort((a, b) => b.year.localeCompare(a.year));
+
+      renderCards();
+      btnCancelEdit.click();
+
+      try {
+        await setDoc(doc(db, "gatherings_history", id), newRecord);
+        alert(`🎉 [${year}년 ${title}] 기록이 저장되었습니다.`);
+      } catch (err) {
+        console.warn("Firestore 저장 에러:", err);
+      }
+    };
+
+    // 5. 연도 필터 버튼 클릭 이벤트
     document.querySelectorAll(".year-btn").forEach(btn => {
       btn.onclick = (e) => {
         document.querySelectorAll(".year-btn").forEach(b => {
           b.className = "year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap";
         });
         e.currentTarget.className = "year-btn px-3 py-1.5 bg-slate-900 text-white rounded-lg whitespace-nowrap";
-        currentYear = e.currentTarget.getAttribute("data-year");
-        renderGatherings();
+        currentFilterYear = e.currentTarget.getAttribute("data-year");
+        renderCards();
       };
     });
 
-    // 관리자 메뉴 가시성 제어
-    const currentUserSelect = document.getElementById("current-user-select");
-    function updateMenuVisibility() {
-      const isAdmin = (currentUserSelect.value === "user_kim_js");
-      document.querySelectorAll(".admin-only").forEach(el => {
-        if (isAdmin) el.classList.remove("hidden");
-        else el.classList.add("hidden");
-      });
+    // 6. DB 로드 및 최초 자동 시드 데이터 생성
+    async function loadHistoryData() {
+      try {
+        const snap = await getDocs(collection(db, "gatherings_history"));
+        if (!snap.empty) {
+          const list = [];
+          snap.forEach(d => list.push(d.data()));
+          list.sort((a, b) => b.year.localeCompare(a.year));
+          historyList = list;
+        } else {
+          // DB가 비어있다면 2019~2026 기본 데이터 1회 자동 생성
+          historyList = [...initialSeed];
+          for (const item of initialSeed) {
+            await setDoc(doc(db, "gatherings_history", item.id), item);
+          }
+        }
+      } catch (e) {
+        console.warn("로컬 모드 유지:", e);
+        historyList = [...initialSeed];
+      }
+      updateRoleUI();
     }
-    currentUserSelect.addEventListener("change", updateMenuVisibility);
 
-    updateMenuVisibility();
-    renderGatherings();
+    currentUserSelect.addEventListener("change", updateRoleUI);
+    loadHistoryData();
   </script>
 
 </body>
