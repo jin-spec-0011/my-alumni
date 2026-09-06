@@ -9,21 +9,17 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 공통 통합 헤더 -->
+  <!-- 공통 상단 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
         <span class="text-xl">📸</span>
         <div>
-          <h1 class="font-black text-base text-slate-900 leading-tight">과거 모임 & 여행 행적</h1>
-          <span class="text-[10px] text-slate-400 font-medium">Since 2019 연도별 추억 기록</span>
+          <h1 class="font-black text-base text-slate-900 leading-tight">과거 여행 & 모임</h1>
+          <span class="text-[10px] text-slate-400 font-medium">자유 등록 & 사진 아카이브 (Since 2019)</span>
         </div>
       </div>
-
-      <!-- 관리자 로그인 뱃지 (기본: 일반 회원 모드) -->
-      <div id="admin-status-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-        일반 회원 모드
-      </div>
+      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border">자율 수정 모드</span>
     </div>
 
     <!-- 5대 메인 탭 + 더보기 콤보박스 -->
@@ -36,25 +32,17 @@
         <a href="election.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">회장 선출</a>
       </div>
 
-      <!-- 콤보박스 (더보기) -->
       <div class="relative inline-block text-left ml-1 flex-shrink-0">
         <button id="btn-dropdown" type="button" class="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg whitespace-nowrap flex items-center gap-1 border border-slate-200">
           <span>더보기 ▾</span>
         </button>
-
-        <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
-          <div class="px-3 py-1 text-[10px] text-slate-400 font-bold border-b border-slate-100 mb-1">부가 기능</div>
+        <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
           <a href="gathering.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
             <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i><span>모임 & 예약</span>
           </a>
           <a href="ledger.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
             <i class="fa-solid fa-won-sign text-amber-600 w-3.5"></i><span>회비 장부</span>
           </a>
-          <div class="border-t border-slate-100 my-1"></div>
-          <button id="btn-admin-auth" type="button" class="w-full text-left px-3 py-2 text-slate-800 hover:bg-slate-50 flex items-center gap-2 font-bold">
-            <i class="fa-solid fa-key text-indigo-600 w-3.5"></i>
-            <span id="admin-auth-text">관리자 로그인 (비번:0000)</span>
-          </button>
         </div>
       </div>
     </nav>
@@ -62,197 +50,153 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 관리자 로그인 시에만 노출되는 모임 등록/수정 폼 -->
-    <div id="admin-form-card" class="hidden bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
+    <!-- 여행/모임 등록 및 수정 폼 (누구나 가능) -->
+    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
         <div>
-          <h2 class="font-bold text-sm text-slate-900" id="form-title">새 모임/여행 기록 등록</h2>
-          <p class="text-[11px] text-slate-400">김진세 관리자 전용 작성창 (수정/저장 시 DB 반영)</p>
+          <h2 class="font-bold text-sm text-slate-900" id="form-title">새 여행/모임 추억 등록</h2>
+          <p class="text-[11px] text-slate-400">누구나 등록·수정 가능 (작업자 실명/시간 기록)</p>
         </div>
-        <button id="btn-cancel-edit" class="hidden text-xs text-rose-600 font-bold px-2 py-0.5 border border-rose-200 rounded">수정 취소</button>
+        <button id="btn-cancel-edit" class="hidden text-xs text-rose-600 font-bold px-2 py-0.5 border border-rose-200 rounded">취소</button>
       </div>
 
       <form id="history-form" class="space-y-2.5 text-xs">
         <input type="hidden" id="edit-id" value="">
 
-        <div class="grid grid-cols-3 gap-2">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">연도</label>
-            <input type="number" id="input-year" value="2026" min="2019" max="2035" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-          </div>
-          <div class="col-span-2">
-            <label class="block font-bold text-slate-700 mb-1">모임 / 여행 제목</label>
-            <input type="text" id="input-title" placeholder="예: 2026 상반기 정기 모임" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-          </div>
-        </div>
-
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">일시 (날짜/요일)</label>
-            <input type="text" id="input-date" placeholder="예: 2026-05-16 (토)" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <label class="block font-bold text-slate-700 mb-1">여행지 / 장소</label>
+            <input type="text" id="input-place" placeholder="예: 제주 서귀포, 속초 해변" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">방문 장소 / 식당</label>
-            <input type="text" id="input-place" placeholder="예: 충북 참숯 한우마을" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <label class="block font-bold text-slate-700 mb-1">날짜</label>
+            <input type="date" id="input-date" value="2026-09-06" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1">참석 인원 및 명단</label>
-          <input type="text" id="input-attendees" placeholder="예: 어른 8명, 아이 2명 (총 10명)" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+          <label class="block font-bold text-slate-700 mb-1">메모 / 후기</label>
+          <textarea id="input-memo" rows="2" placeholder="모임 후기, 맛집 평가, 에피소드를 적어주세요." class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
         </div>
 
+        <!-- 사진 첨부 (자동 압축 기능) -->
         <div>
-          <label class="block font-bold text-slate-700 mb-1">추억 메모 / 후기</label>
-          <textarea id="input-note" rows="2" placeholder="모임 후기, 특이사항을 적어두세요." class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+          <label class="block font-bold text-slate-700 mb-1">사진 첨부 (자동 리사이즈 압축)</label>
+          <input type="file" id="input-photo" accept="image/*" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+          <div id="photo-preview-box" class="hidden mt-2 relative inline-block">
+            <img id="photo-preview" class="w-24 h-24 object-cover rounded-lg border">
+            <button type="button" id="btn-del-photo" class="absolute -top-1.5 -right-1.5 bg-rose-600 text-white rounded-full w-5 h-5 text-[10px] flex items-center justify-center">✕</button>
+          </div>
+        </div>
+
+        <!-- 작성자 선택 (실명 타임스탬프용) -->
+        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex justify-between items-center">
+          <span class="font-bold text-slate-700">작업자 본인 선택</span>
+          <select id="select-author" class="p-1.5 border rounded bg-white font-bold text-slate-800">
+            <option value="김진세" selected>김진세</option>
+            <option value="송환오">송환오</option>
+            <option value="장우석">장우석</option>
+            <option value="김정수">김정수</option>
+            <option value="이해웅">이해웅</option>
+          </select>
         </div>
 
         <button type="submit" id="btn-submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm transition">
-          기록 저장 (DB 등록)
+          추억 기록 저장
         </button>
       </form>
     </div>
 
-    <!-- 연도별 필터 버튼 영역 -->
-    <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
-      <div class="flex justify-between items-center text-[11px] font-bold text-slate-500">
-        <span>연도별 모임 기록 열람</span>
-        <span id="record-count" class="text-blue-600">총 0건</span>
-      </div>
-      <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs font-bold" id="year-filter-buttons">
-        <button class="year-btn px-3 py-1.5 bg-slate-900 text-white rounded-lg whitespace-nowrap" data-year="all">전체</button>
-        <button class="year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap" data-year="2026">2026년</button>
-        <button class="year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap" data-year="2025">2025년</button>
-        <button class="year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap" data-year="2024">2024년</button>
-        <button class="year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap" data-year="2019">2019년</button>
+    <!-- 연도 필터 -->
+    <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm flex items-center justify-between text-xs">
+      <span class="font-bold text-slate-600" id="record-count">총 0건</span>
+      <div class="flex gap-1 overflow-x-auto no-scrollbar" id="year-filter-box">
+        <button class="year-btn px-2.5 py-1 bg-slate-900 text-white rounded-lg font-bold" data-year="all">전체</button>
+        <button class="year-btn px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold" data-year="2026">2026년</button>
+        <button class="year-btn px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold" data-year="2025">2025년</button>
+        <button class="year-btn px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold" data-year="2024">2024년</button>
+        <button class="year-btn px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold" data-year="2019">2019년</button>
       </div>
     </div>
 
-    <!-- 연도별 모임 카드 리스트 -->
-    <div id="history-cards-container" class="space-y-3 text-xs">
-      <!-- 렌더링 영역 -->
-    </div>
+    <!-- 과거 모임 카드 목록 -->
+    <div id="history-cards-container" class="space-y-3 text-xs"></div>
 
   </main>
 
   <script type="module">
     import { db, doc, setDoc, getDocs, collection, deleteDoc } from "./js/firebase.js";
 
-    const initialSeed = [
-      {
-        id: "hist_2026_01",
-        year: "2026",
-        title: "2026 상반기 정기 모임",
-        date: "2026-05-16 (토)",
-        place: "충북 참숯 한우마을 (본관 대형 룸)",
-        attendees: "어른 8명, 아이 2명 (총 10명 참석)",
-        note: "송환오 회장 주재 상반기 모임. 아이들 동반 룸으로 쾌적하게 진행 완료."
-      },
-      {
-        id: "hist_2025_01",
-        year: "2025",
-        title: "2025 연말 송년 가족 모임",
-        date: "2025-12-13 (토)",
-        place: "오창 호수공원 인근 일식 다이닝 코스",
-        attendees: "총 11명 풀가동 전원 참석",
-        note: "연말 정기 결산 및 가족 동반 송년회 완료."
-      },
-      {
-        id: "hist_2024_01",
-        year: "2024",
-        title: "2024 가을 단풍 가족 나들이 모임",
-        date: "2024-10-19 (토)",
-        place: "청주 외곽 가든 바베큐 하우스",
-        attendees: "총 10명 참석",
-        note: "야외 테라스 바베큐 파티 및 동창 교류."
-      },
-      {
-        id: "hist_2019_01",
-        year: "2019",
-        title: "5인 동창 곗모임 최초 결성",
-        date: "2019-09-07 (토)",
-        place: "모교 앞 고깃집 본점",
-        attendees: "동창 5인 전원 (김진세, 송환오, 장우석, 김정수, 이해웅)",
-        note: "곗모임 공식 결성, 회칙 초안 합의 및 초대 송환오 회장 추첨 선출."
-      }
-    ];
-
     let historyList = [];
-    let currentFilterYear = "all";
+    let currentYearFilter = "all";
+    let compressedPhotoBase64 = "";
 
-    const adminFormCard = document.getElementById("admin-form-card");
-    const formTitle = document.getElementById("form-title");
+    const form = document.getElementById("history-form");
     const editIdInput = document.getElementById("edit-id");
+    const inputPlace = document.getElementById("input-place");
+    const inputDate = document.getElementById("input-date");
+    const inputMemo = document.getElementById("input-memo");
+    const inputPhoto = document.getElementById("input-photo");
+    const selectAuthor = document.getElementById("select-author");
+    const photoPreviewBox = document.getElementById("photo-preview-box");
+    const photoPreview = document.getElementById("photo-preview");
     const btnCancelEdit = document.getElementById("btn-cancel-edit");
+    const formTitle = document.getElementById("form-title");
     const btnSubmit = document.getElementById("btn-submit");
 
-    const inputYear = document.getElementById("input-year");
-    const inputTitle = document.getElementById("input-title");
-    const inputDate = document.getElementById("input-date");
-    const inputPlace = document.getElementById("input-place");
-    const inputAttendees = document.getElementById("input-attendees");
-    const inputNote = document.getElementById("input-note");
-
-    // 공통 인증 체크
-    const adminBadge = document.getElementById("admin-status-badge");
-    const adminAuthText = document.getElementById("admin-auth-text");
-
-    function checkAuth() {
-      const isAdmin = (sessionStorage.getItem("alumni_admin_auth") === "true");
-      if (isAdmin) {
-        adminBadge.className = "text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
-        adminBadge.innerText = "⚙️ 관리자(김진세) 모드";
-        adminAuthText.innerText = "관리자 로그아웃";
-        adminFormCard.classList.remove("hidden");
-      } else {
-        adminBadge.className = "text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200";
-        adminBadge.innerText = "일반 회원 모드";
-        adminAuthText.innerText = "관리자 로그인 (비번:0000)";
-        adminFormCard.classList.add("hidden");
-      }
-      renderCards();
-    }
-
-    // 콤보박스 드롭다운 제어
+    // 드롭다운 토글
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
     btnDropdown.onclick = (e) => { e.stopPropagation(); dropdownMenu.classList.toggle("hidden"); };
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // 관리자 로그인 토글 (비번 0000)
-    document.getElementById("btn-admin-auth").onclick = () => {
-      const isAdmin = (sessionStorage.getItem("alumni_admin_auth") === "true");
-      if (isAdmin) {
-        if (confirm("관리자 모드에서 로그아웃하시겠습니까?")) {
-          sessionStorage.removeItem("alumni_admin_auth");
-          alert("일반 회원 모드로 전환되었습니다.");
-          checkAuth();
-        }
-      } else {
-        const pw = prompt("김진세 관리자 비밀번호를 입력하세요:");
-        if (pw === "0000") {
-          sessionStorage.setItem("alumni_admin_auth", "true");
-          alert("🎉 김진세 관리자로 인증되었습니다.");
-          checkAuth();
-        } else if (pw !== null) {
-          alert("❌ 비밀번호가 올바르지 않습니다.");
-        }
-      }
+    // 이미지 500px Canvas 압축 (Firestore 용량 최적화)
+    inputPhoto.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const maxWidth = 500;
+          let w = img.width, h = img.height;
+          if (w > maxWidth) {
+            h = Math.round((h * maxWidth) / w);
+            w = maxWidth;
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+          compressedPhotoBase64 = canvas.toDataURL("image/jpeg", 0.6); // 작은 사이즈 압축
+          photoPreview.src = compressedPhotoBase64;
+          photoPreviewBox.classList.remove("hidden");
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById("btn-del-photo").onclick = () => {
+      compressedPhotoBase64 = "";
+      inputPhoto.value = "";
+      photoPreviewBox.classList.add("hidden");
     };
 
     function renderCards() {
       const container = document.getElementById("history-cards-container");
       container.innerHTML = "";
-      const isAdmin = (sessionStorage.getItem("alumni_admin_auth") === "true");
 
-      const filtered = (currentFilterYear === "all") 
-        ? historyList 
-        : historyList.filter(item => String(item.year) === String(currentFilterYear));
+      const filtered = (currentYearFilter === "all")
+        ? historyList
+        : historyList.filter(item => item.date.startsWith(currentYearFilter));
 
       document.getElementById("record-count").innerText = `총 ${filtered.length}건`;
 
       if (filtered.length === 0) {
-        container.innerHTML = `<div class="p-6 text-center text-slate-400 bg-white rounded-xl border border-slate-200">해당 연도의 모임 기록이 없습니다.</div>`;
+        container.innerHTML = `<div class="p-6 text-center text-slate-400 bg-white rounded-xl border">등록된 모임 기록이 없습니다.</div>`;
         return;
       }
 
@@ -262,134 +206,156 @@
         card.innerHTML = `
           <div class="flex justify-between items-start border-b pb-2">
             <div>
-              <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">${item.year}년</span>
-              <strong class="text-sm font-black text-slate-900 ml-1.5">${item.title}</strong>
+              <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">${item.date.substring(0, 4)}년</span>
+              <strong class="text-sm font-black text-slate-900 ml-1.5">${item.place}</strong>
             </div>
-            ${isAdmin ? `
-              <div class="flex gap-1.5">
-                <button class="btn-edit text-[11px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 font-semibold" data-id="${item.id}">수정</button>
-                <button class="btn-del text-[11px] text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 font-semibold" data-id="${item.id}">삭제</button>
-              </div>
-            ` : ''}
+            <div class="flex gap-1.5">
+              <button class="btn-edit text-[11px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 font-bold" data-id="${item.id}">수정</button>
+              <button class="btn-del text-[11px] text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 font-bold" data-id="${item.id}">삭제</button>
+            </div>
           </div>
+
+          ${item.photo ? `<div><img src="${item.photo}" class="w-full max-h-48 object-cover rounded-lg border"></div>` : ''}
 
           <div class="space-y-1 text-slate-600 text-[11px]">
-            <div>📍 <strong>장소:</strong> ${item.place}</div>
             <div>📅 <strong>일시:</strong> ${item.date}</div>
-            <div>👥 <strong>참석:</strong> ${item.attendees}</div>
+            ${item.memo ? `<div class="p-2 bg-slate-50 border rounded-lg text-slate-600 leading-relaxed">${item.memo}</div>` : ''}
           </div>
 
-          ${item.note ? `
-            <div class="p-2.5 bg-slate-50 border border-slate-100 rounded-lg text-[11px] text-slate-500 leading-relaxed">
-              ${item.note}
-            </div>
-          ` : ''}
+          <div class="text-[10px] text-slate-400 pt-1 border-t flex justify-between">
+            <span>기록: <strong>${item.author || '회원'}</strong></span>
+            <span>${item.updatedAt || item.date}</span>
+          </div>
         `;
         container.appendChild(card);
       });
 
-      if (isAdmin) {
-        document.querySelectorAll(".btn-edit").forEach(btn => {
-          btn.onclick = (e) => {
-            const id = e.currentTarget.getAttribute("data-id");
-            const target = historyList.find(h => h.id === id);
-            if (!target) return;
+      // 수정 클릭 이벤트
+      document.querySelectorAll(".btn-edit").forEach(btn => {
+        btn.onclick = (e) => {
+          const id = e.currentTarget.getAttribute("data-id");
+          const target = historyList.find(h => h.id === id);
+          if (!target) return;
 
-            editIdInput.value = target.id;
-            inputYear.value = target.year;
-            inputTitle.value = target.title;
-            inputDate.value = target.date;
-            inputPlace.value = target.place;
-            inputAttendees.value = target.attendees;
-            inputNote.value = target.note || "";
+          editIdInput.value = target.id;
+          inputPlace.value = target.place;
+          inputDate.value = target.date;
+          inputMemo.value = target.memo || "";
+          if (target.photo) {
+            compressedPhotoBase64 = target.photo;
+            photoPreview.src = target.photo;
+            photoPreviewBox.classList.remove("hidden");
+          } else {
+            compressedPhotoBase64 = "";
+            photoPreviewBox.classList.add("hidden");
+          }
 
-            formTitle.innerText = "모임 기록 수정";
-            btnSubmit.innerText = "수정사항 저장";
-            btnCancelEdit.classList.remove("hidden");
-            adminFormCard.scrollIntoView({ behavior: 'smooth' });
-          };
-        });
+          formTitle.innerText = "여행/모임 기록 수정";
+          btnSubmit.innerText = "수정 완료 (기록자 반영)";
+          btnCancelEdit.classList.remove("hidden");
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+      });
 
-        document.querySelectorAll(".btn-del").forEach(btn => {
-          btn.onclick = async (e) => {
-            const id = e.currentTarget.getAttribute("data-id");
-            if (!confirm("이 기록을 삭제하시겠습니까?")) return;
-            historyList = historyList.filter(h => h.id !== id);
-            renderCards();
-            try { await deleteDoc(doc(db, "gatherings_history", id)); } catch (err) {}
-          };
-        });
-      }
+      // 삭제 클릭 이벤트 (누가 삭제했는지 기록)
+      document.querySelectorAll(".btn-del").forEach(btn => {
+        btn.onclick = async (e) => {
+          const id = e.currentTarget.getAttribute("data-id");
+          const deleter = prompt("삭제자 본인 이름을 입력하세요 (김진세, 송환오, 장우석, 김정수, 이해웅):");
+          if (!deleter) return;
+
+          if (!confirm(`[${deleter}] 님이 이 기록을 영구 삭제하시겠습니까?`)) return;
+
+          historyList = historyList.filter(h => h.id !== id);
+          renderCards();
+
+          try {
+            await deleteDoc(doc(db, "gatherings_history", id));
+            alert(`[${deleter}] 삭제 완료되었습니다.`);
+          } catch (err) {
+            console.warn(err);
+          }
+        };
+      });
     }
 
     btnCancelEdit.onclick = () => {
       editIdInput.value = "";
-      formTitle.innerText = "새 모임/여행 기록 등록";
-      btnSubmit.innerText = "기록 저장 (DB 등록)";
+      formTitle.innerText = "새 여행/모임 추억 등록";
+      btnSubmit.innerText = "추억 기록 저장";
       btnCancelEdit.classList.add("hidden");
-      document.getElementById("history-form").reset();
-      inputYear.value = "2026";
+      form.reset();
+      compressedPhotoBase64 = "";
+      photoPreviewBox.classList.add("hidden");
     };
 
-    document.getElementById("history-form").onsubmit = async (e) => {
+    form.onsubmit = async (e) => {
       e.preventDefault();
       const id = editIdInput.value || `hist_${Date.now()}`;
-      const year = inputYear.value.trim();
-      const title = inputTitle.value.trim();
-      const date = inputDate.value.trim();
-      const place = inputPlace.value.trim();
-      const attendees = inputAttendees.value.trim();
-      const note = inputNote.value.trim();
+      const author = selectAuthor.value;
+      const now = new Date();
+      const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
-      const newRecord = { id, year, title, date, place, attendees, note };
+      const newRecord = {
+        id,
+        place: inputPlace.value.trim(),
+        date: inputDate.value,
+        memo: inputMemo.value.trim(),
+        photo: compressedPhotoBase64,
+        author: author,
+        updatedAt: timeStr
+      };
+
       const idx = historyList.findIndex(h => h.id === id);
       if (idx > -1) historyList[idx] = newRecord;
       else historyList.unshift(newRecord);
 
-      historyList.sort((a, b) => b.year.localeCompare(a.year));
+      historyList.sort((a, b) => b.date.localeCompare(a.date));
       renderCards();
       btnCancelEdit.click();
 
       try {
         await setDoc(doc(db, "gatherings_history", id), newRecord);
-        alert(`🎉 [${year}년 ${title}] 기록이 저장되었습니다.`);
+        alert(`🎉 [${author}] 기록이 성공적으로 저장되었습니다.`);
       } catch (err) {
         console.warn(err);
       }
     };
 
+    // 연도 필터 버튼
     document.querySelectorAll(".year-btn").forEach(btn => {
       btn.onclick = (e) => {
-        document.querySelectorAll(".year-btn").forEach(b => {
-          b.className = "year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap";
-        });
-        e.currentTarget.className = "year-btn px-3 py-1.5 bg-slate-900 text-white rounded-lg whitespace-nowrap";
-        currentFilterYear = e.currentTarget.getAttribute("data-year");
+        document.querySelectorAll(".year-btn").forEach(b => b.className = "year-btn px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold");
+        e.currentTarget.className = "year-btn px-2.5 py-1 bg-slate-900 text-white rounded-lg font-bold";
+        currentYearFilter = e.currentTarget.getAttribute("data-year");
         renderCards();
       };
     });
 
-    async function loadHistoryData() {
+    async function loadData() {
       try {
         const snap = await getDocs(collection(db, "gatherings_history"));
         if (!snap.empty) {
           const list = [];
           snap.forEach(d => list.push(d.data()));
-          list.sort((a, b) => b.year.localeCompare(a.year));
+          list.sort((a, b) => b.date.localeCompare(a.date));
           historyList = list;
         } else {
-          historyList = [...initialSeed];
-          for (const item of initialSeed) {
+          // 최초 시드
+          historyList = [
+            { id: "hist_1", place: "충북 참숯 한우마을", date: "2026-05-16", memo: "아이들과 단독 룸에서 상반기 모임 완료", author: "송환오", updatedAt: "2026-05-16 20:00" },
+            { id: "hist_2", place: "오창 호수공원 일식 다이닝", date: "2025-12-13", memo: "연말 송년회 및 가족 동반", author: "김진세", updatedAt: "2025-12-13 19:30" },
+            { id: "hist_3", place: "모교 앞 고깃집 본점", date: "2019-09-07", memo: "5인 동창 곗모임 최초 결성식", author: "장우석", updatedAt: "2019-09-07 18:00" }
+          ];
+          for (const item of historyList) {
             await setDoc(doc(db, "gatherings_history", item.id), item);
           }
         }
-      } catch (e) {
-        historyList = [...initialSeed];
-      }
-      checkAuth();
+      } catch (e) {}
+      renderCards();
     }
 
-    loadHistoryData();
+    loadData();
   </script>
 
 </body>
