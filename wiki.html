@@ -9,18 +9,18 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 통합 모바일 상단 헤더 -->
+  <!-- 통합 모바일 상단 헤더 (항시 일반 회원 모드 기본값) -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
         <span class="text-xl">📜</span>
         <div>
           <h1 class="font-black text-base text-slate-900 leading-tight">5인 동창 곗모임 회칙</h1>
-          <span class="text-[10px] text-slate-400 font-medium">합의 계칙 문서 (Since 2019)</span>
+          <span class="text-[10px] text-slate-400 font-medium">Since 2019 모임 합의 계칙</span>
         </div>
       </div>
 
-      <!-- 관리자 로그인 뱃지 -->
+      <!-- 관리자 로그인 인증 뱃지 -->
       <div id="admin-status-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
         일반 회원 모드
       </div>
@@ -29,29 +29,46 @@
     <!-- 네비게이션 탭 4종 + 더보기 콤보박스 -->
     <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
       <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
-        <a href="index.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">대시보드</a>
-        <a href="history.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">과거 여행/모임</a>
-        <a href="wiki.html" class="py-1.5 px-2.5 bg-blue-50 text-blue-600 rounded-lg whitespace-nowrap">회칙</a>
-        <a href="election.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">회장 선출소</a>
+        <a href="index.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">
+          대시보드
+        </a>
+        <a href="history.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">
+          과거 여행/모임
+        </a>
+        <a href="wiki.html" class="py-1.5 px-2.5 bg-blue-50 text-blue-600 rounded-lg whitespace-nowrap">
+          회칙
+        </a>
+        <a href="election.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">
+          회장 선출소
+        </a>
       </div>
 
+      <!-- 콤보박스 (나머지 페이지 및 관리자 로그인) -->
       <div class="relative inline-block text-left ml-1">
         <button id="btn-dropdown" type="button" class="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg whitespace-nowrap flex items-center gap-1 border border-slate-200">
           <span>더보기 ▾</span>
         </button>
 
         <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
-          <div class="px-3 py-1 text-[10px] text-slate-400 font-bold border-b border-slate-100 mb-1">부가 기능</div>
+          <div class="px-3 py-1 text-[10px] text-slate-400 font-bold border-b border-slate-100 mb-1">
+            부가 기능 페이지
+          </div>
           <a href="settlement.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-            <i class="fa-solid fa-receipt text-emerald-600 w-3.5"></i><span>개별 정산소</span>
+            <i class="fa-solid fa-receipt text-emerald-600 w-3.5"></i>
+            <span>개별 정산소</span>
           </a>
           <a href="gathering.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-            <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i><span>모임 & 예약</span>
+            <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i>
+            <span>모임 & 예약</span>
           </a>
           <a href="ledger.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-            <i class="fa-solid fa-won-sign text-amber-600 w-3.5"></i><span>회비 장부</span>
+            <i class="fa-solid fa-won-sign text-amber-600 w-3.5"></i>
+            <span>회비 장부</span>
           </a>
+
           <div class="border-t border-slate-100 my-1"></div>
+
+          <!-- 0000 비밀번호 로그인 토글 -->
           <button id="btn-admin-auth" type="button" class="w-full text-left px-3 py-2 text-slate-800 hover:bg-slate-50 flex items-center gap-2 font-bold">
             <i class="fa-solid fa-key text-indigo-600 w-3.5"></i>
             <span id="admin-auth-text">관리자 로그인 (비번:0000)</span>
@@ -64,19 +81,19 @@
   <!-- 메인 모바일 뷰 컨테이너 -->
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 문서 메타 카드 & 서브 탭 -->
+    <!-- 문서 헤더 & 모바일 서브 탭 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="flex justify-between items-center border-b pb-2">
         <div>
           <span class="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded">BYLAWS-001</span>
-          <h2 class="text-base font-black text-slate-900 mt-1">모임 공식 계칙 전문</h2>
+          <h2 class="text-base font-black text-slate-900 mt-1">동창회 공식 계칙 전문</h2>
         </div>
         <div class="text-right text-[11px] text-slate-400">
           <span id="wiki-rev" class="font-bold text-teal-600">r3 판본</span>
         </div>
       </div>
 
-      <!-- 모바일 서브 탭 (열람 / 개정 / 역사) -->
+      <!-- 서브 탭 (열람 / 회칙 개정 / 개정 역사) -->
       <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-lg text-xs font-bold text-center">
         <button id="subtab-view" class="py-1.5 bg-white text-slate-900 rounded shadow-sm">열람</button>
         <button id="subtab-edit" class="py-1.5 text-slate-600 hover:text-slate-900 rounded">회칙 개정</button>
@@ -84,14 +101,16 @@
       </div>
     </div>
 
-    <!-- 1. [열람 패널] 모바일 최적화 조항 카드 리스트 -->
+    <!-- 1. [열람 패널] 모바일 전용 조항 카드 -->
     <div id="panel-view" class="space-y-3 text-xs leading-relaxed">
       <!-- 제1조 -->
       <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm space-y-1">
         <strong class="text-slate-900 text-sm flex items-center gap-1.5">
           <span class="text-teal-600 font-black">1.</span> 제1조 (명칭 및 목적)
         </strong>
-        <p class="text-slate-600 pt-1">본 모임은 고등학교 5인 동창 간의 친목 도모와 정기적인 회합, 상호 부조를 목적으로 2019년에 결성된 곗모임이다.</p>
+        <p class="text-slate-600 pt-1">
+          본 모임은 고등학교 5인 동창 간의 친목 도모와 정기적인 회합, 상호 부조를 목적으로 2019년에 결성된 곗모임이다.
+        </p>
       </div>
 
       <!-- 제2조 -->
@@ -100,7 +119,7 @@
           <span class="text-teal-600 font-black">2.</span> 제2조 (회원의 자격 및 현황)
         </strong>
         <p class="text-slate-600">본 회의 정회원은 아래 5인으로 영구 한정한다.</p>
-        <div class="bg-slate-50 p-2 rounded-lg space-y-1 text-[11px] text-slate-700">
+        <div class="bg-slate-50 p-2.5 rounded-lg space-y-1 text-[11px] text-slate-700 border border-slate-100">
           <div>• <strong>김진세:</strong> 홈페이지 관리자 (기혼, 자녀 1명)</div>
           <div>• <strong>송환오:</strong> 회장 (기혼, 무자녀)</div>
           <div>• <strong>장우석:</strong> 총무 (기혼, 자녀 2명)</div>
@@ -114,7 +133,9 @@
         <strong class="text-slate-900 text-sm flex items-center gap-1.5">
           <span class="text-teal-600 font-black">3.</span> 제3조 (총무의 영구 면제권)
         </strong>
-        <p class="text-slate-600 pt-1">장우석 총무는 공금 관리 및 행정 업무를 상시 수행하는 대가로 <strong>차기 회장 피선거권에서 영구 면제</strong>된다.</p>
+        <p class="text-slate-600 pt-1">
+          장우석 총무는 공금 관리 및 행정 업무를 상시 수행하는 대가로 <strong>차기 회장 피선거권에서 영구 면제</strong>된다.
+        </p>
       </div>
 
       <!-- 제4조 -->
@@ -123,9 +144,9 @@
           <span class="text-teal-600 font-black">4.</span> 제4조 (임기 및 탄핵 연동)
         </strong>
         <p class="text-slate-600 pt-1">
-          ① 회장 임기는 <strong>대한민국 대통령 재임 기간과 연동</strong>된다.<br>
-          ② 대통령 탄핵 인용 시 회장직은 즉시 자동 박탈되며 비상 선출을 실시한다.<br>
-          ③ 차기 회장은 장우석 총무를 제외한 <strong>4인(송환오 현 회장 포함)을 대상으로 룰렛 추첨</strong>하며, 당선 확률은 각 25% 균등하다. (연임 제한 없음)
+          ① 회장 임기는 <strong>대한민국 대통령 재임 기간과 일치</strong>한다.<br>
+          ② 대통령 탄핵 인용 시 회장직은 즉시 자동 박탈되며 비상 선출을 진행한다.<br>
+          ③ 차기 회장은 장우석 총무를 제외한 <strong>4인(송환오 현 회장 포함)을 대상으로 룰렛 추첨</strong>하며 확률은 각 25%로 균등하다. (연임 제한 없음)
         </p>
       </div>
 
@@ -135,7 +156,7 @@
           <span class="text-amber-600 font-black">5.</span> 제5조 (장소 독점권 및 딴지 금지)
         </strong>
         <p class="text-amber-900 pt-1">
-          정기·임시 모임의 장소, 식당, 예약은 <strong>회장이 단독 결정</strong>한다. 모든 회원은 회장의 결정에 대해 일체의 불만이나 딴지를 걸 수 없으며 오직 가족 참석 여부(RSVP)만 회신한다.
+          정기·임시 모임의 장소 및 예약은 <strong>회장이 단독 결정</strong>한다. 모든 회원은 회장의 결정에 대해 일체의 불만이나 딴지를 제기할 수 없으며 오직 가족 참석 여부(RSVP)만 회신한다.
         </p>
       </div>
 
@@ -144,17 +165,19 @@
         <strong class="text-slate-900 text-sm flex items-center gap-1.5">
           <span class="text-teal-600 font-black">6.</span> 제6조 (가족 동반 및 수용 상한)
         </strong>
-        <p class="text-slate-600 pt-1">풀가동 시 최대 수용 규모는 <strong>성인 8명(회원 5 + 배우자 3)과 어린이 3명(장우석 2, 김진세 1)을 합산한 총 11명</strong>으로 산정하여 단독 룸을 예약한다.</p>
+        <p class="text-slate-600 pt-1">
+          풀가동 시 최대 수용 규모는 <strong>성인 8명(회원 5 + 배우자 3)과 어린이 3명(장우석 2, 김진세 1)을 합산한 총 11명</strong>으로 산정하여 단독 프라이빗 룸을 예약한다.
+        </p>
       </div>
 
       <!-- 제7조 -->
       <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm space-y-1">
         <strong class="text-slate-900 text-sm flex items-center gap-1.5">
-          <span class="text-teal-600 font-black">7.</span> 제7조 (정기 회비 및 결혼 전환)
+          <span class="text-teal-600 font-black">7.</span> 제7조 (정기 회비 및 전환 규정)
         </strong>
         <p class="text-slate-600 pt-1">
           ① 월 정기 곗돈은 기혼자 월 80,000원, 미혼자 월 40,000원으로 차등 부과한다. (월 목표 320,000원)<br>
-          ② 미혼 회원이 결혼할 경우 익월부터 기혼자 요율(8만 원)로 자동 전환된다.
+          ② 미혼 회원이 결혼할 경우 익월부터 기혼자 요율(8만 원)로 자동 전환 적용된다.
         </p>
       </div>
 
@@ -164,7 +187,7 @@
           <span class="text-rose-600 font-black">8.</span> 제8조·제9조 (경조사비 개별 각출 원칙)
         </strong>
         <p class="text-rose-900 pt-1">
-          모임 공금은 <strong>정기 모임 식대 전용</strong>이며, 회원의 결혼, 돌잔치, 부고 등 경조사비는 <strong>공금에서 지출하지 않고 당사자를 제외한 4인이 개별 각출</strong>하여 송금한다.
+          모임 공금은 <strong>정기 모임 식대 전용</strong>이며, 회원의 결혼, 돌잔치, 부고 등 모든 경조사비는 <strong>공금에서 지출하지 않고 당사자를 제외한 4인이 개별 각출</strong>하여 송금한다.
         </p>
       </div>
 
@@ -173,19 +196,21 @@
         <strong class="text-slate-900 text-sm flex items-center gap-1.5">
           <span class="text-teal-600 font-black">9.</span> 제10조 (편집 요약 의무제)
         </strong>
-        <p class="text-slate-600 pt-1">본 회칙을 개정할 때에는 반드시 개정 사유(편집 요약)를 필수로 입력해야만 판본으로 저장된다.</p>
+        <p class="text-slate-600 pt-1">
+          본 회칙을 개정할 때에는 개정 사유(편집 요약)를 필수로 입력해야만 판본으로 저장된다.
+        </p>
       </div>
     </div>
 
-    <!-- 2. [개정 패널] 관리자 전용 에디터 -->
+    <!-- 2. [개정 패널] 관리자(비번 0000 인증자) 전용 에디터 -->
     <div id="panel-edit" class="hidden bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
-        <h3 class="font-bold text-sm text-slate-900">회칙 조항 개정 편집창</h3>
+        <h3 class="font-bold text-sm text-slate-900">회칙 조항 개정 에디터</h3>
         <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded">관리자 전용</span>
       </div>
 
       <div class="space-y-2 text-xs">
-        <label class="block font-bold text-slate-700">개정 본문 마크다운</label>
+        <label class="block font-bold text-slate-700">개정 본문 텍스트</label>
         <textarea id="edit-content" rows="12" class="w-full p-2.5 border rounded-lg font-mono text-[11px] leading-relaxed bg-slate-50 focus:ring-2 focus:ring-teal-500"></textarea>
 
         <div class="p-2.5 bg-teal-50 border border-teal-200 rounded-lg space-y-1">
@@ -203,7 +228,7 @@
     <!-- 3. [역사 패널] 판본 히스토리 로그 -->
     <div id="panel-hist" class="hidden bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
-        <h3 class="font-bold text-sm text-slate-900">문서 개정 역사 (나무위키식)</h3>
+        <h3 class="font-bold text-sm text-slate-900">문서 개정 역사 (로그)</h3>
         <span id="hist-count" class="text-[11px] text-slate-400">총 3개 판본</span>
       </div>
 
@@ -215,7 +240,7 @@
   </main>
 
   <script type="module">
-    import { db, doc, setDoc, getDocs, collection } from "./js/firebase.js";
+    import { db, doc, setDoc } from "./js/firebase.js";
 
     let revisions = [
       { rev: "r3", date: "2026-09-06 22:00", author: "김진세", summary: "장우석 2자녀, 김진세 1자녀 현황 반영 및 모바일 뷰 개편" },
@@ -223,7 +248,7 @@
       { rev: "r1", date: "2019-09-07 18:00", author: "송환오", summary: "5인 동창 곗모임 최초 회칙 제정" }
     ];
 
-    // 관리자 인증 체크
+    // 관리자 인증 상태 체크 (기본: 일반 회원)
     const adminBadge = document.getElementById("admin-status-badge");
     const adminAuthText = document.getElementById("admin-auth-text");
 
@@ -240,17 +265,17 @@
       }
     }
 
-    // 드롭다운 토글
+    // 콤보박스 드롭다운 제어
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
     btnDropdown.onclick = (e) => { e.stopPropagation(); dropdownMenu.classList.toggle("hidden"); };
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // 관리자 로그인 토글
+    // 비밀번호 0000 로그인 제어
     document.getElementById("btn-admin-auth").onclick = () => {
       const isAdmin = (sessionStorage.getItem("alumni_admin_auth") === "true");
       if (isAdmin) {
-        if (confirm("로그아웃하시겠습니까?")) {
+        if (confirm("관리자 모드에서 로그아웃하시겠습니까?")) {
           sessionStorage.removeItem("alumni_admin_auth");
           alert("일반 회원 모드로 전환되었습니다.");
           checkAuth();
@@ -287,7 +312,7 @@
       } else if (tab === "edit") {
         const isAdmin = (sessionStorage.getItem("alumni_admin_auth") === "true");
         if (!isAdmin) {
-          alert("⚠️ 회칙 개정은 김진세 관리자 로그인 후 가능합니다.");
+          alert("⚠️ 회칙 개정은 김진세 관리자 로그인(비번:0000) 후 가능합니다.");
           return setTab("view");
         }
         subtabEdit.className = "py-1.5 bg-white text-slate-900 rounded shadow-sm";
