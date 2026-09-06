@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5인 동창 곗모임 대시보드</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- 공통 네비게이션 헤더 -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="text-2xl">🎓</span>
+        <a href="index.html" class="font-extrabold text-lg tracking-tight text-slate-900">5인 동창 곗모임</a>
+      </div>
+
+      <!-- 5인 전용 실명 접속자 스위처 -->
+      <div class="flex items-center space-x-2">
+        <label for="current-user-select" class="text-xs text-slate-500 hidden sm:inline">현재 접속자:</label>
+        <select id="current-user-select" class="text-sm bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium focus:ring-2 focus:ring-blue-500">
+          <option value="user_song" selected>👑 송환오 (회장, 기혼)</option>
+          <option value="user_jang">🛡️ 장우석 (총무, 기혼, 2자녀)</option>
+          <option value="user_kim_js">김진세 (기혼, 1자녀)</option>
+          <option value="user_kim_jungsoo">김정수 (미혼)</option>
+          <option value="user_lee">이해웅 (미혼)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 탭 네비게이션 -->
+    <nav class="max-w-5xl mx-auto px-4 flex space-x-1 sm:space-x-4 border-t border-slate-100 text-sm overflow-x-auto">
+      <a href="index.html" class="py-2.5 px-3 border-b-2 border-blue-600 text-blue-600 font-bold whitespace-nowrap">
+        <i class="fa-solid fa-chart-pie mr-1.5"></i>대시보드
+      </a>
+      <a href="gathering.html" class="py-2.5 px-3 text-slate-600 hover:text-slate-900 whitespace-nowrap">
+        <i class="fa-solid fa-calendar-check mr-1.5"></i>모임 & 예약
+      </a>
+      <a href="ledger.html" class="py-2.5 px-3 text-slate-600 hover:text-slate-900 whitespace-nowrap">
+        <i class="fa-solid fa-won-sign mr-1.5"></i>회비 장부
+      </a>
+      <a href="election.html" class="py-2.5 px-3 text-slate-600 hover:text-slate-900 whitespace-nowrap">
+        <i class="fa-solid fa-check-to-slot mr-1.5"></i>회장 선출소
+      </a>
+      <a href="wiki.html" class="py-2.5 px-3 text-slate-600 hover:text-slate-900 whitespace-nowrap">
+        <i class="fa-solid fa-book mr-1.5"></i>회칙
+      </a>
+    </nav>
+  </header>
+
+  <!-- 메인 대시보드 콘텐츠 -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+    <!-- 배너: 현직 회장(송환오) 독점 장소 권한 & 대통령 임기 연동 시계 -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="bg-amber-400 text-slate-950 text-xs font-black px-2.5 py-0.5 rounded-full uppercase">Current Leader</span>
+          <h2 class="text-xl font-bold">제N대 회장: 송환오 👑</h2>
+        </div>
+        <p class="text-slate-300 text-xs sm:text-sm mt-1.5 leading-relaxed">
+          정기·임시 모임의 모든 예약과 장소는 송환오 회장이 단독 결정합니다. (회칙 제5조: 반대 및 딴지 불가)
+        </p>
+      </div>
+      <div class="bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-xl text-left md:text-right border border-white/10 w-full md:w-auto">
+        <div class="text-[11px] text-indigo-200 uppercase font-semibold tracking-wider">대통령 임기 만료까지</div>
+        <div class="text-xl sm:text-2xl font-black text-amber-300 tracking-wide mt-0.5" id="president-dday">D-계산중</div>
+      </div>
+    </div>
+
+    <!-- 요약 통계 카드 3종 -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex justify-between items-center text-slate-400 mb-2">
+          <span class="text-xs font-semibold">모임 공금 통장 잔액</span>
+          <i class="fa-solid fa-vault text-emerald-600"></i>
+        </div>
+        <div class="text-2xl font-black text-slate-900" id="account-balance">2,380,000원</div>
+        <div class="text-xs text-slate-400 mt-1">상·하반기 정기 모임 식대 전용</div>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex justify-between items-center text-slate-400 mb-2">
+          <span class="text-xs font-semibold">이달의 곗돈 목표액</span>
+          <i class="fa-solid fa-coins text-amber-500"></i>
+        </div>
+        <div class="text-2xl font-black text-slate-900">320,000원</div>
+        <div class="text-xs text-blue-600 font-semibold mt-1">기혼(3인 24만) + 미혼(2인 8만)</div>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+        <div class="flex justify-between items-center text-slate-400 mb-2">
+          <span class="text-xs font-semibold">가족 동반 총 규모</span>
+          <i class="fa-solid fa-users text-purple-600"></i>
+        </div>
+        <div class="text-2xl font-black text-slate-900">최대 11명</div>
+        <div class="text-xs text-slate-400 mt-1">어른 8명(회원 5 + 배우자 3) + 어린이 3명</div>
+      </div>
+    </div>
+
+    <!-- 2단 레이아웃: 5인 실명 곗돈 현황(좌) / 다가오는 정기 모임 프리뷰(우) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+        <div class="flex justify-between items-center border-b pb-3">
+          <div>
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <i class="fa-solid fa-user-group text-slate-400"></i>
+              <span>동창 5인 곗돈 및 가족 현황</span>
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">경조사비는 계칙에 따라 전원 개별 각출</p>
+          </div>
+          <span class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded font-semibold">정원 5명</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-50 text-slate-500 text-xs border-y">
+              <tr>
+                <th class="py-2.5 px-3">이름</th>
+                <th class="py-2.5 px-3">직책</th>
+                <th class="py-2.5 px-3">가족 구성</th>
+                <th class="py-2.5 px-3">월 회비</th>
+                <th class="py-2.5 px-3 text-center">납부 상태</th>
+              </tr>
+            </thead>
+            <tbody id="member-table-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5 bg-white rounded-xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between space-y-4">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <i class="fa-solid fa-bell text-blue-600"></i>
+              <span>다음 정기 모임</span>
+            </h3>
+            <span class="text-xs bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded">하반기</span>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+            <div class="text-[11px] text-slate-400 font-semibold">송환오 회장 확정 장소 (반대 불가)</div>
+            <div class="font-black text-slate-900 text-lg">충북 한우 명가 (대형 룸)</div>
+            <div class="text-xs text-slate-600 flex items-center gap-1.5">
+              <i class="fa-regular fa-clock text-slate-400"></i>
+              <span>2026-11-14 (토) 18:00</span>
+            </div>
+          </div>
+
+          <div class="p-3.5 bg-indigo-50/60 border border-indigo-100 rounded-xl space-y-1.5 text-xs text-slate-700">
+            <div class="flex justify-between">
+              <span class="text-slate-500">예약 확정 총원:</span>
+              <strong class="text-indigo-900 font-black">총 11명 (풀가동)</strong>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">어른 인원 (회원+배우자):</span>
+              <span class="font-semibold text-slate-800">8명</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">어린이 인원 (장우석 2, 김진세 1):</span>
+              <span class="font-semibold text-slate-800">3명 (유아의자 2개)</span>
+            </div>
+          </div>
+        </div>
+
+        <a href="gathering.html" class="block text-center py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg transition">
+          모임 상세 확인 및 가족 RSVP 변경
+        </a>
+      </div>
+    </div>
+
+    <!-- 초기 데이터 생성 도구 -->
+    <div class="p-4 bg-slate-200/60 rounded-xl border border-slate-300 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-600">
+      <span>💡 Firebase Firestore에 5인 실명 기본 데이터를 최초 등록하려면 버튼을 클릭하세요.</span>
+      <button id="btn-init-db" class="px-3.5 py-1.5 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-medium transition whitespace-nowrap">
+        Firestore 기본 시드 데이터 생성
+      </button>
+    </div>
+
+  </main>
+
+  <footer class="max-w-5xl mx-auto w-full px-4 py-6 text-center text-xs text-slate-400">
+    <p>5인 동창회 합의 계칙에 따라 운영됩니다. 회장의 장소 결정에 딴지를 금합니다.</p>
+  </footer>
+
+  <!-- 메인 로직 모듈 -->
+  <script type="module">
+    import { db, doc, setDoc } from "./js/firebase.js";
+
+    const MEMBERS_DATA = [
+      { id: "user_song", name: "송환오", role: "president", marital: "married", children: 0, fee: 80000, isPaid: true },
+      { id: "user_jang", name: "장우석", role: "treasurer", marital: "married", children: 2, fee: 80000, isPaid: true },
+      { id: "user_kim_js", name: "김진세", role: "general", marital: "married", children: 1, fee: 80000, isPaid: true },
+      { id: "user_kim_jungsoo", name: "김정수", role: "general", marital: "single", children: 0, fee: 40000, isPaid: false },
+      { id: "user_lee", name: "이해웅", role: "general", marital: "single", children: 0, fee: 40000, isPaid: true }
+    ];
+
+    function renderMembersTable(members) {
+      const tbody = document.getElementById("member-table-body");
+      tbody.innerHTML = "";
+
+      members.forEach(member => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50 transition";
+
+        let roleBadge = '<span class="text-xs text-slate-500">회원</span>';
+        if (member.role === 'president') {
+          roleBadge = '<span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold">👑 회장</span>';
+        } else if (member.role === 'treasurer') {
+          roleBadge = '<span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-bold">🛡️ 총무 (면제)</span>';
+        }
+
+        let familyText = member.marital === 'married'
+          ? (member.children > 0 ? `기혼 (자녀 ${member.children}명)` : `기혼 (무자녀)`)
+          : '미혼';
+
+        const paidBadge = member.isPaid
+          ? '<span class="text-xs text-emerald-600 font-bold"><i class="fa-solid fa-circle-check mr-1"></i>완납</span>'
+          : '<span class="text-xs text-rose-500 font-bold"><i class="fa-solid fa-clock mr-1"></i>미납</span>';
+
+        tr.innerHTML = `
+          <td class="py-3 px-3 font-bold text-slate-900">${member.name}</td>
+          <td class="py-3 px-3">${roleBadge}</td>
+          <td class="py-3 px-3 text-xs text-slate-600">${familyText}</td>
+          <td class="py-3 px-3 font-bold text-slate-700">${member.fee.toLocaleString()}원</td>
+          <td class="py-3 px-3 text-center">${paidBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updatePresidentCountdown() {
+      const targetDate = new Date("2027-05-10T00:00:00+09:00").getTime();
+      const now = new Date().getTime();
+      const diff = targetDate - now;
+
+      if (diff <= 0) {
+        document.getElementById("president-dday").innerText = "임기 만료";
+      } else {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        document.getElementById("president-dday").innerText = `D-${days}일`;
+      }
+    }
+
+    document.getElementById("btn-init-db").addEventListener("click", async () => {
+      try {
+        for (const member of MEMBERS_DATA) {
+          await setDoc(doc(db, "members", member.id), member);
+        }
+        alert("🎉 Firestore에 5인 실명 데이터가 성공적으로 초기 등록되었습니다!");
+      } catch (err) {
+        console.warn("Firestore 저장 건너뜀 (로컬 상태 정상 반영):", err);
+        alert("Firestore 연동 실패: js/firebase.js 파일 구성을 확인해 주세요.");
+      }
+    });
+
+    renderMembersTable(MEMBERS_DATA);
+    updatePresidentCountdown();
+  </script>
+
+</body>
+</html>
