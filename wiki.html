@@ -25,11 +25,11 @@
         <span class="text-xl">📜</span>
         <div>
           <h1 class="font-black text-base text-slate-900 leading-tight">5인 동창회 정관</h1>
-          <span class="text-[10px] text-slate-400 font-medium">나무위키 스타일 아카이브</span>
+          <span class="text-[10px] text-slate-400 font-medium">동창 규약 및 공식 연혁</span>
         </div>
       </div>
       <span id="current-rev-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-        판본 r1
+        판본 로딩 중...
       </span>
     </div>
 
@@ -58,9 +58,9 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 서브 탭 (나무위키 본문 / 개정 역사 / 회장 연혁) -->
+    <!-- 서브 탭 (회칙 / 개정 역사 / 회장 연혁) -->
     <div class="bg-white p-1 rounded-xl border border-slate-200 flex text-xs font-bold shadow-sm">
-      <button id="tab-btn-doc" class="flex-1 py-2 rounded-lg bg-slate-900 text-white transition">나무위키 회칙</button>
+      <button id="tab-btn-doc" class="flex-1 py-2 rounded-lg bg-slate-900 text-white transition">회칙</button>
       <button id="tab-btn-logs" class="flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1">
         <span>개정 역사</span>
         <span id="log-count-pill" class="text-[9px] bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded-full font-mono">0</span>
@@ -70,7 +70,7 @@
       </button>
     </div>
 
-    <!-- 1. [나무위키 스타일 회칙 본문] -->
+    <!-- 1. [회칙 본문 뷰] -->
     <section id="view-doc" class="space-y-4">
       <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
         <div class="flex justify-between items-start border-b pb-2">
@@ -83,7 +83,7 @@
           </button>
         </div>
 
-        <!-- 나무위키형 목차 (TOC) -->
+        <!-- 목차 (TOC) -->
         <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs space-y-1">
           <div class="font-black text-slate-800 flex items-center gap-1 border-b border-slate-200 pb-1 mb-1.5">
             <i class="fa-solid fa-list-ol text-blue-600"></i>
@@ -103,22 +103,22 @@
           </div>
         </div>
 
-        <!-- 동적 렌더링 본문 (나무위키 스타일 파싱) -->
-        <div id="wiki-rendered-container" class="space-y-3.5 text-xs text-slate-800 leading-relaxed pt-1">
+        <!-- 동적 렌더링 본문 (들여쓰기 제거 + 어절 단위 줄바꿈) -->
+        <div id="wiki-rendered-container" class="space-y-3 text-xs text-slate-800 leading-relaxed pt-1">
           <div class="p-6 text-center text-slate-400">회칙 문서를 불러오는 중입니다...</div>
         </div>
       </div>
     </section>
 
-    <!-- 2. [개정 역사 뷰] -->
+    <!-- 2. [개정 역사 뷰 (무제한 전체 출력)] -->
     <section id="view-logs" class="hidden space-y-3">
       <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
         <div class="border-b pb-2 flex justify-between items-center">
           <div>
-            <h3 class="font-bold text-sm text-slate-900">회칙 개정 역사 (역대 판본)</h3>
-            <p class="text-[11px] text-slate-400">모든 변경 사항이 영구 타임스탬프로 기록됩니다.</p>
+            <h3 class="font-bold text-sm text-slate-900">회칙 개정 역사 (전체 기록)</h3>
+            <p class="text-[11px] text-slate-400">수동·자동 변경된 모든 판본이 누적 보존됩니다.</p>
           </div>
-          <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">영구 보존</span>
+          <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">전체 로그</span>
         </div>
 
         <div id="revisions-timeline" class="space-y-2 text-xs">
@@ -127,7 +127,7 @@
       </div>
     </section>
 
-    <!-- 3. [회장 연혁 뷰 + 테스트 로그 삭제 기능] -->
+    <!-- 3. [회장 연혁 뷰] -->
     <section id="view-history" class="hidden space-y-3">
       <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
         <div class="border-b pb-2 flex justify-between items-center">
@@ -156,7 +156,7 @@
           <textarea id="edit-rule-textarea" rows="12" class="w-full p-2.5 border rounded-lg text-xs leading-relaxed font-mono focus:ring-2 focus:ring-blue-500"></textarea>
 
           <div>
-            <label class="block font-bold text-slate-700 mb-1">편집 요약 (나무위키 필수제)</label>
+            <label class="block font-bold text-slate-700 mb-1">편집 요약 (필수 의무제)</label>
             <input type="text" id="edit-rule-summary" placeholder="예: 제8조 식대 결제 규정 문구 구체화" required class="w-full p-2 border rounded-lg font-medium">
           </div>
 
@@ -230,7 +230,7 @@
 
     let currentFullText = "";
 
-    // 나무위키 스타일 조항 박스 렌더러
+    // [핵심] 들여쓰기 공백 제거 및 어절 단위 줄바꿈(break-keep) 렌더러
     function renderWikiStyle(text) {
       const container = document.getElementById("wiki-rendered-container");
       container.innerHTML = "";
@@ -239,31 +239,30 @@
 
       sections.forEach((sec, idx) => {
         const lines = sec.trim().split("\n");
-        const titleLine = lines[0];
-        const bodyLines = lines.slice(1).join("\n").trim();
+        const titleLine = lines[0].trim();
+        const bodyLines = lines.slice(1);
+
+        // 각 줄 앞뒤의 불필요한 공백을 완전히 제거
+        const cleanedBody = bodyLines.map(line => line.trim()).filter(line => line.length > 0).join("\n");
 
         const box = document.createElement("div");
         box.id = `sec-${idx + 1}`;
-        box.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 scroll-mt-24";
-
-                // 앞뒤 불필요한 빈칸 및 공백 들여쓰기 제거
-        const cleanedBody = bodyLines.split('\n').map(line => line.trim()).join('\n');
+        box.className = "p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 scroll-mt-24 text-left";
 
         box.innerHTML = `
-          <div class="font-black text-slate-900 text-xs border-b border-slate-200 pb-1 flex items-center justify-between">
-            <span class="text-blue-700">${titleLine}</span>
-            <span class="text-[10px] text-slate-400">§ ${idx + 1}</span>
+          <div class="font-black text-slate-900 text-xs border-b border-slate-200 pb-1.5 flex items-center justify-between">
+            <span class="text-blue-700 font-bold">${titleLine}</span>
+            <span class="text-[10px] text-slate-400 font-mono">§ ${idx + 1}</span>
           </div>
-          <div class="text-[11px] text-slate-700 leading-relaxed whitespace-pre-line break-keep font-sans text-left">
-            ${cleanedBody.replace(/•/g, '<span class="text-blue-500 font-bold">•</span>')}
+          <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-line break-keep font-sans pl-0.5">
+            ${cleanedBody.replace(/•/g, '<span class="text-blue-500 font-bold mr-1">•</span>')}
           </div>
         `;
-
         container.appendChild(box);
       });
     }
 
-    // 1. 회칙 전문 구독
+    // 1. 회칙 전문 실시간 리스너
     try {
       onSnapshot(doc(db, "rule_content", "latest"), (docSnap) => {
         if (docSnap.exists()) {
@@ -278,14 +277,21 @@
       console.error(e);
     }
 
-    // 2. 개정 로그(판본 히스토리) 구독
+    // 2. 개정 로그(판본 히스토리) 실시간 리스너 (개수 제한 없이 100% 전체 노출)
     try {
       onSnapshot(collection(db, "rule_revisions"), (snapshot) => {
         const container = document.getElementById("revisions-timeline");
         container.innerHTML = "";
         const list = [];
         snapshot.forEach(d => list.push(d.data()));
-        list.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+
+        // 판본 번호(r4, r3, r2, r1...) 및 날짜 기준 최신순 완전 정렬
+        list.sort((a, b) => {
+          const numA = parseInt((a.rev || "r0").replace(/[^0-9]/g, ''), 10) || 0;
+          const numB = parseInt((b.rev || "r0").replace(/[^0-9]/g, ''), 10) || 0;
+          if (numA !== numB) return numB - numA;
+          return (b.date || "").localeCompare(a.date || "");
+        });
 
         document.getElementById("log-count-pill").innerText = list.length;
 
@@ -294,18 +300,19 @@
           return;
         }
 
+        // 제한(slice) 없이 전체 목록 렌더링
         list.forEach((r, idx) => {
           const card = document.createElement("div");
-          card.className = "p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1";
+          card.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-left";
           card.innerHTML = `
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-1.5">
                 <span class="font-black px-2 py-0.5 rounded text-[10px] ${idx === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}">${r.rev}</span>
-                <strong class="text-slate-800">${r.author}</strong>
+                <strong class="text-slate-800 text-xs">${r.author}</strong>
               </div>
               <span class="text-[10px] text-slate-400 font-mono">${r.date}</span>
             </div>
-            <p class="text-[11px] text-slate-600 pl-0.5 leading-relaxed">${r.summary || '사유 없음'}</p>
+            <p class="text-[11px] text-slate-600 pl-0.5 leading-relaxed break-keep">${r.summary || '사유 없음'}</p>
           `;
           container.appendChild(card);
         });
@@ -314,7 +321,7 @@
       console.error(e);
     }
 
-    // 3. 역대 회장 연혁 구독 및 [테스트 로그 직접 삭제] 구현
+    // 3. 역대 회장 연혁 실시간 리스너 및 삭제 기능
     try {
       onSnapshot(collection(db, "election_history"), (snapshot) => {
         const container = document.getElementById("presidents-timeline");
@@ -352,7 +359,7 @@
         fullChronicle.reverse().forEach((p, index) => {
           const isCurrent = (index === 0);
           const card = document.createElement("div");
-          card.className = `p-3 rounded-xl border ${isCurrent ? 'bg-amber-50/80 border-amber-300' : 'bg-slate-50 border-slate-200'} space-y-1`;
+          card.className = `p-3 rounded-xl border ${isCurrent ? 'bg-amber-50/80 border-amber-300' : 'bg-slate-50 border-slate-200'} space-y-1 text-left`;
           card.innerHTML = `
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-1.5">
@@ -369,23 +376,22 @@
                 ` : ''}
               </div>
             </div>
-            <div class="text-[11px] text-slate-600 pl-0.5 leading-relaxed">${p.note}</div>
+            <div class="text-[11px] text-slate-600 pl-0.5 leading-relaxed break-keep">${p.note}</div>
           `;
           container.appendChild(card);
         });
 
-        // [핵심] 테스트 연혁 삭제 처리
         document.querySelectorAll(".btn-del-election-log").forEach(btn => {
           btn.onclick = async (e) => {
             const docId = e.currentTarget.getAttribute("data-id");
             const deleter = prompt("삭제자 본인 이름을 입력하세요 (김진세, 송환오, 장우석, 김정수, 이해웅):");
             if (!deleter) return;
 
-            if (!confirm(`[${deleter}] 님이 이 회장 선출 테스트 기록을 클라우드에서 영구 삭제하시겠습니까?`)) return;
+            if (!confirm(`[${deleter}] 님이 이 회장 선출 기록을 클라우드에서 영구 삭제하시겠습니까?`)) return;
 
             try {
               await deleteDoc(doc(db, "election_history", docId));
-              alert("테스트 연혁 기록이 삭제되었습니다.");
+              alert("선출 기록이 삭제되었습니다.");
             } catch (err) {
               alert(`❌ 삭제 실패: ${err.message}`);
             }
