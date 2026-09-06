@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>과거 여행 & 모임 - 5인 동창 곗모임</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
+
+  <!-- 상단 헤더 -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="text-xl">📸</span>
+        <div>
+          <h1 class="font-black text-base text-slate-900 leading-tight">과거 모임 & 여행 행적</h1>
+          <span class="text-[10px] text-slate-400">Since 2019 동창 추억 아카이브</span>
+        </div>
+      </div>
+
+      <select id="current-user-select" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 font-semibold text-slate-700">
+        <option value="user_kim_js" selected>⚙️ 김진세 (관리자)</option>
+        <option value="user_song">👑 송환오 (회장)</option>
+        <option value="user_jang">🛡️ 장우석 (총무)</option>
+        <option value="user_kim_jungsoo">김정수 (회원)</option>
+        <option value="user_lee">이해웅 (회원)</option>
+      </select>
+    </div>
+
+    <!-- 네비게이션 바 -->
+    <nav class="flex space-x-1 border-t border-slate-100 mt-2.5 pt-2 overflow-x-auto text-xs no-scrollbar">
+      <a href="index.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">대시보드</a>
+      <a href="history.html" class="py-1.5 px-3 bg-emerald-50 text-emerald-700 font-bold rounded-lg whitespace-nowrap">과거 여행/모임</a>
+      <a href="wiki.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회칙</a>
+      <a href="settlement.html" class="admin-only py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">개별 정산</a>
+      <a href="election.html" class="admin-only py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회장 선출</a>
+    </nav>
+  </header>
+
+  <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
+
+    <!-- 연도별 필터 버튼 바 -->
+    <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm space-y-2">
+      <div class="text-[11px] font-bold text-slate-500">연도별 모임 기록 열람</div>
+      <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs font-bold" id="year-filter-buttons">
+        <button class="year-btn px-3 py-1.5 bg-slate-900 text-white rounded-lg whitespace-nowrap" data-year="all">전체</button>
+        <button class="year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap" data-year="2026">2026년</button>
+        <button class="year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap" data-year="2025">2025년</button>
+        <button class="year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap" data-year="2024">2024년</button>
+        <button class="year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap" data-year="2019">2019년(창립)</button>
+      </div>
+    </div>
+
+    <!-- 연도별 모임 카드 리스트 -->
+    <div id="history-cards-container" class="space-y-3 text-xs">
+      <!-- 렌더링 영역 -->
+    </div>
+
+  </main>
+
+  <script type="module">
+    const gatherings = [
+      {
+        year: "2026",
+        title: "2026 상반기 정기 모임",
+        date: "2026-05-16 (토)",
+        place: "충북 참숯 한우마을 (본관 대형 룸)",
+        attendees: "어른 8명, 아이 2명 (총 10명 참석)",
+        note: "송환오 회장 주재 상반기 모임. 아이들 동반 룸으로 쾌적하게 진행 완료."
+      },
+      {
+        year: "2025",
+        title: "2025 연말 송년 가족 모임",
+        date: "2025-12-13 (토)",
+        place: "오창 호수공원 인근 일식 다이닝 코스",
+        attendees: "총 11명 풀가동 전원 참석",
+        note: "연말 정기 결산 및 가족 동반 송년회 완료."
+      },
+      {
+        year: "2024",
+        title: "2024 가을 단풍 가족 나들이 모임",
+        date: "2024-10-19 (토)",
+        place: "청주 외곽 가든 바베큐 하우스",
+        attendees: "총 10명 참석",
+        note: "야외 테라스 바베큐 파티 및 동창 교류."
+      },
+      {
+        year: "2019",
+        title: "5인 동창 곗모임 최초 결성",
+        date: "2019-09-07 (토)",
+        place: "모교 앞 고깃집 본점",
+        attendees: "동창 5인 전원 (김진세, 송환오, 장우석, 김정수, 이해웅)",
+        note: "곗모임 공식 결성, 회칙 초안 합의 및 초대 송환오 회장 추첨 선출."
+      }
+    ];
+
+    let currentYear = "all";
+
+    function renderGatherings() {
+      const container = document.getElementById("history-cards-container");
+      container.innerHTML = "";
+
+      const filtered = (currentYear === "all") 
+        ? gatherings 
+        : gatherings.filter(g => g.year === currentYear);
+
+      filtered.forEach(g => {
+        const card = document.createElement("div");
+        card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2";
+        card.innerHTML = `
+          <div class="flex justify-between items-center border-b pb-2">
+            <span class="font-black text-slate-900 text-sm">${g.title}</span>
+            <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">${g.year}년</span>
+          </div>
+          <div class="space-y-1 text-slate-600 text-[11px]">
+            <div>📍 <strong>장소:</strong> ${g.place}</div>
+            <div>📅 <strong>일시:</strong> ${g.date}</div>
+            <div>👥 <strong>참석:</strong> ${g.attendees}</div>
+          </div>
+          <div class="p-2 bg-slate-50 rounded text-[11px] text-slate-500 leading-relaxed">
+            ${g.note}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // 연도 필터 버튼 클릭
+    document.querySelectorAll(".year-btn").forEach(btn => {
+      btn.onclick = (e) => {
+        document.querySelectorAll(".year-btn").forEach(b => {
+          b.className = "year-btn px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg whitespace-nowrap";
+        });
+        e.currentTarget.className = "year-btn px-3 py-1.5 bg-slate-900 text-white rounded-lg whitespace-nowrap";
+        currentYear = e.currentTarget.getAttribute("data-year");
+        renderGatherings();
+      };
+    });
+
+    // 관리자 메뉴 가시성 제어
+    const currentUserSelect = document.getElementById("current-user-select");
+    function updateMenuVisibility() {
+      const isAdmin = (currentUserSelect.value === "user_kim_js");
+      document.querySelectorAll(".admin-only").forEach(el => {
+        if (isAdmin) el.classList.remove("hidden");
+        else el.classList.add("hidden");
+      });
+    }
+    currentUserSelect.addEventListener("change", updateMenuVisibility);
+
+    updateMenuVisibility();
+    renderGatherings();
+  </script>
+
+</body>
+</html>
