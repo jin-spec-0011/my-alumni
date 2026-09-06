@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>정기 모임 & 회장 단독 예약 - 5인 동창 곗모임</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- 공통 네비게이션 헤더 -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="text-2xl">🎓</span>
+        <a href="index.html" class="font-extrabold text-lg tracking-tight text-slate-900">5인 동창 곗모임</a>
+      </div>
+
+      <!-- 접속자 전환 셀렉터 -->
+      <div class="flex items-center space-x-2">
+        <label for="current-user-select" class="text-xs text-slate-500 hidden sm:inline">현재 접속자:</label>
+        <select id="current-user-select" class="text-sm bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium focus:ring-2 focus:ring-blue-500">
+          <option value="user_song" selected>👑 송환오 (회장, 기혼)</option>
+          <option value="user_jang">🛡️ 장우석 (총무, 기혼, 2자녀)</option>
+          <option value="user_kim_js">김진세 (기혼, 1자녀)</option>
+          <option value="user_kim_jungsoo">김정수 (미혼)</option>
+          <option value="user_lee">이해웅 (미혼)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 탭 네비게이션 -->
+    <nav class="max-w-5xl mx-auto px-4 flex space-x-1 sm:space-x-4 border-t border-slate-100 text-sm overflow-x-auto">
+      <a href="index.html" class="py-2.5 px-3 text-slate-600 hover:text-slate-900 whitespace-nowrap">
+        <i class="fa-solid fa-chart-pie mr-1.5"></i>대시보드
+      </a>
+      <a href="gathering.html" class="py-2.5 px-3 border-b-2 border-blue-600 text-blue-600 font-bold whitespace-nowrap">
+        <i class="fa-solid fa-calendar-check mr-1.5"></i>모임 & 예약
+      </a>
+      <a href="ledger.html" class="py-2.5 px-3 text-slate-600 hover:text-slate-900 whitespace-nowrap">
+        <i class="fa-solid fa-won-sign mr-1.5"></i>회비 장부
+      </a>
+      <a href="election.html" class="py-2.5 px-3 text-slate-600 hover:text-slate-900 whitespace-nowrap">
+        <i class="fa-solid fa-check-to-slot mr-1.5"></i>회장 선출소
+      </a>
+      <a href="wiki.html" class="py-2.5 px-3 text-slate-600 hover:text-slate-900 whitespace-nowrap">
+        <i class="fa-solid fa-book mr-1.5"></i>회칙
+      </a>
+    </nav>
+  </header>
+
+  <!-- 메인 컨테이너 -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+    <!-- 회장 장소 독점권 안내 배너 -->
+    <div class="bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 text-white rounded-2xl p-5 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="bg-black/20 text-white text-xs font-bold px-2.5 py-0.5 rounded-full border border-white/20">회칙 제5조 발동 중</span>
+          <h2 class="text-lg sm:text-xl font-black">👑 송환오 회장의 장소 결정 전권 (반대 불가)</h2>
+        </div>
+        <p class="text-amber-100 text-xs sm:text-sm mt-1">
+          모임의 모든 예약과 장소는 송환오 회장이 단독으로 확정합니다. 회원들은 가족 참석 인원만 체크해 주십시오.
+        </p>
+      </div>
+      <div id="auth-status-badge" class="bg-white/10 backdrop-blur-md border border-white/20 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white">
+      </div>
+    </div>
+
+    <!-- 2단 그리드: 좌측(장소 공표 카드) / 우측(가족 RSVP 입력) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- 좌측: 모임 상세 및 장소 공표 카드 (7칸) -->
+      <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-5">
+        <div class="flex justify-between items-center border-b pb-3">
+          <div>
+            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded">2026 하반기 정기 모임</span>
+            <h3 class="text-xl font-black text-slate-900 mt-1">회장 단독 확정 장소 공표</h3>
+          </div>
+          <button id="btn-toggle-edit-meeting" class="text-xs px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-semibold transition flex items-center gap-1">
+            <i class="fa-solid fa-pen"></i><span>장소/일정 수정</span>
+          </button>
+        </div>
+
+        <!-- 열람 모드 -->
+        <div id="meeting-display-box" class="space-y-4">
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+            <div class="text-xs text-slate-400 font-semibold">확정 장소 (식당명)</div>
+            <div id="view-place-name" class="text-lg sm:text-xl font-black text-slate-900">
+              충북 한우 명가 (대형 단독 룸)
+            </div>
+            <div class="text-xs text-blue-600 hover:underline flex items-center gap-1">
+              <i class="fa-solid fa-location-dot"></i>
+              <a id="view-place-link" href="https://map.naver.com" target="_blank">식당 위치 지도 열기</a>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div class="p-3 bg-slate-50 border rounded-lg">
+              <span class="text-xs text-slate-400 block mb-0.5">모임 일시</span>
+              <strong id="view-meeting-date" class="text-slate-800">2026년 11월 14일 (토) 18:00</strong>
+            </div>
+            <div class="p-3 bg-slate-50 border rounded-lg">
+              <span class="text-xs text-slate-400 block mb-0.5">예약 형태</span>
+              <strong class="text-slate-800">단독 프라이빗 룸 (유아의자 완비)</strong>
+            </div>
+          </div>
+
+          <div class="p-4 bg-amber-50/60 border border-amber-200 rounded-xl">
+            <div class="text-xs font-bold text-amber-900 mb-1 flex items-center gap-1.5">
+              <i class="fa-solid fa-crown text-amber-600"></i>회장 지침
+            </div>
+            <p id="view-meeting-note" class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+              아이들과 함께 편하게 식사할 수 있도록 룸으로 단독 예약해 두었습니다. 이동 동선과 주차가 편리한 곳이니 딴지 없이 전원 가족 동반 참석 바랍니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- 수정 모드 (송환오 회장 전용) -->
+        <form id="meeting-edit-form" class="hidden space-y-4 pt-2 border-t border-slate-100">
+          <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg text-xs text-blue-900 font-medium">
+            👑 <strong>송환오 회장 전용 편집창:</strong> 장소 및 일정을 수정하면 전 회원 화면에 즉시 공표됩니다.
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">식당 / 장소명</label>
+            <input type="text" id="input-place-name" class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500" value="충북 한우 명가 (대형 단독 룸)">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">모임 일시</label>
+              <input type="datetime-local" id="input-meeting-date" class="w-full text-sm p-2 border rounded-lg focus:ring-2 focus:ring-blue-500" value="2026-11-14T18:00">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">지도 URL</label>
+              <input type="url" id="input-place-link" class="w-full text-sm p-2 border rounded-lg focus:ring-2 focus:ring-blue-500" value="https://map.naver.com">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">회장 공지사항</label>
+            <textarea id="input-meeting-note" rows="3" class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">아이들과 함께 편하게 식사할 수 있도록 룸으로 단독 예약해 두었습니다. 이동 동선과 주차가 편리한 곳이니 딴지 없이 전원 가족 동반 참석 바랍니다.</textarea>
+          </div>
+
+          <div class="flex justify-end space-x-2 pt-2">
+            <button type="button" id="btn-cancel-meeting-edit" class="px-3.5 py-1.5 border text-xs font-semibold rounded-lg text-slate-600 hover:bg-slate-50">취소</button>
+            <button type="submit" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg">장소 공표 저장</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- 우측: 나의 참석 & 동반 가족 RSVP 등록 (5칸) -->
+      <div class="lg:col-span-5 bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-5">
+        <div class="border-b pb-3">
+          <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded">Family RSVP</span>
+          <h3 class="text-lg font-black text-slate-900 mt-1" id="my-rsvp-title">참석 및 가족 수 등록</h3>
+          <p class="text-xs text-slate-400 mt-0.5">정확한 인원수를 체크해 주셔야 룸 예약이 확정됩니다.</p>
+        </div>
+
+        <form id="rsvp-form" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">본인 참석 여부</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="flex items-center justify-center p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50 font-semibold text-xs text-slate-700 has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50 has-[:checked]:text-emerald-700 transition">
+                <input type="radio" name="rsvp-attending" value="yes" checked class="hidden">
+                <i class="fa-solid fa-circle-check mr-1.5 text-emerald-600"></i>참석
+              </label>
+              <label class="flex items-center justify-center p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50 font-semibold text-xs text-slate-700 has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 has-[:checked]:text-rose-700 transition">
+                <input type="radio" name="rsvp-attending" value="no" class="hidden">
+                <i class="fa-solid fa-circle-xmark mr-1.5 text-rose-500"></i>불참
+              </label>
+            </div>
+          </div>
+
+          <div id="spouse-container" class="p-3 bg-slate-50 border rounded-lg space-y-2">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-slate-800">배우자 동반</span>
+                <p class="text-[11px] text-slate-400">배우자 동반 여부 (+1명)</p>
+              </div>
+              <input type="checkbox" id="check-spouse" checked class="w-4 h-4 text-blue-600 rounded">
+            </div>
+          </div>
+
+          <div id="child-container" class="p-3 bg-slate-50 border rounded-lg space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800">동반 어린이 인원</span>
+              <div class="flex items-center space-x-2">
+                <button type="button" id="btn-child-minus" class="w-7 h-7 border rounded bg-white text-slate-700 font-bold hover:bg-slate-100">-</button>
+                <span id="child-count-display" class="font-black text-sm w-4 text-center">0</span>
+                <button type="button" id="btn-child-plus" class="w-7 h-7 border rounded bg-white text-slate-700 font-bold hover:bg-slate-100">+</button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-200">
+              <span class="text-xs text-slate-600">유아용 식기 / 아기의자 필요</span>
+              <input type="checkbox" id="check-baby-chair" class="w-4 h-4 text-blue-600 rounded">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">식당 전달 메모</label>
+            <input type="text" id="input-rsvp-memo" placeholder="예: 유아 식기 세팅 부탁드립니다" class="w-full text-xs p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500">
+          </div>
+
+          <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition shadow-sm">
+            내 가족 RSVP 저장
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- 식당 예약 종합 집계표 -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-5">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-4">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-clipboard-list text-blue-600"></i>
+            <span>식당 예약 종합 집계표 (최대 11인 풀가동 기준)</span>
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">회원 5명 및 동반 가족 현재 응답 상태입니다.</p>
+        </div>
+
+        <button id="btn-copy-booking-text" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border transition flex items-center gap-1.5">
+          <i class="fa-regular fa-copy"></i><span>식당 예약 문자 복사</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="p-3 bg-blue-50/70 border border-blue-200 rounded-xl text-center">
+          <div class="text-xs text-blue-600 font-semibold">총 확정 인원</div>
+          <div id="stat-total-people" class="text-2xl font-black text-blue-900 mt-1">11명</div>
+        </div>
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+          <div class="text-xs text-slate-500 font-semibold">어른 (회원+배우자)</div>
+          <div id="stat-adult-count" class="text-2xl font-black text-slate-800 mt-1">8명</div>
+        </div>
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+          <div class="text-xs text-slate-500 font-semibold">동반 어린이</div>
+          <div id="stat-child-count" class="text-2xl font-black text-slate-800 mt-1">3명</div>
+        </div>
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
+          <div class="text-xs text-amber-700 font-semibold">유아의자 요청</div>
+          <div id="stat-chair-count" class="text-2xl font-black text-amber-800 mt-1">2개</div>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead class="bg-slate-50 text-slate-500 text-xs border-y">
+            <tr>
+              <th class="py-2.5 px-3">회원명</th>
+              <th class="py-2.5 px-3">직책</th>
+              <th class="py-2.5 px-3">참석 상태</th>
+              <th class="py-2.5 px-3">동반 가족 구성</th>
+              <th class="py-2.5 px-3">합계 인원</th>
+              <th class="py-2.5 px-3">식당 메모</th>
+            </tr>
+          </thead>
+          <tbody id="rsvp-table-body" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="max-w-5xl mx-auto w-full px-4 py-6 text-center text-xs text-slate-400">
+    <p>회칙 제5조에 의거, 회장의 장소 결정에 일체의 이의 제기 및 딴지를 금지합니다.</p>
+  </footer>
+
+  <!-- 로직 스크립트 -->
+  <script type="module">
+    import { db, doc, setDoc } from "./js/firebase.js";
+
+    // 5인 실명 데이터 (송환오 0자녀, 장우석 2자녀, 김진세 1자녀)
+    let membersData = [
+      { id: "user_song", name: "송환오", role: "president", marital: "married", attending: "yes", spouse: true, children: 0, needChair: false, memo: "회장 본인 및 배우자 참석" },
+      { id: "user_jang", name: "장우석", role: "treasurer", marital: "married", attending: "yes", spouse: true, children: 2, needChair: true, memo: "유아의자 2개 부탁드립니다" },
+      { id: "user_kim_js", name: "김진세", role: "general", marital: "married", attending: "yes", spouse: true, children: 1, needChair: false, memo: "가족 전원 참석" },
+      { id: "user_kim_jungsoo", name: "김정수", role: "general", marital: "single", attending: "yes", spouse: false, children: 0, needChair: false, memo: "단독 참석" },
+      { id: "user_lee", name: "이해웅", role: "general", marital: "single", attending: "yes", spouse: false, children: 0, needChair: false, memo: "단독 참석" }
+    ];
+
+    let meetingInfo = {
+      placeName: "충북 한우 명가 (대형 단독 룸)",
+      dateStr: "2026-11-14T18:00",
+      placeLink: "https://map.naver.com",
+      note: "아이들과 함께 편하게 식사할 수 있도록 룸으로 단독 예약해 두었습니다. 이동 동선과 주차가 편리한 곳이니 딴지 없이 전원 가족 동반 참석 바랍니다."
+    };
+
+    const currentUserSelect = document.getElementById("current-user-select");
+    const authStatusBadge = document.getElementById("auth-status-badge");
+    const btnToggleEditMeeting = document.getElementById("btn-toggle-edit-meeting");
+    const meetingDisplayBox = document.getElementById("meeting-display-box");
+    const meetingEditForm = document.getElementById("meeting-edit-form");
+    const btnCancelMeetingEdit = document.getElementById("btn-cancel-meeting-edit");
+
+    const viewPlaceName = document.getElementById("view-place-name");
+    const viewPlaceLink = document.getElementById("view-place-link");
+    const viewMeetingDate = document.getElementById("view-meeting-date");
+    const viewMeetingNote = document.getElementById("view-meeting-note");
+
+    const inputPlaceName = document.getElementById("input-place-name");
+    const inputMeetingDate = document.getElementById("input-meeting-date");
+    const inputPlaceLink = document.getElementById("input-place-link");
+    const inputMeetingNote = document.getElementById("input-meeting-note");
+
+    const myRsvpTitle = document.getElementById("my-rsvp-title");
+    const spouseContainer = document.getElementById("spouse-container");
+    const childContainer = document.getElementById("child-container");
+    const checkSpouse = document.getElementById("check-spouse");
+    const childCountDisplay = document.getElementById("child-count-display");
+    const checkBabyChair = document.getElementById("check-baby-chair");
+    const inputRsvpMemo = document.getElementById("input-rsvp-memo");
+
+    function updateCurrentUserUI() {
+      const currentUserId = currentUserSelect.value;
+      const user = membersData.find(m => m.id === currentUserId);
+      const isPresident = (user.role === 'president');
+
+      if (isPresident) {
+        authStatusBadge.innerHTML = `<i class="fa-solid fa-crown mr-1 text-amber-300"></i>송환오 회장: 장소 수정 권한 활성`;
+        authStatusBadge.className = "bg-amber-700/80 border border-amber-300/50 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white shadow";
+        btnToggleEditMeeting.classList.remove("hidden");
+      } else {
+        authStatusBadge.innerHTML = `<i class="fa-solid fa-lock mr-1"></i>일반 회원: 반대 불가 (RSVP만 가능)`;
+        authStatusBadge.className = "bg-black/30 border border-white/20 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white";
+        btnToggleEditMeeting.classList.add("hidden");
+        meetingEditForm.classList.add("hidden");
+        meetingDisplayBox.classList.remove("hidden");
+      }
+
+      myRsvpTitle.innerText = `${user.name}의 참석 및 가족 수 등록`;
+
+      if (user.marital === 'single') {
+        spouseContainer.classList.add("opacity-40", "pointer-events-none");
+        childContainer.classList.add("opacity-40", "pointer-events-none");
+        checkSpouse.checked = false;
+        childCountDisplay.innerText = "0";
+        checkBabyChair.checked = false;
+      } else {
+        spouseContainer.classList.remove("opacity-40", "pointer-events-none");
+        childContainer.classList.remove("opacity-40", "pointer-events-none");
+        checkSpouse.checked = user.spouse;
+        childCountDisplay.innerText = user.children;
+        checkBabyChair.checked = user.needChair;
+      }
+
+      document.querySelector(`input[name="rsvp-attending"][value="${user.attending}"]`).checked = true;
+      inputRsvpMemo.value = user.memo || "";
+    }
+
+    function renderMeetingInfo() {
+      viewPlaceName.innerText = meetingInfo.placeName;
+      viewPlaceLink.href = meetingInfo.placeLink;
+      
+      const d = new Date(meetingInfo.dateStr);
+      const dateFormatted = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 (토) ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      viewMeetingDate.innerText = dateFormatted;
+      viewMeetingNote.innerText = meetingInfo.note;
+
+      inputPlaceName.value = meetingInfo.placeName;
+      inputMeetingDate.value = meetingInfo.dateStr;
+      inputPlaceLink.value = meetingInfo.placeLink;
+      inputMeetingNote.value = meetingInfo.note;
+    }
+
+    function renderRSVPTable() {
+      const tbody = document.getElementById("rsvp-table-body");
+      tbody.innerHTML = "";
+
+      let totalPeople = 0;
+      let totalAdults = 0;
+      let totalChildren = 0;
+      let totalChairs = 0;
+
+      membersData.forEach(member => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50 transition";
+
+        const isAttending = member.attending === "yes";
+        let adultCount = 0;
+        let childCount = 0;
+
+        if (isAttending) {
+          adultCount = 1 + (member.spouse ? 1 : 0);
+          childCount = member.children || 0;
+          totalAdults += adultCount;
+          totalChildren += childCount;
+          totalPeople += (adultCount + childCount);
+          if (member.needChair) totalChairs += (childCount > 0 ? childCount : 1);
+        }
+
+        let roleTag = '<span class="text-xs text-slate-500">회원</span>';
+        if (member.role === 'treasurer') roleTag = '<span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-bold">🛡️ 총무 (면제)</span>';
+        if (member.role === 'president') roleTag = '<span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold">👑 회장</span>';
+
+        let familyText = "-";
+        if (isAttending) {
+          const parts = ["본인"];
+          if (member.spouse) parts.push("배우자");
+          if (member.children > 0) parts.push(`자녀 ${member.children}명`);
+          familyText = parts.join(" + ");
+        }
+
+        tr.innerHTML = `
+          <td class="py-3 px-3 font-bold text-slate-900">${member.name}</td>
+          <td class="py-3 px-3">${roleTag}</td>
+          <td class="py-3 px-3">
+            ${isAttending 
+              ? '<span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold"><i class="fa-solid fa-check mr-1"></i>참석</span>'
+              : '<span class="text-xs bg-rose-100 text-rose-700 px-2 py-0.5 rounded font-bold">불참</span>'}
+          </td>
+          <td class="py-3 px-3 text-slate-600">${familyText}</td>
+          <td class="py-3 px-3 font-black text-slate-900">${isAttending ? `${adultCount + childCount}명` : '0명'}</td>
+          <td class="py-3 px-3 text-xs text-slate-500">${member.memo || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("stat-total-people").innerText = `${totalPeople}명`;
+      document.getElementById("stat-adult-count").innerText = `${totalAdults}명`;
+      document.getElementById("stat-child-count").innerText = `${totalChildren}명`;
+      document.getElementById("stat-chair-count").innerText = `${totalChairs}개`;
+    }
+
+    currentUserSelect.addEventListener("change", updateCurrentUserUI);
+
+    btnToggleEditMeeting.addEventListener("click", () => {
+      meetingDisplayBox.classList.add("hidden");
+      meetingEditForm.classList.remove("hidden");
+    });
+    btnCancelMeetingEdit.addEventListener("click", () => {
+      meetingEditForm.classList.add("hidden");
+      meetingDisplayBox.classList.remove("hidden");
+    });
+
+    meetingEditForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      meetingInfo.placeName = inputPlaceName.value;
+      meetingInfo.dateStr = inputMeetingDate.value;
+      meetingInfo.placeLink = inputPlaceLink.value;
+      meetingInfo.note = inputMeetingNote.value;
+
+      try {
+        await setDoc(doc(db, "gathering", "latest"), meetingInfo);
+      } catch (err) {
+        console.warn("Firestore 로컬 모드:", err);
+      }
+
+      renderMeetingInfo();
+      meetingEditForm.classList.add("hidden");
+      meetingDisplayBox.classList.remove("hidden");
+      alert("👑 [송환오 회장 공표 완료] 모임 장소 및 일정이 확정 공지되었습니다. (회칙 제5조: 반대 불가)");
+    });
+
+    document.getElementById("btn-child-plus").addEventListener("click", () => {
+      let count = parseInt(childCountDisplay.innerText, 10);
+      if (count < 5) childCountDisplay.innerText = count + 1;
+    });
+    document.getElementById("btn-child-minus").addEventListener("click", () => {
+      let count = parseInt(childCountDisplay.innerText, 10);
+      if (count > 0) childCountDisplay.innerText = count - 1;
+    });
+
+    document.getElementById("rsvp-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const currentUserId = currentUserSelect.value;
+      const user = membersData.find(m => m.id === currentUserId);
+
+      user.attending = document.querySelector('input[name="rsvp-attending"][value]:checked').value;
+      if (user.marital === 'married') {
+        user.spouse = checkSpouse.checked;
+        user.children = parseInt(childCountDisplay.innerText, 10);
+        user.needChair = checkBabyChair.checked;
+      }
+      user.memo = inputRsvpMemo.value.trim();
+
+      try {
+        await setDoc(doc(db, "rsvp", currentUserId), user);
+      } catch (err) {
+        console.warn("Firestore 로컬 모드:", err);
+      }
+
+      renderRSVPTable();
+      alert(`🎉 [${user.name}] 동반 가족 정보가 성공적으로 갱신되었습니다.`);
+    });
+
+    document.getElementById("btn-copy-booking-text").addEventListener("click", () => {
+      const totalPeople = document.getElementById("stat-total-people").innerText;
+      const adultCount = document.getElementById("stat-adult-count").innerText;
+      const childCount = document.getElementById("stat-child-count").innerText;
+      const chairCount = document.getElementById("stat-chair-count").innerText;
+
+      const copyText = `[식당 예약 요청]\n- 일시: ${viewMeetingDate.innerText}\n- 장소: ${meetingInfo.placeName}\n- 총 인원: ${totalPeople} (성인 ${adultCount}, 어린이 ${childCount})\n- 요청사항: 독립 프라이빗 룸, 유아용 의자 ${chairCount}개 세팅 부탁드립니다.`;
+
+      navigator.clipboard.writeText(copyText).then(() => {
+        alert("📋 식당 예약용 텍스트가 클립보드에 복사되었습니다!\n식당 통화나 예약 메시지에 바로 붙여넣으세요.");
+      });
+    });
+
+    renderMeetingInfo();
+    updateCurrentUserUI();
+    renderRSVPTable();
+  </script>
+
+</body>
+</html>
