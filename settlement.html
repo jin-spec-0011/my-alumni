@@ -160,10 +160,10 @@
         <div class="text-center text-slate-400 py-4">지출 내역을 불러오는 중...</div>
       </div>
 
-      <!-- 단톡방 공금 정산 보고 복사 버튼 -->
+      <!-- 단톡방 공금 정산 보고 복사 버튼 (세부 내역 포함) -->
       <button id="btn-copy-settle-report" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
         <i class="fa-regular fa-copy"></i>
-        <span>공금 출금 지급표 카톡 복사 (1원 단위)</span>
+        <span>상세 내역 포함 정산서 카톡 복사</span>
       </button>
     </div>
 
@@ -202,7 +202,7 @@
     const members = ["송환오", "장우석", "김진세", "김정수", "이해웅"];
     let currentSeasonExpenses = [];
 
-    // [핵심 1] 접속 시점 기준 연도/반기 자동 인식
+    // 1. 접속 시점 기준 연도/반기 자동 인식
     const selectYear = document.getElementById("season-year");
     const selectHalf = document.getElementById("season-half");
 
@@ -228,7 +228,7 @@
       };
     });
 
-    // [핵심 2] 지출 등록 처리
+    // 2. 지출 등록 처리
     const expenseForm = document.getElementById("expense-form");
     expenseForm.onsubmit = async (e) => {
       e.preventDefault();
@@ -263,7 +263,7 @@
       }
     };
 
-    // [핵심 3] 공금 출금형 회원별 합산 렌더링
+    // 3. 공금 출금형 회원별 합산 렌더링
     function calculateAndRender() {
       const spentMap = {};
       members.forEach(m => spentMap[m] = 0);
@@ -380,17 +380,24 @@
     selectHalf.addEventListener("change", subscribeSeasonData);
     subscribeSeasonData();
 
-    // [카카오톡 공금 출금 내역 복사]
+    // [핵심] 이름별 + 세부 영수증 항목별 내역까지 완벽 포함하여 카카오톡 복사
     document.getElementById("btn-copy-settle-report").onclick = () => {
       const year = selectYear.value;
       const halfName = selectHalf.value === "H1" ? "전반기" : "하반기";
 
       let grandTotal = 0;
-      const spentMap = {};
-      members.forEach(m => spentMap[m] = 0);
+      const memberDetails = {};
+      members.forEach(m => {
+        memberDetails[m] = { total: 0, items: [] };
+      });
 
+      // 영수증들을 회원별로 분류 및 합산
       currentSeasonExpenses.forEach(item => {
-        spentMap[item.author] = (spentMap[item.author] || 0) + item.amount;
+        if (!memberDetails[item.author]) {
+          memberDetails[item.author] = { total: 0, items: [] };
+        }
+        memberDetails[item.author].total += item.amount;
+        memberDetails[item.author].items.push(item);
         grandTotal += item.amount;
       });
 
@@ -398,26 +405,36 @@
       msg += `💰 공금 총 출금액: ${grandTotal.toLocaleString()}원\n`;
       msg += `🏦 출금 계좌: 모임 공금 통장 (장우석 총무)\n`;
       msg += `------------------------------------\n`;
-      msg += `[회원별 개인 계좌 지급액]\n`;
+      msg += `[회원별 청구 합계 및 상세 지출 내역]\n\n`;
 
       let hasPayout = false;
+      const noExpenseMembers = [];
+
       members.forEach(name => {
-        const mySpent = spentMap[name] || 0;
-        if (mySpent > 0) {
+        const data = memberDetails[name];
+        if (data.total > 0) {
           hasPayout = true;
-          msg += `• ${name}: ${mySpent.toLocaleString()}원 입금 필요\n`;
+          msg += `• ${name}: 총 ${data.total.toLocaleString()}원 입금 필요\n`;
+          data.items.forEach(it => {
+            msg += `  - ${it.desc}: ${it.amount.toLocaleString()}원\n`;
+          });
+          msg += `\n`;
+        } else {
+          noExpenseMembers.push(name);
         }
       });
 
       if (!hasPayout) {
-        msg += `(등록된 지출 내역이 없습니다.)\n`;
+        msg += `(해당 시즌에 등록된 영수증이 없습니다.)\n\n`;
+      } else if (noExpenseMembers.length > 0) {
+        msg += `• ${noExpenseMembers.join(", ")}: 지출 내역 없음\n`;
       }
 
       msg += `------------------------------------\n`;
-      msg += `📌 장우석 총무님은 확인 후 위 금액을 각 회원 계좌로 이체해 주세요! (1원 단위 정확 반영)`;
+      msg += `📌 장우석 총무님은 상세 내역 확인 후 위 금액을 각 회원 계좌로 이체해 주세요! (1원 단위 정확 반영)`;
 
       navigator.clipboard.writeText(msg).then(() => {
-        alert("📋 공금 출금 지급표가 복사되었습니다!\n단톡방에 붙여넣어 총무님께 이체를 요청하세요.");
+        alert("📋 상세 지출 내역이 포함된 정산서가 복사되었습니다!\n단톡방에 붙여넣어 총무님께 이체를 요청하세요.");
       }).catch(err => {
         alert("복사 실패: " + err);
       });
