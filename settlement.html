@@ -19,7 +19,9 @@
           <span class="text-[10px] text-slate-400 font-medium">모임별 & 개인별 실비 정산</span>
         </div>
       </div>
-      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">자율 참여 모드</span>
+      <span id="sync-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <i class="fa-solid fa-rotate mr-1"></i>실시간 동기화
+      </span>
     </div>
 
     <!-- 5대 메인 탭 + 부가기능 콤보박스 -->
@@ -50,22 +52,22 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 실시간 합산 대시보드 (모임구분별 & 인원별) -->
+    <!-- 실시간 합산 대시보드 -->
     <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-4 shadow-sm space-y-3">
       <div class="flex justify-between items-center text-xs">
         <span class="text-amber-300 font-bold flex items-center gap-1">
-          <i class="fa-solid fa-chart-pie"></i> 실시간 지출 합산 집계
+          <i class="fa-solid fa-chart-pie"></i> 전 기기 실시간 집계
         </span>
         <span class="text-slate-300 font-bold text-xs" id="stat-total-grand">총 0원</span>
       </div>
 
-      <!-- 1. 지출자 본인별 합산 그리드 -->
+      <!-- 회원별 합산 -->
       <div class="space-y-1">
         <span class="text-[10px] text-slate-400 block font-semibold">👥 5인 회원별 지출 합산</span>
         <div class="grid grid-cols-5 gap-1 text-center" id="stat-by-person"></div>
       </div>
 
-      <!-- 2. 모임 구분별 합산 바 -->
+      <!-- 모임 구분별 합산 -->
       <div class="pt-2 border-t border-white/10 space-y-1">
         <span class="text-[10px] text-slate-400 block font-semibold">📅 모임 구분별 합계</span>
         <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs" id="stat-by-period"></div>
@@ -77,7 +79,7 @@
       <div class="border-b pb-2 flex justify-between items-center">
         <div>
           <h2 class="font-bold text-sm text-slate-900" id="form-title">정산 내역 등록</h2>
-          <p class="text-[11px] text-slate-400">교통비, 식비 등 지출 실비를 등록합니다.</p>
+          <p class="text-[11px] text-slate-400">지출 시 타 디바이스에도 실시간 전송됩니다.</p>
         </div>
         <button id="btn-cancel-edit" class="hidden text-xs text-rose-600 font-bold px-2 py-0.5 border border-rose-200 rounded">취소</button>
       </div>
@@ -85,13 +87,10 @@
       <form id="settlement-form" class="space-y-2.5 text-xs">
         <input type="hidden" id="edit-id" value="">
 
-        <!-- 모임 구분 (±5년 연도 선택 + 모임 종류) -->
         <div>
           <label class="block font-bold text-slate-700 mb-1">모임 구분 (연도 및 모임 선택)</label>
           <div class="grid grid-cols-2 gap-2">
-            <select id="select-year" class="p-2 border rounded-lg bg-white font-bold text-slate-800">
-              <!-- JS로 2021~2031 자동 생성 (2026 기본 선택) -->
-            </select>
+            <select id="select-year" class="p-2 border rounded-lg bg-white font-bold text-slate-800"></select>
             <select id="select-term" class="p-2 border rounded-lg bg-white font-bold text-slate-800">
               <option value="하반기 정기 모임" selected>하반기 정기 모임</option>
               <option value="상반기 정기 모임">상반기 정기 모임</option>
@@ -123,11 +122,10 @@
           <input type="text" id="input-detail" placeholder="예: 교통비 40000원, 식비 4000원" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
         </div>
 
-        <!-- 작업자 확인 (지출자 선택 시 자동 연동) -->
         <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex justify-between items-center">
           <div>
             <span class="font-bold text-slate-700">작업자 확인</span>
-            <span class="text-[10px] text-slate-400 block">지출자와 자동 동기화</span>
+            <span class="text-[10px] text-slate-400 block">지출자와 자동 연동</span>
           </div>
           <select id="select-operator" class="p-1.5 border rounded bg-white font-bold text-slate-800">
             <option value="김진세" selected>김진세</option>
@@ -139,7 +137,7 @@
         </div>
 
         <button type="submit" id="btn-submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm transition">
-          정산 내역 저장
+          클라우드 DB 실시간 저장
         </button>
       </form>
     </div>
@@ -147,22 +145,23 @@
     <!-- 정산 목록 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
-        <h3 class="font-bold text-sm text-slate-900">전체 정산 목록</h3>
+        <h3 class="font-bold text-sm text-slate-900">전체 정산 목록 (실시간 연동)</h3>
         <span class="text-[11px] text-slate-400" id="list-count">총 0건</span>
       </div>
 
-      <div id="settlement-cards-container" class="space-y-2 text-xs"></div>
+      <div id="settlement-cards-container" class="space-y-2 text-xs">
+        <div class="p-6 text-center text-slate-400">데이터를 실시간 동기화 중...</div>
+      </div>
     </div>
 
   </main>
 
   <script type="module">
-    import { db } from "./js/firebase.js";
-    import { doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { db, doc, setDoc, deleteDoc, collection, onSnapshot } from "./js/firebase.js";
 
     let settlements = [];
 
-    // 콤보박스 클릭
+    // 드롭다운 토글
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
     btnDropdown.addEventListener("click", (e) => {
@@ -171,7 +170,7 @@
     });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // 모임구분 연도 생성 (현재 2026년 기준 앞뒤 5년: 2021 ~ 2031)
+    // 연도 셀렉터 (2021 ~ 2031)
     const currentYear = 2026;
     const yearSelect = document.getElementById("select-year");
     for (let y = currentYear - 5; y <= currentYear + 5; y++) {
@@ -182,14 +181,13 @@
       yearSelect.appendChild(opt);
     }
 
-    // 지출자 본인 선택 시 작업자 확인 자동 연동
+    // 지출자 변경 시 작업자 자동 동기화
     const inputName = document.getElementById("input-name");
     const selectOperator = document.getElementById("select-operator");
     inputName.addEventListener("change", () => {
       selectOperator.value = inputName.value;
     });
 
-    // 실시간 합산 통계 집계
     function updateAggregations() {
       let grandTotal = 0;
       const byPerson = { "김진세": 0, "송환오": 0, "장우석": 0, "김정수": 0, "이해웅": 0 };
@@ -206,7 +204,6 @@
 
       document.getElementById("stat-total-grand").innerText = `총 ${grandTotal.toLocaleString()}원`;
 
-      // 회원별 합산 렌더링
       const personBox = document.getElementById("stat-by-person");
       personBox.innerHTML = "";
       Object.keys(byPerson).forEach(name => {
@@ -219,7 +216,6 @@
         personBox.appendChild(div);
       });
 
-      // 모임 구분별 합산 렌더링
       const periodBox = document.getElementById("stat-by-period");
       periodBox.innerHTML = "";
       Object.keys(byPeriod).forEach(p => {
@@ -270,7 +266,6 @@
         container.appendChild(card);
       });
 
-      // 수정
       document.querySelectorAll(".btn-edit").forEach(btn => {
         btn.onclick = (e) => {
           const id = e.currentTarget.getAttribute("data-id");
@@ -284,31 +279,26 @@
           document.getElementById("input-detail").value = target.detail;
 
           document.getElementById("form-title").innerText = "정산 내역 수정";
-          document.getElementById("btn-submit").innerText = "수정 완료 (이력 갱신)";
+          document.getElementById("btn-submit").innerText = "수정 완료 (클라우드 반영)";
           document.getElementById("btn-cancel-edit").classList.remove("hidden");
           window.scrollTo({ top: 0, behavior: 'smooth' });
         };
       });
 
-      // 삭제
       document.querySelectorAll(".btn-del").forEach(btn => {
         btn.onclick = async (e) => {
           const id = e.currentTarget.getAttribute("data-id");
           const deleter = prompt("삭제자 본인 이름을 입력하세요 (김진세, 송환오, 장우석, 김정수, 이해웅):");
           if (!deleter) return;
 
-          if (!confirm(`[${deleter}] 님이 이 정산 내역을 삭제하시겠습니까?`)) return;
-
-          settlements = settlements.filter(s => s.id !== id);
-          localStorage.setItem("alumni_settlements", JSON.stringify(settlements));
-          renderList();
+          if (!confirm(`[${deleter}] 님이 이 정산 건을 클라우드 DB에서 삭제하시겠습니까?`)) return;
 
           try {
             await deleteDoc(doc(db, "settlements", id));
+            alert(`[${deleter}] 삭제 완료되었습니다.`);
           } catch(err) {
-            console.warn("DB 삭제 에러(로컬 삭제 완료):", err);
+            alert(`❌ 삭제 실패: Firestore 규칙을 확인하세요. (${err.message})`);
           }
-          alert(`[${deleter}] 삭제되었습니다.`);
         };
       });
 
@@ -318,7 +308,7 @@
     document.getElementById("btn-cancel-edit").onclick = () => {
       document.getElementById("edit-id").value = "";
       document.getElementById("form-title").innerText = "정산 내역 등록";
-      document.getElementById("btn-submit").innerText = "정산 내역 저장";
+      document.getElementById("btn-submit").innerText = "클라우드 DB 실시간 저장";
       document.getElementById("btn-cancel-edit").classList.add("hidden");
       document.getElementById("settlement-form").reset();
       yearSelect.value = "2026년";
@@ -343,48 +333,32 @@
         updatedAt: timeStr
       };
 
-      const idx = settlements.findIndex(s => s.id === id);
-      if (idx > -1) settlements[idx] = newRecord;
-      else settlements.unshift(newRecord);
-
-      localStorage.setItem("alumni_settlements", JSON.stringify(settlements));
-      renderList();
-      document.getElementById("btn-cancel-edit").click();
-
       try {
         await setDoc(doc(db, "settlements", id), newRecord);
+        alert(`🎉 [${operator}] 클라우드에 성공적으로 등록되었습니다. 모든 기기에 즉시 반영됩니다.`);
+        document.getElementById("btn-cancel-edit").click();
       } catch (err) {
-        console.warn("DB 저장 에러(로컬 저장 완료):", err);
+        alert(`❌ 클라우드 저장 실패! Firebase 보안 규칙을 확인하세요:\n${err.message}`);
       }
-      alert(`🎉 [${operator}] 정산이 저장되었습니다.`);
     };
 
-    async function loadData() {
-      const local = localStorage.getItem("alumni_settlements");
-      if (local) {
-        try { settlements = JSON.parse(local); renderList(); } catch(e){}
-      }
-
-      try {
-        const snap = await getDocs(collection(db, "settlements"));
-        if (!snap.empty) {
-          const list = [];
-          snap.forEach(d => list.push(d.data()));
-          settlements = list;
-          localStorage.setItem("alumni_settlements", JSON.stringify(list));
-        } else if (!local) {
-          settlements = [
-            { id: "set_init_1", period: "2026년 하반기 정기 모임", name: "김진세", amount: 44000, detail: "교통비 40000원, 식비 4000원", operator: "김진세", updatedAt: "2026-09-06 21:00" }
-          ];
-          for (const item of settlements) {
-            await setDoc(doc(db, "settlements", item.id), item);
-          }
-        }
-      } catch(e){}
-      renderList();
+    // [핵심] Firestore 실시간 리스너 구독 (onSnapshot)
+    try {
+      onSnapshot(collection(db, "settlements"), (snapshot) => {
+        const list = [];
+        snapshot.forEach(d => list.push(d.data()));
+        list.sort((a, b) => b.id.localeCompare(a.id));
+        settlements = list;
+        renderList();
+      }, (error) => {
+        console.error("Firestore 구독 에러:", error);
+        document.getElementById("sync-badge").className = "text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200";
+        document.getElementById("sync-badge").innerText = "⚠️ DB 연결 차단됨";
+        alert("⚠️ Firebase 보안 규칙이 만료되었거나 차단되었습니다. Firebase 콘솔에서 규칙을 확인해 주세요.");
+      });
+    } catch (e) {
+      console.error(e);
     }
-
-    loadData();
   </script>
 
 </body>
