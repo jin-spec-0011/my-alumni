@@ -9,7 +9,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 공통 상단 헤더 -->
+  <!-- 공통 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
@@ -19,10 +19,11 @@
           <span class="text-[10px] text-slate-400 font-medium">Since 2019 합의 계칙</span>
         </div>
       </div>
-      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">자율 개정 모드</span>
+      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <i class="fa-solid fa-rotate mr-1"></i>실시간 연동
+      </span>
     </div>
 
-    <!-- 5대 메인 탭 + 부가기능 콤보박스 -->
     <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
       <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
         <a href="index.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">대시보드</a>
@@ -50,7 +51,6 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 문서 헤더 & 3대 서브 탭 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="flex justify-between items-center border-b pb-2">
         <div>
@@ -58,13 +58,12 @@
           <h2 class="text-base font-black text-slate-900 mt-1">공식 회칙 전문 (제1조~제10조)</h2>
         </div>
         <div class="text-right text-[11px] text-slate-400">
-          <span id="wiki-rev-badge" class="font-bold text-teal-600">r3 판본</span>
+          <span id="wiki-rev-badge" class="font-bold text-teal-600">최신 판본</span>
         </div>
       </div>
 
-      <!-- 색상 안내 가이드 -->
       <div class="flex items-center gap-2 text-[10px] bg-slate-50 p-2 rounded-lg text-slate-500">
-        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>노란색: 딴지금지 권한</span>
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>노란색: 딴지금지</span>
         <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"></span>붉은색: 공금지출 엄금</span>
       </div>
 
@@ -75,18 +74,18 @@
       </div>
     </div>
 
-    <!-- 1. [열람 패널] -->
-    <div id="panel-view" class="space-y-3 text-xs leading-relaxed"></div>
+    <div id="panel-view" class="space-y-3 text-xs leading-relaxed">
+      <div class="p-6 text-center text-slate-400">회칙을 동기화하는 중...</div>
+    </div>
 
-    <!-- 2. [개정 패널] -->
     <div id="panel-edit" class="hidden bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
         <h3 class="font-bold text-sm text-slate-900">회칙 조항 개정 편집창</h3>
-        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">수정 즉시 반영</span>
+        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">수정 즉시 전체 공유</span>
       </div>
 
       <div class="space-y-2 text-xs">
-        <label class="block font-bold text-slate-700">개정 본문 텍스트 (조항별 자유 수정)</label>
+        <label class="block font-bold text-slate-700">개정 본문 텍스트 (자유 수정)</label>
         <textarea id="edit-content" rows="15" class="w-full p-2.5 border rounded-lg font-mono text-[11px] leading-relaxed bg-slate-50 focus:ring-2 focus:ring-teal-500"></textarea>
 
         <div class="grid grid-cols-2 gap-2">
@@ -102,22 +101,21 @@
           </div>
           <div>
             <label class="block font-bold text-teal-900 mb-1">편집 요약 (개정 사유) *</label>
-            <input type="text" id="edit-summary" placeholder="예: 제8조 식대 전용 조항 분리 반영" class="w-full p-2 border border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-xs">
+            <input type="text" id="edit-summary" placeholder="예: 제8조 식대 조항 보완" class="w-full p-2 border border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-xs">
           </div>
         </div>
 
         <div class="flex gap-2 justify-end pt-2">
           <button type="button" id="btn-cancel-edit" class="px-3 py-1.5 border rounded font-semibold text-slate-600">취소</button>
-          <button type="button" id="btn-save-edit" class="px-4 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded font-bold">개정안 저장 (새 판본 등록)</button>
+          <button type="button" id="btn-save-edit" class="px-4 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded font-bold">개정안 저장 (클라우드 반영)</button>
         </div>
       </div>
     </div>
 
-    <!-- 3. [역사 패널] -->
     <div id="panel-hist" class="hidden bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
-        <h3 class="font-bold text-sm text-slate-900">문서 개정 역사 (나무위키식)</h3>
-        <span id="hist-count" class="text-[11px] text-slate-400">총 3개 판본</span>
+        <h3 class="font-bold text-sm text-slate-900">문서 개정 역사 (로그)</h3>
+        <span id="hist-count" class="text-[11px] text-slate-400">총 0개 판본</span>
       </div>
 
       <div id="hist-list-container" class="space-y-2 text-xs"></div>
@@ -126,10 +124,8 @@
   </main>
 
   <script type="module">
-    import { db } from "./js/firebase.js";
-    import { doc, setDoc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { db, doc, setDoc, collection, onSnapshot } from "./js/firebase.js";
 
-    // 제8조와 제9조를 온전히 분리한 기본 표준 회칙 전문
     const defaultRuleText = `제1조 (명칭 및 목적)
 본 모임은 고등학교 5인 동창 간의 친목 도모와 정기적인 회합, 상호 부조를 목적으로 2019년에 결성된 곗모임이다.
 
@@ -169,14 +165,8 @@
 본 회칙을 개정할 때에는 개정 사유(편집 요약)를 필수로 입력해야만 판본으로 저장된다.`;
 
     let currentRuleText = defaultRuleText;
+    let revisions = [];
 
-    let revisions = [
-      { rev: "r3", date: "2026-09-07 00:00", author: "김진세", summary: "제8조 식대 전용 운영 및 제9조 경조사비 독립 분리 개정" },
-      { rev: "r2", date: "2026-05-10 14:30", author: "장우석", summary: "경조사비 4인 개별 각출 원칙 명문화" },
-      { rev: "r1", date: "2019-09-07 18:00", author: "송환오", summary: "5인 동창 곗모임 최초 회칙 제정" }
-    ];
-
-    // 드롭다운 제어
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
     btnDropdown.addEventListener("click", (e) => {
@@ -185,17 +175,10 @@
     });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // [핵심] 조항 분리 및 색상별 카드 렌더링 함수
     function renderRuleText(rawText) {
       const container = document.getElementById("panel-view");
       container.innerHTML = "";
 
-      if (!rawText || !rawText.trim()) {
-        container.innerHTML = `<div class="p-6 text-center text-slate-400 bg-white rounded-xl border">등록된 회칙 내용이 없습니다.</div>`;
-        return;
-      }
-
-      // '제X조' 단위로 정확히 분할 (제8조, 제9조 완벽 분리)
       const sections = rawText.split(/(?=제\s*[0-9]+조)/g).map(s => s.trim()).filter(Boolean);
 
       sections.forEach((sec, idx) => {
@@ -209,7 +192,6 @@
           body = sec.substring(firstLineEnd + 1).trim();
         }
 
-        // 제5조(딴지금지): 노란색 / 제9조(경조사비 공금지출 엄금): 붉은색
         const isWarning = title.includes("5조") || title.includes("장소");
         const isDanger = title.includes("9조") || title.includes("경조사");
 
@@ -241,7 +223,6 @@
       });
     }
 
-    // 탭 전환
     const tabView = document.getElementById("tab-view");
     const tabEdit = document.getElementById("tab-edit");
     const tabHist = document.getElementById("tab-hist");
@@ -295,97 +276,64 @@
       }
     }
 
-    // 개정안 저장
     document.getElementById("btn-save-edit").onclick = async () => {
       const newContent = document.getElementById("edit-content").value.trim();
       const summary = document.getElementById("edit-summary").value.trim();
       const author = document.getElementById("edit-author").value;
 
-      if (!newContent) {
-        alert("⚠️ 회칙 본문 내용이 비어있습니다.");
-        return;
-      }
+      if (!newContent) return alert("⚠️ 회칙 본문 내용이 비어있습니다.");
       if (!summary) {
-        alert("⚠️ [편집 요약 필수] 개정 사유(편집 요약)를 반드시 입력해야 합니다.");
+        alert("⚠️ [편집 요약 필수] 개정 사유를 반드시 입력해야 합니다.");
         return document.getElementById("edit-summary").focus();
       }
-
-      currentRuleText = newContent;
-      localStorage.setItem("alumni_wiki_content", currentRuleText);
 
       const nextRev = `r${revisions.length + 1}`;
       const now = new Date();
       const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
       const newRec = { rev: nextRev, date: dateStr, author: author, summary: summary };
-      revisions.unshift(newRec);
-      localStorage.setItem("alumni_wiki_revs", JSON.stringify(revisions));
-
-      renderRuleText(currentRuleText);
-      document.getElementById("wiki-rev-badge").innerText = `${nextRev} 판본`;
-      document.getElementById("edit-summary").value = "";
-
-      setTab("view");
-      alert(`🎉 [${author}] 개정안(${nextRev})이 열람 화면에 반영되었습니다.`);
 
       try {
         await setDoc(doc(db, "rule_content", "latest"), {
-          content: currentRuleText,
+          content: newContent,
           updatedAt: dateStr,
           author: author,
           rev: nextRev,
           summary: summary
         });
         await setDoc(doc(db, "rule_revisions", nextRev), newRec);
+
+        alert(`🎉 [${author}] 개정안(${nextRev})이 클라우드에 성공적으로 반영되었습니다.`);
+        document.getElementById("edit-summary").value = "";
+        setTab("view");
       } catch (err) {
-        console.warn("DB 저장 에러(로컬 반영 완료):", err);
+        alert(`❌ 클라우드 저장 실패! Firebase 보안 규칙을 확인하세요:\n${err.message}`);
       }
     };
 
-    // 초기 데이터 로드 (로컬스토리지 우선 로드 후 Firestore 동기화)
-    async function loadWikiData() {
-      // 로컬에 기존 8·9조 통합본이 저장되어 있을 수 있으므로 defaultRuleText 우선 적용
-      const localContent = localStorage.getItem("alumni_wiki_content");
-      if (localContent && localContent.includes("제8조 (공금 통장")) {
-        currentRuleText = localContent;
-      } else {
-        currentRuleText = defaultRuleText;
-        localStorage.setItem("alumni_wiki_content", defaultRuleText);
-      }
-      renderRuleText(currentRuleText);
-
-      const localRevs = localStorage.getItem("alumni_wiki_revs");
-      if (localRevs) {
-        try { revisions = JSON.parse(localRevs); } catch(e){}
-      }
-      renderHistory();
-
-      try {
-        const contentSnap = await getDoc(doc(db, "rule_content", "latest"));
-        if (contentSnap.exists()) {
-          const data = contentSnap.data();
-          if (data.content && data.content.includes("제8조 (공금 통장")) {
-            currentRuleText = data.content;
-            localStorage.setItem("alumni_wiki_content", currentRuleText);
-            renderRuleText(currentRuleText);
-          }
+    // 실시간 본문 동기화
+    try {
+      onSnapshot(doc(db, "rule_content", "latest"), (d) => {
+        if (d.exists() && d.data().content) {
+          currentRuleText = d.data().content;
+          document.getElementById("wiki-rev-badge").innerText = `${d.data().rev || '최신'} 판본`;
+        } else {
+          currentRuleText = defaultRuleText;
         }
-      } catch(e) {}
+        renderRuleText(currentRuleText);
+      });
 
-      try {
-        const revSnap = await getDocs(collection(db, "rule_revisions"));
-        if (!revSnap.empty) {
-          const list = [];
-          revSnap.forEach(d => list.push(d.data()));
-          list.sort((a, b) => b.rev.localeCompare(a.rev, undefined, { numeric: true }));
-          revisions = list;
-          localStorage.setItem("alumni_wiki_revs", JSON.stringify(list));
-          renderHistory();
-        }
-      } catch(e) {}
+      // 실시간 개정 역사 동기화
+      onSnapshot(collection(db, "rule_revisions"), (snapshot) => {
+        const list = [];
+        snapshot.forEach(docSnap => list.push(docSnap.data()));
+        list.sort((a, b) => b.rev.localeCompare(a.rev, undefined, { numeric: true }));
+        revisions = list;
+        renderHistory();
+      });
+    } catch(e) {
+      console.error(e);
     }
-
-    loadWikiData();
   </script>
 
 </body>
