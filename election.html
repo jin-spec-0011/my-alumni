@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>회장 선출소 - 5인 동창 곗모임</title>
 
+  <!-- PWA & 아이폰 설정 -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -17,6 +18,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
+  <!-- 공통 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
@@ -31,6 +33,7 @@
       </span>
     </div>
 
+    <!-- 5대 메인 탭 + 부가기능 콤보박스 -->
     <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
       <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
         <a href="index.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">대시보드</a>
@@ -55,6 +58,7 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
+    <!-- 대통령 임기 연동 시계 -->
     <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-4 shadow-sm space-y-3">
       <div class="flex justify-between items-center text-xs">
         <span class="text-[10px] bg-indigo-500/30 text-indigo-200 border border-indigo-400/40 px-2 py-0.5 rounded-full font-bold">회칙 제4조 연동</span>
@@ -63,7 +67,9 @@
 
       <div>
         <h2 class="text-base font-black text-white">대한민국 대통령 임기 연동 시계</h2>
-        <p class="text-[11px] text-slate-300">대통령 임기 만료 시 4인 룰렛으로 차기 회장을 선출합니다.</p>
+        <div class="text-[11px] text-slate-300 mt-0.5">
+          현재 임기 목표일: <strong id="display-target-date" class="text-amber-300 font-mono">2027-05-10</strong>
+        </div>
       </div>
 
       <div class="grid grid-cols-4 gap-2 text-center text-xs">
@@ -86,18 +92,19 @@
       </div>
     </div>
 
+    <!-- 룰렛 게임기 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-4 text-center">
       <div class="border-b pb-2 flex justify-between items-center text-left">
         <div>
-          <h3 class="font-bold text-sm text-slate-900">차기 회장 4인 룰렛</h3>
-          <span class="text-[11px] text-slate-400">장우석 총무 영구 면제 (후보 4인 균등 25%)</span>
+          <h3 class="font-bold text-sm text-slate-900">차기 회장 4인 룰렛 추첨</h3>
+          <span class="text-[11px] text-slate-400">장우석 총무 영구 면제 (후보 4인 균등 각 25%)</span>
         </div>
         <span class="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded">후보 4인 풀</span>
       </div>
 
-      <div class="p-2 bg-slate-50 border border-dashed rounded-lg flex justify-between items-center text-xs opacity-60">
+      <div class="p-2.5 bg-slate-50 border border-dashed rounded-lg flex justify-between items-center text-xs opacity-75">
         <span class="font-bold text-slate-700">장우석 (총무)</span>
-        <span class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded">회장직 영구 면제</span>
+        <span class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded">회칙 제3조: 피선거권 영구 면제</span>
       </div>
 
       <div class="relative w-64 h-64 mx-auto my-2 flex items-center justify-center">
@@ -112,22 +119,32 @@
         <span>룰렛 회전 시작 (추첨)</span>
       </button>
 
+      <!-- 당선 결과 가안 및 승계 버튼 -->
       <div id="result-box" class="hidden p-3.5 bg-amber-50 border-2 border-amber-300 rounded-xl space-y-2.5">
         <div class="text-[11px] font-bold text-amber-800">🎯 룰렛 추첨 결과</div>
         <div id="winner-name-display" class="text-2xl font-black text-slate-900">당선자: -</div>
+        
+        <!-- 차기 임기 만료일 선택 영역 (자동 기본 5년 계산) -->
+        <div class="p-2.5 bg-white border border-amber-200 rounded-lg text-left text-xs space-y-1">
+          <label class="block font-bold text-slate-700 text-[11px]">차기 회장 임기 만료일 (카운트다운 리셋 기준일)</label>
+          <input type="date" id="input-new-term-end" class="w-full p-2 border rounded font-mono font-bold text-slate-800 bg-amber-50/50">
+          <span class="text-[10px] text-slate-400 block">• 취임일로부터 기본 5년 뒤로 자동 세팅됩니다.</span>
+        </div>
+
         <div class="p-2 bg-white/80 border border-amber-200 rounded text-[11px] text-slate-600 text-left leading-relaxed">
-          ⚡ <strong>원클릭 승계:</strong> 확정 즉시 대시보드 배너가 교체되고, 회칙(제2조, 제4조)이 새 회장 명의로 자동 갱신됩니다.
+          ⚡ <strong>원클릭 통합 승계:</strong> 확정 시 대시보드 배너가 교체되고, 회칙(제2조, 제4조)이 자동 갱신되며, <strong>대통령 시계 카운트다운도 새 임기(기본 5년)로 자동 리셋</strong>됩니다.
         </div>
 
         <button id="btn-confirm-winner" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-lg shadow transition flex items-center justify-center gap-1.5">
           <i class="fa-solid fa-stamp"></i>
-          <span>👑 차기 회장 공식 확정 (대시보드·회칙 자동 갱신)</span>
+          <span>👑 차기 회장 확정 & 카운트다운 리셋</span>
         </button>
       </div>
     </div>
 
+    <!-- 역대 선출 역사 로그 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2 text-xs">
-      <div class="font-bold text-slate-900 border-b pb-1.5 flex justify-between">
+      <div class="font-bold text-slate-900 border-b pb-1.5 flex justify-between items-center">
         <span>역대 회장 선출 역사</span>
         <span class="text-[10px] text-slate-400">실시간 로그</span>
       </div>
@@ -149,7 +166,6 @@
       onSnapshot 
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // 드롭다운 토글
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
     btnDropdown.addEventListener("click", (e) => {
@@ -171,6 +187,7 @@
     let currentAngle = 0;
     let isSpinning = false;
     let pendingWinner = null;
+    let targetEndDateStr = "2027-05-10T00:00:00+09:00"; // 기본값
 
     function drawRoulette() {
       const cx = canvas.width / 2;
@@ -245,6 +262,13 @@
           pendingWinner = candidates[winnerIndex];
 
           document.getElementById("winner-name-display").innerText = `👑 당선자: ${pendingWinner.name}`;
+
+          // 취임일 기준 5년 뒤 기본 계산
+          const today = new Date();
+          const future5Years = new Date(today.getFullYear() + 5, today.getMonth(), today.getDate());
+          const defaultDateStr = `${future5Years.getFullYear()}-${String(future5Years.getMonth()+1).padStart(2,'0')}-${String(future5Years.getDate()).padStart(2,'0')}`;
+          document.getElementById("input-new-term-end").value = defaultDateStr;
+
           document.getElementById("result-box").classList.remove("hidden");
         }
       }
@@ -252,21 +276,35 @@
       requestAnimationFrame(animate);
     };
 
-    // [핵심 엔진] 공식 확정 시 대시보드 배너 & 뱃지 & 회칙 100% 자동 동시 교체
+    // [핵심 엔진] 공식 확정 시 카운트다운 리셋 + 대시보드 + 회칙 동시 처리
     document.getElementById("btn-confirm-winner").onclick = async () => {
       if (!pendingWinner) return;
       const operator = prompt("확정자 본인 이름을 입력하세요 (김진세, 송환오, 장우석, 김정수, 이해웅):");
       if (!operator) return;
 
+      const customTermEnd = document.getElementById("input-new-term-end").value;
+      if (!customTermEnd) {
+        alert("차기 회장의 임기 만료일을 입력해 주세요.");
+        return;
+      }
+
       const btn = document.getElementById("btn-confirm-winner");
       btn.disabled = true;
-      btn.innerText = "대시보드 및 회칙 자동 갱신 중...";
+      btn.innerText = "임기 시계 리셋 및 시스템 갱신 중...";
 
       const now = new Date();
       const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const newTargetISO = `${customTermEnd}T00:00:00+09:00`;
 
       try {
-        // 1. 차기 회장 상태 저장 (대시보드 상단 배너용)
+        // 1. [카운트다운 리셋] 새 임기 만료일 저장 (대시보드와 동기화)
+        await setDoc(doc(db, "app_state", "term_config"), {
+          targetDateStr: newTargetISO,
+          updatedAt: dateStr,
+          setBy: operator
+        });
+
+        // 2. 현재 회장 상태 저장 (대시보드 배너)
         await setDoc(doc(db, "app_state", "current_president"), {
           presidentId: pendingWinner.id,
           presidentName: pendingWinner.name,
@@ -274,7 +312,7 @@
           confirmedAt: dateStr
         });
 
-        // 2. 동창 5인 회원 뱃지 자동 교체 (기존 회장 -> 회원, 새 당선자 -> 👑 회장)
+        // 3. 5인 회원 뱃지 교체
         const membersSnap = await getDoc(doc(db, "app_state", "members_status"));
         let members = membersSnap.exists() ? membersSnap.data().list : [
           { id: "user_song", name: "송환오", role: "👑 회장", roleBadge: "bg-amber-100 text-amber-800", marital: "married", children: 0 },
@@ -295,7 +333,7 @@
 
         await setDoc(doc(db, "app_state", "members_status"), { list: members });
 
-        // 3. 회칙 10개 조항(제2조 회원현황, 제4조 피선거권 문구) 자동 재생성
+        // 4. 회칙 전문 자동 재작성
         let adultCount = 5;
         let spouseCount = 0;
         let childCount = 0;
@@ -350,12 +388,16 @@ ${memberLines.join("\n")}
 제10조 (편집 요약 의무제)
 본 회칙을 개정할 때에는 개정 사유(편집 요약)를 필수로 입력해야만 판본으로 저장된다.`;
 
-        // 회칙 캐시 및 클라우드 저장
         localStorage.setItem("alumni_wiki_content", updatedRuleText);
 
         const revSnap = await getDocs(collection(db, "rule_revisions"));
-        const nextRev = `r${revSnap.size + 1}`;
-        const autoSummary = `[회장 선출] 4인 룰렛 추첨으로 ${pendingWinner.name} 회장 당선 (제2조·제4조 자동 갱신)`;
+        let maxNum = 0;
+        revSnap.forEach(d => {
+          const num = parseInt(String(d.data().rev || "").replace(/[^0-9]/g, ''), 10) || 0;
+          if (num > maxNum) maxNum = num;
+        });
+        const nextRev = `r${maxNum + 1}`;
+        const autoSummary = `[회장 선출] 4인 룰렛 추첨으로 ${pendingWinner.name} 회장 공식 취임 (임기 리셋: ~${customTermEnd})`;
 
         const newRec = { rev: nextRev, date: dateStr, author: operator, summary: autoSummary };
 
@@ -366,34 +408,37 @@ ${memberLines.join("\n")}
           rev: nextRev,
           summary: autoSummary
         });
-        await setDoc(doc(db, "rule_revisions", nextRev), newRec);
+        await setDoc(doc(db, "rule_revisions", `rev_${Date.now()}`), newRec);
 
-     
-          // 4. 역대 선출 기록 저장
-                // 4. 역대 선출 기록 저장
+        // 5. 역대 선출 기록 저장
         await setDoc(doc(db, "election_history", `elec_${Date.now()}`), {
           winner: pendingWinner.name,
           confirmedBy: operator,
           date: dateStr,
-          note: `제20대 대통령 임기 연동 선출 승인 (승인자: ${operator})`
+          note: `대통령 임기 연동 선출 승인 (임기 만료: ${customTermEnd}, 승인자: ${operator})`
         });
 
-        alert(`🎉 [공식 확정] ${pendingWinner.name} 회장이 차기 회장으로 공식 취임했습니다!...`);
-
-
-
-        alert(`🎉 [공식 확정] ${pendingWinner.name} 회장이 차기 회장으로 공식 취임했습니다!\n\n• 대시보드: CURRENT LEADER가 [${pendingWinner.name} 회장]으로 교체되었습니다.\n• 5인 현황: 회장 뱃지가 [${pendingWinner.name}]에게 이동했습니다.\n• 회칙(제2조, 제4조): 새 판본(${nextRev})으로 자동 갱신되었습니다.`);
+        alert(`🎉 [공식 확정] ${pendingWinner.name} 회장이 차기 회장으로 공식 취임했습니다!\n\n• 카운트다운 타이머: [${customTermEnd}] 기준으로 리셋 완료\n• 대시보드: CURRENT LEADER가 [${pendingWinner.name} 회장]으로 교체되었습니다.\n• 회칙(제2·4조): 새 판본 [${nextRev}]으로 자동 갱신되었습니다.`);
         document.getElementById("result-box").classList.add("hidden");
       } catch (err) {
         alert(`❌ 승계 처리 실패: ${err.message}`);
       } finally {
         btn.disabled = false;
-        btn.innerText = "👑 차기 회장 공식 확정 (대시보드·회칙 자동 갱신)";
+        btn.innerText = "👑 차기 회장 확정 & 카운트다운 리셋";
       }
     };
 
-    // 실시간 리스너 구독 (역대 선출 역사 & 현재 회장 태그)
+    // 실시간 리스너 구독 (임기 시계 및 회장 상태)
     try {
+      // 1. 임기 만료일 실시간 구독 (리셋 시 즉시 적용)
+      onSnapshot(doc(db, "app_state", "term_config"), (docSnap) => {
+        if (docSnap.exists() && docSnap.data().targetDateStr) {
+          targetEndDateStr = docSnap.data().targetDateStr;
+          document.getElementById("display-target-date").innerText = targetEndDateStr.substring(0, 10);
+        }
+      });
+
+      // 2. 현재 회장 상태 구독
       onSnapshot(doc(db, "app_state", "current_president"), (docSnap) => {
         if (docSnap.exists()) {
           const p = docSnap.data();
@@ -401,12 +446,13 @@ ${memberLines.join("\n")}
         }
       });
 
+      // 3. 역대 선출 역사 구독
       onSnapshot(collection(db, "election_history"), (snapshot) => {
         const container = document.getElementById("history-list");
         container.innerHTML = "";
         const list = [];
         snapshot.forEach(d => list.push(d.data()));
-        list.sort((a, b) => b.date.localeCompare(a.date));
+        list.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
         if (list.length === 0) {
           container.innerHTML = `
@@ -435,9 +481,16 @@ ${memberLines.join("\n")}
       console.error(e);
     }
 
+    // 대통령 시계 카운트다운 타이머 (동적 목표일 기준)
     function updateCountdown() {
-      const diff = new Date("2027-05-10T00:00:00+09:00").getTime() - Date.now();
-      if (diff <= 0) return;
+      const diff = new Date(targetEndDateStr).getTime() - Date.now();
+      if (diff <= 0) {
+        document.getElementById("t-days").innerText = "000";
+        document.getElementById("t-hours").innerText = "00";
+        document.getElementById("t-mins").innerText = "00";
+        document.getElementById("t-secs").innerText = "00";
+        return;
+      }
       document.getElementById("t-days").innerText = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(3, '0');
       document.getElementById("t-hours").innerText = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
       document.getElementById("t-mins").innerText = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
