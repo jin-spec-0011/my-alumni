@@ -9,6 +9,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
+  <!-- 공통 상단 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
@@ -23,6 +24,7 @@
       </span>
     </div>
 
+    <!-- 5대 메인 탭 + 부가기능 콤보박스 -->
     <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
       <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
         <a href="index.html" class="py-1.5 px-2 bg-blue-50 text-blue-600 rounded-lg whitespace-nowrap">대시보드</a>
@@ -47,6 +49,7 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
+    <!-- CURRENT LEADER 배너 -->
     <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-5 shadow-sm space-y-3">
       <div class="flex justify-between items-center text-xs">
         <span class="bg-amber-400 text-slate-950 font-black px-2.5 py-0.5 rounded text-[10px] tracking-wider uppercase">CURRENT LEADER</span>
@@ -68,6 +71,7 @@
       </div>
     </div>
 
+    <!-- 다음 정기 모임 안내 표 (인원 변동 시 자동 재계산) -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="flex justify-between items-center border-b pb-2">
         <div class="flex items-center gap-1.5">
@@ -108,13 +112,14 @@
       </a>
     </div>
 
+    <!-- 5인 회원 현황 카드 & 원클릭 가족 변경 버튼 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2.5">
       <div class="border-b pb-2 flex justify-between items-center">
         <h3 class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
           <i class="fa-solid fa-user-group text-slate-500"></i>
           <span>동창 5인 회원 현황</span>
         </h3>
-        <button id="btn-open-member-modal" class="text-[11px] font-bold px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg flex items-center gap-1">
+        <button id="btn-open-member-modal" class="text-[11px] font-bold px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg flex items-center gap-1 transition shadow-sm">
           <i class="fa-solid fa-user-pen"></i>
           <span>가족/인원 변경</span>
         </button>
@@ -127,12 +132,13 @@
 
   </main>
 
+  <!-- [모달] 가족/인원 변경 팝업 레이어 (회칙 자동 갱신 엔진 내장) -->
   <div id="member-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4 animate-bottom">
+    <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4">
       <div class="flex justify-between items-center border-b pb-2.5">
         <div>
           <h3 class="font-bold text-base text-slate-900">회원 가족/인원 상태 변경</h3>
-          <p class="text-[11px] text-slate-400">결혼 또는 출산 시 변경하면 총 인원이 자동 계산됩니다.</p>
+          <p class="text-[11px] text-slate-400">저장 시 대시보드와 회칙 조항(제2조, 제6조)이 자동 갱신됩니다.</p>
         </div>
         <button id="btn-close-member-modal" class="text-slate-400 hover:text-slate-700 text-lg px-2">✕</button>
       </div>
@@ -169,12 +175,12 @@
           </div>
         </div>
 
-        <div class="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-[11px] text-blue-800 leading-relaxed">
-          💡 <strong>자동 연동 안내:</strong> '기혼' 선택 시 배우자(+1명)가 성인 인원에 자동 가산되며, 자녀 수는 어린이 인원에 실시간 합산됩니다.
+        <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-[11px] text-emerald-900 leading-relaxed">
+          ⚡ <strong>회칙 원클릭 자동 갱신:</strong> 저장 버튼을 누르면 회칙 전문의 제2조 회원 현황 및 제6조 참석 상한 수치가 자동으로 다시 작성되어 새 판본으로 등록됩니다.
         </div>
 
-        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow transition">
-          변경 사항 저장 (실시간 합산 반영)
+        <button type="submit" id="btn-submit-member" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow transition">
+          변경 사항 저장 (회칙 및 대시보드 동시 갱신)
         </button>
       </form>
     </div>
@@ -182,9 +188,16 @@
 
   <script type="module">
     import { db } from "./js/firebase.js";
-    import { doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { 
+      doc, 
+      setDoc, 
+      getDoc, 
+      getDocs, 
+      collection, 
+      onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // 1. 초기 5인 기본 세팅 데이터
+    // 5인 기본 현황
     let membersData = [
       { id: "user_song", name: "송환오", role: "👑 회장", roleBadge: "bg-amber-100 text-amber-800", marital: "married", children: 0 },
       { id: "user_jang", name: "장우석", role: "🛡️ 총무", roleBadge: "bg-slate-200 text-slate-700", marital: "married", children: 2 },
@@ -202,16 +215,15 @@
     });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // 2. 인원 자동 계산 및 화면 렌더링
+    // 인원 계산 & 대시보드 렌더링
     function renderMembers() {
       const container = document.getElementById("members-list-container");
       container.innerHTML = "";
 
-      let adultCount = 5; // 회원 5명 기본
+      let adultCount = 5;
       let childCount = 0;
 
       membersData.forEach(m => {
-        // 기혼이면 배우자 +1명
         if (m.marital === "married") adultCount += 1;
         childCount += Number(m.children) || 0;
 
@@ -232,13 +244,11 @@
       });
 
       const totalCount = adultCount + childCount;
-
-      // 상단 모임 안내 표 자동 갱신
       document.getElementById("dash-capacity-total").innerText = `총 ${totalCount}명 (풀가동)`;
       document.getElementById("dash-capacity-detail").innerText = `성인 ${adultCount}명 + 어린이 ${childCount}명`;
     }
 
-    // 3. 모달 팝업 제어
+    // 모달 팝업 제어
     const modal = document.getElementById("member-modal");
     const memberSelect = document.getElementById("modal-member-select");
     const maritalSelect = document.getElementById("modal-marital");
@@ -254,41 +264,114 @@
     };
 
     function syncModalInputs() {
-      const selectedId = memberSelect.value;
-      const target = membersData.find(m => m.id === selectedId);
+      const target = membersData.find(m => m.id === memberSelect.value);
       if (target) {
         maritalSelect.value = target.marital;
         childrenSelect.value = target.children;
       }
     }
-
     memberSelect.addEventListener("change", syncModalInputs);
 
-    // 4. 모달에서 저장 시 클라우드 Firestore 동기화
+    // [핵심] 회칙 제2조 및 제6조 텍스트 자동 조립 함수
+    function buildAutoRuleSections(members) {
+      let adultCount = 5;
+      let spouseCount = 0;
+      let childCount = 0;
+
+      let memberLines = ["제2조 (회원의 자격 및 현황)", "본 회의 정회원은 아래 5인으로 영구 한정한다."];
+
+      members.forEach(m => {
+        if (m.marital === "married") {
+          adultCount += 1;
+          spouseCount += 1;
+        }
+        childCount += Number(m.children) || 0;
+
+        let roleClean = m.role.replace(/^[^\s]+\s*/, '');
+        let desc = (m.marital === "married")
+          ? (m.children > 0 ? `기혼, 자녀 ${m.children}명` : "기혼, 무자녀")
+          : "미혼";
+
+        memberLines.push(`• ${m.name}: ${roleClean} (${desc})`);
+      });
+
+      const totalCount = adultCount + childCount;
+
+      const sec2 = memberLines.join("\n");
+      const sec6 = `제6조 (가족 동반 및 수용 상한)\n풀가동 시 최대 수용 규모는 성인 ${adultCount}명(회원 5 + 배우자 ${spouseCount}명)과 어린이 ${childCount}명을 합산한 총 ${totalCount}명으로 산정하여 단독 프라이빗 룸을 예약한다.`;
+
+      return { sec2, sec6, totalCount };
+    }
+
+    // 인원 변경 및 회칙 자동 갱신 실행
     document.getElementById("member-update-form").onsubmit = async (e) => {
       e.preventDefault();
       const selectedId = memberSelect.value;
       const target = membersData.find(m => m.id === selectedId);
-
       if (!target) return;
+
+      const btn = document.getElementById("btn-submit-member");
+      btn.disabled = true;
+      btn.innerText = "회칙 자동 갱신 및 저장 중...";
 
       target.marital = maritalSelect.value;
       target.children = parseInt(childrenSelect.value, 10);
 
       renderMembers();
-      modal.classList.add("hidden");
+
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
       try {
+        // 1. 회원 현황 저장
         await setDoc(doc(db, "app_state", "members_status"), { list: membersData });
-        alert(`🎉 [${target.name}] 회원의 가족/인원 상태가 저장되었습니다.\n참석 총 규모가 실시간 갱신되었습니다.`);
+
+        // 2. 현재 최신 회칙 가져오기
+        const contentSnap = await getDoc(doc(db, "rule_content", "latest"));
+        let currentText = contentSnap.exists() ? contentSnap.data().content : "";
+
+        // 3. 제2조와 제6조 자동 치환
+        const { sec2, sec6, totalCount } = buildAutoRuleSections(membersData);
+
+        if (currentText.includes("제2조") && currentText.includes("제6조")) {
+          currentText = currentText.replace(/제2조[\s\S]*?(?=제3조)/, sec2 + "\n\n");
+          currentText = currentText.replace(/제6조[\s\S]*?(?=제7조)/, sec6 + "\n\n");
+        }
+
+        // 4. 회칙 새 판본 번호 및 역사 기록 생성
+        const revSnap = await getDocs(collection(db, "rule_revisions"));
+        const nextRev = `r${revSnap.size + 1}`;
+        const autoSummary = `[인원 변동] ${target.name} 가족 현황 반영 (제2조·제6조 자동 갱신, 총 ${totalCount}명)`;
+
+        const newRec = {
+          rev: nextRev,
+          date: dateStr,
+          author: target.name,
+          summary: autoSummary
+        };
+
+        // 5. 회칙 DB 영구 반영
+        await setDoc(doc(db, "rule_content", "latest"), {
+          content: currentText,
+          updatedAt: dateStr,
+          author: target.name,
+          rev: nextRev,
+          summary: autoSummary
+        });
+        await setDoc(doc(db, "rule_revisions", nextRev), newRec);
+
+        alert(`🎉 [${target.name}] 가족 현황 저장 완료!\n\n• 대시보드 참석 규모: 총 ${totalCount}명 자동 계산\n• 회칙 제2조 & 제6조: 새 판본(${nextRev})으로 자동 갱신되었습니다.`);
+        modal.classList.add("hidden");
       } catch (err) {
-        alert(`❌ 클라우드 저장 실패: ${err.message}`);
+        alert(`❌ 저장 중 오류 발생: ${err.message}`);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "변경 사항 저장 (회칙 및 대시보드 동시 갱신)";
       }
     };
 
-    // 5. Firestore 실시간 리스너 연동
+    // 실시간 리스너 구독
     try {
-      // 회원 상태 실시간 구독
       onSnapshot(doc(db, "app_state", "members_status"), (docSnap) => {
         if (docSnap.exists() && docSnap.data().list) {
           membersData = docSnap.data().list;
@@ -298,7 +381,6 @@
         renderMembers();
       });
 
-      // 모임 장소/일시 실시간 연동
       onSnapshot(doc(db, "gathering", "latest"), (docSnap) => {
         if (docSnap.exists()) {
           const g = docSnap.data();
