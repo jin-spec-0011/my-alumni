@@ -50,16 +50,22 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 문서 메타 헤더 & 3대 서브 탭 -->
+    <!-- 문서 헤더 & 3대 서브 탭 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="flex justify-between items-center border-b pb-2">
         <div>
           <span class="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded">BYLAWS-001</span>
-          <h2 class="text-base font-black text-slate-900 mt-1">공식 회칙 전문</h2>
+          <h2 class="text-base font-black text-slate-900 mt-1">공식 회칙 전문 (제1조~제10조)</h2>
         </div>
         <div class="text-right text-[11px] text-slate-400">
           <span id="wiki-rev-badge" class="font-bold text-teal-600">r3 판본</span>
         </div>
+      </div>
+
+      <!-- 색상 안내 가이드 -->
+      <div class="flex items-center gap-2 text-[10px] bg-slate-50 p-2 rounded-lg text-slate-500">
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>노란색: 딴지금지 권한</span>
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"></span>붉은색: 공금지출 엄금</span>
       </div>
 
       <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-lg text-xs font-bold text-center">
@@ -69,25 +75,23 @@
       </div>
     </div>
 
-    <!-- 1. [열람 패널: 실시간 자동 렌더링 영역] -->
-    <div id="panel-view" class="space-y-3 text-xs leading-relaxed">
-      <!-- 자바스크립트가 현재 확정된 회칙 본문을 카드로 자동 생성합니다 -->
-    </div>
+    <!-- 1. [열람 패널] -->
+    <div id="panel-view" class="space-y-3 text-xs leading-relaxed"></div>
 
-    <!-- 2. [개정 패널: 에디터] -->
+    <!-- 2. [개정 패널] -->
     <div id="panel-edit" class="hidden bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
         <h3 class="font-bold text-sm text-slate-900">회칙 조항 개정 편집창</h3>
-        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">수정 후 즉시 반영</span>
+        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">수정 즉시 반영</span>
       </div>
 
       <div class="space-y-2 text-xs">
-        <label class="block font-bold text-slate-700">개정 본문 텍스트 (자유롭게 수정 가능)</label>
-        <textarea id="edit-content" rows="14" class="w-full p-2.5 border rounded-lg font-mono text-[11px] leading-relaxed bg-slate-50 focus:ring-2 focus:ring-teal-500"></textarea>
+        <label class="block font-bold text-slate-700">개정 본문 텍스트 (조항별 자유 수정)</label>
+        <textarea id="edit-content" rows="15" class="w-full p-2.5 border rounded-lg font-mono text-[11px] leading-relaxed bg-slate-50 focus:ring-2 focus:ring-teal-500"></textarea>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">개정 작업자 (본인)</label>
+            <label class="block font-bold text-slate-700 mb-1">작업자 본인</label>
             <select id="edit-author" class="w-full p-2 border rounded-lg bg-white font-bold text-slate-800">
               <option value="김진세" selected>김진세</option>
               <option value="송환오">송환오</option>
@@ -98,13 +102,13 @@
           </div>
           <div>
             <label class="block font-bold text-teal-900 mb-1">편집 요약 (개정 사유) *</label>
-            <input type="text" id="edit-summary" placeholder="예: 제2조 회원 현황 수정" class="w-full p-2 border border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-xs">
+            <input type="text" id="edit-summary" placeholder="예: 제8조 식대 전용 조항 분리 반영" class="w-full p-2 border border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-xs">
           </div>
         </div>
 
         <div class="flex gap-2 justify-end pt-2">
           <button type="button" id="btn-cancel-edit" class="px-3 py-1.5 border rounded font-semibold text-slate-600">취소</button>
-          <button type="button" id="btn-save-edit" class="px-4 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded font-bold">개정안 저장 (열람 화면 갱신)</button>
+          <button type="button" id="btn-save-edit" class="px-4 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded font-bold">개정안 저장 (새 판본 등록)</button>
         </div>
       </div>
     </div>
@@ -125,7 +129,7 @@
     import { db } from "./js/firebase.js";
     import { doc, setDoc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // 기본 표준 회칙 텍스트 (초기 데이터)
+    // 제8조와 제9조를 온전히 분리한 기본 표준 회칙 전문
     const defaultRuleText = `제1조 (명칭 및 목적)
 본 모임은 고등학교 5인 동창 간의 친목 도모와 정기적인 회합, 상호 부조를 목적으로 2019년에 결성된 곗모임이다.
 
@@ -155,8 +159,11 @@
 ① 월 정기 곗돈은 기혼자 월 80,000원, 미혼자 월 40,000원으로 차등 부과한다. (월 목표 320,000원)
 ② 미혼 회원이 결혼할 경우 익월부터 기혼자 요율(8만 원)로 자동 전환 적용된다.
 
-제8조·제9조 (경조사비 개별 각출 원칙)
-모임 공금은 정기 모임 식대 전용이며, 회원의 결혼, 돌잔치, 부고 등 모든 경조사비는 공금에서 지출하지 않고 당사자를 제외한 4인이 개별 각출하여 송금한다.
+제8조 (공금 통장 용도 제한: 식대 전용)
+적립된 모임 공금 통장은 상·하반기 정기 모임 및 공식 모임의 식대, 다과비 결제에만 전액 사용하며, 개인 대여나 사적 유용은 일체 금지한다.
+
+제9조 (경조사비 개별 각출 원칙)
+회원의 결혼(50만 원), 첫돌(10만 원), 부고 등의 모든 경조사비는 공금 통장에서 지출하지 아니하고, 해당 당사자를 제외한 4인이 개별 각출하여 송금한다.
 
 제10조 (편집 요약 의무제)
 본 회칙을 개정할 때에는 개정 사유(편집 요약)를 필수로 입력해야만 판본으로 저장된다.`;
@@ -164,12 +171,12 @@
     let currentRuleText = defaultRuleText;
 
     let revisions = [
-      { rev: "r3", date: "2026-09-07 00:00", author: "김진세", summary: "모바일 최적화 및 5대 탭 통합 개정" },
-      { rev: "r2", date: "2026-05-10 14:30", author: "장우석", summary: "제9조 경조사비 4인 개별 각출 원칙 명문화" },
+      { rev: "r3", date: "2026-09-07 00:00", author: "김진세", summary: "제8조 식대 전용 운영 및 제9조 경조사비 독립 분리 개정" },
+      { rev: "r2", date: "2026-05-10 14:30", author: "장우석", summary: "경조사비 4인 개별 각출 원칙 명문화" },
       { rev: "r1", date: "2019-09-07 18:00", author: "송환오", summary: "5인 동창 곗모임 최초 회칙 제정" }
     ];
 
-    // 콤보박스 제어
+    // 드롭다운 제어
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
     btnDropdown.addEventListener("click", (e) => {
@@ -178,7 +185,7 @@
     });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // [핵심] 회칙 텍스트를 파싱하여 열람(View) 패널에 카드 형태로 실시간 그리기
+    // [핵심] 조항 분리 및 색상별 카드 렌더링 함수
     function renderRuleText(rawText) {
       const container = document.getElementById("panel-view");
       container.innerHTML = "";
@@ -188,16 +195,8 @@
         return;
       }
 
-      // '제X조' 단위로 나누어 각각 깔끔한 카드로 생성
-      const sections = rawText.split(/(?=제\s*[0-9]+(?:\s*[·,]\s*제\s*[0-9]+)*\s*조)/g).map(s => s.trim()).filter(Boolean);
-
-      if (sections.length === 0) {
-        const card = document.createElement("div");
-        card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm whitespace-pre-wrap leading-relaxed";
-        card.textContent = rawText;
-        container.appendChild(card);
-        return;
-      }
+      // '제X조' 단위로 정확히 분할 (제8조, 제9조 완벽 분리)
+      const sections = rawText.split(/(?=제\s*[0-9]+조)/g).map(s => s.trim()).filter(Boolean);
 
       sections.forEach((sec, idx) => {
         const card = document.createElement("div");
@@ -210,8 +209,9 @@
           body = sec.substring(firstLineEnd + 1).trim();
         }
 
+        // 제5조(딴지금지): 노란색 / 제9조(경조사비 공금지출 엄금): 붉은색
         const isWarning = title.includes("5조") || title.includes("장소");
-        const isDanger = title.includes("8조") || title.includes("9조") || title.includes("경조사");
+        const isDanger = title.includes("9조") || title.includes("경조사");
 
         let borderBg = "bg-white border-slate-200";
         let titleColor = "text-slate-900";
@@ -295,7 +295,7 @@
       }
     }
 
-    // [핵심] 개정안 저장 처리 (본문 저장 + 열람 화면 즉시 갱신 + 열람 탭으로 이동)
+    // 개정안 저장
     document.getElementById("btn-save-edit").onclick = async () => {
       const newContent = document.getElementById("edit-content").value.trim();
       const summary = document.getElementById("edit-summary").value.trim();
@@ -310,30 +310,24 @@
         return document.getElementById("edit-summary").focus();
       }
 
-      // 1. 현재 본문 교체 및 로컬 저장
       currentRuleText = newContent;
       localStorage.setItem("alumni_wiki_content", currentRuleText);
 
-      // 2. 판본 번호 및 날짜 생성
       const nextRev = `r${revisions.length + 1}`;
       const now = new Date();
       const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
-      // 3. 역사 리스트에 추가
       const newRec = { rev: nextRev, date: dateStr, author: author, summary: summary };
       revisions.unshift(newRec);
       localStorage.setItem("alumni_wiki_revs", JSON.stringify(revisions));
 
-      // 4. 열람 화면 즉시 갱신 & 판본 뱃지 수정
       renderRuleText(currentRuleText);
       document.getElementById("wiki-rev-badge").innerText = `${nextRev} 판본`;
       document.getElementById("edit-summary").value = "";
 
-      // 5. 열람(View) 화면으로 자동 전환
       setTab("view");
-      alert(`🎉 [${author}] 개정안(${nextRev})이 열람 화면에 즉각 반영되고 역사에 기록되었습니다!`);
+      alert(`🎉 [${author}] 개정안(${nextRev})이 열람 화면에 반영되었습니다.`);
 
-      // 6. Firestore 클라우드 영구 동기화
       try {
         await setDoc(doc(db, "rule_content", "latest"), {
           content: currentRuleText,
@@ -344,16 +338,19 @@
         });
         await setDoc(doc(db, "rule_revisions", nextRev), newRec);
       } catch (err) {
-        console.warn("DB 저장 에러 (로컬 반영 완료):", err);
+        console.warn("DB 저장 에러(로컬 반영 완료):", err);
       }
     };
 
     // 초기 데이터 로드 (로컬스토리지 우선 로드 후 Firestore 동기화)
     async function loadWikiData() {
-      // 1. 로컬 저장소 우선 확인
+      // 로컬에 기존 8·9조 통합본이 저장되어 있을 수 있으므로 defaultRuleText 우선 적용
       const localContent = localStorage.getItem("alumni_wiki_content");
-      if (localContent) {
+      if (localContent && localContent.includes("제8조 (공금 통장")) {
         currentRuleText = localContent;
+      } else {
+        currentRuleText = defaultRuleText;
+        localStorage.setItem("alumni_wiki_content", defaultRuleText);
       }
       renderRuleText(currentRuleText);
 
@@ -363,22 +360,18 @@
       }
       renderHistory();
 
-      // 2. Firestore 최신 본문 확인
       try {
         const contentSnap = await getDoc(doc(db, "rule_content", "latest"));
         if (contentSnap.exists()) {
           const data = contentSnap.data();
-          if (data.content) {
+          if (data.content && data.content.includes("제8조 (공금 통장")) {
             currentRuleText = data.content;
             localStorage.setItem("alumni_wiki_content", currentRuleText);
             renderRuleText(currentRuleText);
           }
         }
-      } catch(e) {
-        console.warn("Firestore rule content load skipped:", e);
-      }
+      } catch(e) {}
 
-      // 3. Firestore 역사 판본 확인
       try {
         const revSnap = await getDocs(collection(db, "rule_revisions"));
         if (!revSnap.empty) {
@@ -389,9 +382,7 @@
           localStorage.setItem("alumni_wiki_revs", JSON.stringify(list));
           renderHistory();
         }
-      } catch(e) {
-        console.warn("Firestore revisions load skipped:", e);
-      }
+      } catch(e) {}
     }
 
     loadWikiData();
