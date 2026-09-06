@@ -3,359 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>회비 장부 - 5인 동창 곗모임</title>
+  <title>회비 장부 (비활성화) - 5인 동창 곗모임</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 공통 상단 네비게이션 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
-        <span class="text-xl">🎓</span>
+        <span class="text-xl">🏦</span>
         <div>
-          <h1 class="font-black text-base text-slate-900 leading-tight">회비 장부 & 출납소</h1>
-          <span class="text-[10px] text-slate-400">관리자: 김진세 / 총무: 장우석</span>
+          <h1 class="font-black text-base text-slate-900 leading-tight">회비 장부</h1>
+          <span class="text-[10px] text-slate-400 font-medium">서비스 운영 종료 안내</span>
         </div>
       </div>
-
-      <!-- 접속자 스위처 -->
-      <select id="current-user-select" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 font-semibold text-slate-700">
-        <option value="user_kim_js" selected>⚙️ 김진세 (관리자)</option>
-        <option value="user_jang">🛡️ 장우석 (총무)</option>
-        <option value="user_song">👑 송환오 (회장)</option>
-        <option value="user_kim_jungsoo">김정수 (회원)</option>
-        <option value="user_lee">이해웅 (회원)</option>
-      </select>
+      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 border">
+        기능 일시 중단
+      </span>
     </div>
 
-    <!-- 메뉴 바 -->
-    <nav class="flex space-x-1 border-t border-slate-100 mt-2.5 pt-2 overflow-x-auto text-xs no-scrollbar">
-      <a href="index.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">대시보드</a>
-      <a href="gathering.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">모임 & 장소</a>
-      <a href="ledger.html" class="py-1.5 px-3 bg-emerald-50 text-emerald-700 font-bold rounded-lg whitespace-nowrap">회비 장부</a>
-      <a href="election.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회장 선출</a>
-      <a href="wiki.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회칙</a>
+    <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
+      <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
+        <a href="index.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">대시보드</a>
+        <a href="history.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">과거 여행</a>
+        <a href="wiki.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">회칙</a>
+        <a href="settlement.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">개별 정산</a>
+        <a href="election.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">회장 선출</a>
+      </div>
+
+      <div class="relative inline-block text-left ml-1 flex-shrink-0">
+        <button id="btn-dropdown" type="button" class="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg whitespace-nowrap flex items-center gap-1 border border-slate-200">
+          <span>더보기 ▾</span>
+        </button>
+        <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
+          <a href="gathering.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+            <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i><span>모임 공표</span>
+          </a>
+          <a href="ledger.html" class="block px-3 py-2 text-slate-400 bg-slate-50 flex items-center gap-2 cursor-not-allowed">
+            <i class="fa-solid fa-lock text-slate-400 w-3.5"></i><span>회비 장부 (중단)</span>
+          </a>
+        </div>
+      </div>
     </nav>
   </header>
 
-  <!-- 메인 모바일 뷰 컨테이너 -->
-  <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
+  <main class="flex-1 w-full max-w-md mx-auto p-4 flex flex-col justify-center">
 
-    <!-- 현재 공금 총잔액 카드 (기준: 1,765,851원) -->
-    <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white rounded-2xl p-5 shadow-sm space-y-2">
-      <div class="flex justify-between items-center text-xs text-emerald-200">
-        <span>공금 통장 현재 잔액</span>
-        <span id="role-auth-tag" class="bg-white/20 text-white text-[10px] px-2 py-0.5 rounded font-bold">관리자 권한</span>
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-center space-y-4">
+      <div class="w-14 h-14 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto text-2xl border border-amber-200">
+        <i class="fa-solid fa-piggy-bank"></i>
       </div>
-      <div id="stat-total-balance" class="text-3xl font-black text-white">1,765,851원</div>
-      <div class="text-[11px] text-emerald-200/80">
-        기준일: 2026-09-04 (경조사비 지출 불가 / 식대 전용)
-      </div>
-    </div>
 
-    <!-- 당월 5인 곗돈 수납 관리 (기본 100% 완납) -->
-    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
-      <div class="flex justify-between items-center border-b pb-2">
-        <div>
-          <h3 class="font-bold text-sm text-slate-900">2026년 9월 곗돈 수납 현황</h3>
-          <p class="text-[11px] text-slate-400">목표액 320,000원 (전원 100% 완납)</p>
+      <div>
+        <h2 class="text-base font-black text-slate-900">회비 장부 페이지 비활성화 안내</h2>
+        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+          곗돈 수납 및 통장 잔액 관리는 <strong>카카오뱅크 모임통장</strong>으로 일원화되어 본 웹페이지 서비스가 공식 비활성화되었습니다.
+        </p>
+      </div>
+
+      <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-left text-xs space-y-1.5 text-slate-600">
+        <div class="flex items-center gap-1.5 font-bold text-slate-800">
+          <i class="fa-solid fa-circle-info text-blue-500"></i>
+          <span>안내 사항</span>
         </div>
-        <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">320,000원 수납</span>
+        <p class="text-[11px] leading-relaxed">
+          • 실시간 통장 잔액 및 입출금 확인은 총무의 카카오뱅크 모임통장을 확인해 주세요.<br>
+          • 모임 관련 개인 실비(교통비·식비) 청구 및 등록은 <strong>[개별 정산소]</strong> 탭을 이용하시면 됩니다.
+        </p>
       </div>
 
-      <div id="dues-list-container" class="space-y-2">
-        <!-- 5인 수납 카드 렌더링 -->
-      </div>
-    </div>
-
-    <!-- 식대 지출 전표 등록 폼 (수정/추가 가능) -->
-    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
-      <div class="border-b pb-2">
-        <h3 class="font-bold text-sm text-slate-900">식대 지출 전표 등록</h3>
-        <p class="text-[11px] text-slate-400">김진세 관리자 및 장우석 총무만 등록 및 잔액 차감 가능</p>
-      </div>
-
-      <form id="expense-form" class="space-y-2.5 text-xs">
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">식당 / 내역명</label>
-          <input type="text" id="input-exp-title" placeholder="예: 충북 한우 명가 룸 식대 결제" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">지출 금액 (원)</label>
-            <input type="number" id="input-exp-amount" placeholder="450000" step="1" required class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">지출 일자</label>
-            <input type="date" id="input-exp-date" value="2026-09-04" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
-          </div>
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">메모</label>
-          <input type="text" id="input-exp-memo" placeholder="어른 8, 아이 3 식사" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-emerald-500">
-        </div>
-
-        <button type="submit" id="btn-submit-expense" class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg transition shadow-sm">
-          지출 전표 등록 (잔액 차감)
-        </button>
-      </form>
-    </div>
-
-    <!-- 입출금 거래 내역 (삭제 및 수정 기능 탑재) -->
-    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-sm text-slate-900">입출금 원장 내역</h3>
-        <span class="text-[11px] text-slate-400">오등록 시 우측 삭제 가능</span>
-      </div>
-
-      <div id="transaction-list" class="space-y-2 text-xs">
-        <!-- 거래 내역 카드 렌더링 -->
+      <div class="space-y-2 pt-2">
+        <a href="index.html" class="block w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition shadow-sm">
+          대시보드로 돌아가기
+        </a>
+        <a href="settlement.html" class="block w-full py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition border border-blue-200">
+          개별 정산소로 이동
+        </a>
       </div>
     </div>
 
   </main>
 
-  <!-- 로직 스크립트 -->
-  <script type="module">
-    import { db, doc, setDoc, getDocs, collection, deleteDoc } from "./js/firebase.js";
-
-    let currentBalance = 1765851;
-
-    // 5인 기본 완납 데이터 (기본 100% 세팅)
-    let duesMembers = [
-      { id: "user_kim_js", name: "김진세", marital: "married", fee: 80000, isPaid: true },
-      { id: "user_song", name: "송환오", marital: "married", fee: 80000, isPaid: true },
-      { id: "user_jang", name: "장우석", marital: "married", fee: 80000, isPaid: true },
-      { id: "user_kim_jungsoo", name: "김정수", marital: "single",  fee: 40000, isPaid: true },
-      { id: "user_lee", name: "이해웅", marital: "single",  fee: 40000, isPaid: true }
-    ];
-
-    let transactions = [
-      { id: "tx_init", date: "2026-09-04", type: "deposit", title: "2026-09-04 기준 공금 잔액 확정", amount: 1765851, balance: 1765851 }
-    ];
-
-    const currentUserSelect = document.getElementById("current-user-select");
-    const roleAuthTag = document.getElementById("role-auth-tag");
-    const statTotalBalance = document.getElementById("stat-total-balance");
-    const duesListContainer = document.getElementById("dues-list-container");
-    const transactionList = document.getElementById("transaction-list");
-    const btnSubmitExpense = document.getElementById("btn-submit-expense");
-
-    function hasAdminAuth() {
-      const val = currentUserSelect.value;
-      return (val === "user_kim_js" || val === "user_jang"); // 김진세(관리자) 또는 장우석(총무)
-    }
-
-    function checkAuth() {
-      const auth = hasAdminAuth();
-      if (auth) {
-        roleAuthTag.innerText = currentUserSelect.value === "user_kim_js" ? "관리자 (김진세)" : "총무 (장우석)";
-        roleAuthTag.className = "bg-white/20 text-white text-[10px] px-2 py-0.5 rounded font-bold";
-        btnSubmitExpense.disabled = false;
-        btnSubmitExpense.classList.remove("opacity-50");
-      } else {
-        roleAuthTag.innerText = "열람 모드";
-        roleAuthTag.className = "bg-slate-700 text-slate-300 text-[10px] px-2 py-0.5 rounded";
-        btnSubmitExpense.disabled = true;
-        btnSubmitExpense.classList.add("opacity-50");
-      }
-      renderDues();
-      renderTransactions();
-    }
-
-    function renderDues() {
-      duesListContainer.innerHTML = "";
-      const auth = hasAdminAuth();
-
-      duesMembers.forEach(m => {
-        const div = document.createElement("div");
-        div.className = "flex items-center justify-between p-2.5 bg-slate-50 border rounded-lg text-xs";
-        div.innerHTML = `
-          <div>
-            <span class="font-bold text-slate-800">${m.name}</span>
-            <span class="text-[11px] text-slate-400 ml-1">(${m.fee.toLocaleString()}원)</span>
-          </div>
-          <div class="flex items-center gap-2">
-            ${m.isPaid 
-              ? '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check mr-1"></i>완납</span>'
-              : '<span class="text-rose-500 font-bold"><i class="fa-solid fa-clock mr-1"></i>미납</span>'}
-            ${auth ? `
-              <button class="btn-toggle text-[11px] px-2 py-0.5 border rounded bg-white text-slate-600 hover:bg-slate-100" data-id="${m.id}">
-                ${m.isPaid ? '미납전환' : '완납처리'}
-              </button>
-            ` : ''}
-          </div>
-        `;
-        duesListContainer.appendChild(div);
-      });
-
-      if (auth) {
-        document.querySelectorAll(".btn-toggle").forEach(btn => {
-          btn.onclick = async (e) => {
-            const id = e.currentTarget.getAttribute("data-id");
-            const target = duesMembers.find(item => item.id === id);
-            if (!target) return;
-            target.isPaid = !target.isPaid;
-            renderDues();
-            try {
-              await setDoc(doc(db, "dues_status", target.id), target);
-            } catch (err) {
-              console.warn(err);
-            }
-          };
-        });
-      }
-    }
-
-    function renderTransactions() {
-      transactionList.innerHTML = "";
-      const auth = hasAdminAuth();
-
-      transactions.forEach(tx => {
-        const isDeposit = (tx.type === "deposit");
-        const div = document.createElement("div");
-        div.className = "p-2.5 bg-slate-50 border rounded-lg flex justify-between items-center text-xs";
-        div.innerHTML = `
-          <div>
-            <div class="font-semibold text-slate-800">${tx.title}</div>
-            <div class="text-[10px] text-slate-400">${tx.date} | 잔액: ${tx.balance.toLocaleString()}원</div>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="font-bold ${isDeposit ? 'text-emerald-600' : 'text-rose-600'}">
-              ${isDeposit ? '+' : '-'}${tx.amount.toLocaleString()}원
-            </span>
-            ${(auth && tx.id !== "tx_init") ? `
-              <button class="btn-del-tx text-slate-400 hover:text-rose-600 text-xs px-1" data-id="${tx.id}">
-                <i class="fa-regular fa-trash-can"></i>
-              </button>
-            ` : ''}
-          </div>
-        `;
-        transactionList.appendChild(div);
-      });
-
-      statTotalBalance.innerText = `${currentBalance.toLocaleString()}원`;
-
-      if (auth) {
-        document.querySelectorAll(".btn-del-tx").forEach(btn => {
-          btn.onclick = async (e) => {
-            const txId = e.currentTarget.getAttribute("data-id");
-            if (!confirm("이 지출 내역을 삭제하고 잔액을 복구하시겠습니까?")) return;
-            await deleteTransaction(txId);
-          };
-        });
-      }
-    }
-
-    async function syncBalanceToDB(newBal) {
-      currentBalance = newBal;
-      statTotalBalance.innerText = `${newBal.toLocaleString()}원`;
-      try {
-        await setDoc(doc(db, "app_state", "balance"), {
-          currentBalance: newBal,
-          updatedAt: new Date().toISOString()
-        });
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-
-    // 지출 등록
-    document.getElementById("expense-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!hasAdminAuth()) {
-        alert("⚠️ 등록 권한이 없습니다. (김진세 관리자 또는 장우석 총무 전용)");
-        return;
-      }
-
-      const title = document.getElementById("input-exp-title").value.trim();
-      const amount = parseInt(document.getElementById("input-exp-amount").value, 10);
-      const date = document.getElementById("input-exp-date").value;
-      const memo = document.getElementById("input-exp-memo").value.trim();
-
-      if (!amount || amount <= 0) return alert("올바른 금액을 입력하세요.");
-      if (amount > currentBalance) return alert("통장 잔액을 초과할 수 없습니다.");
-
-      const newBal = currentBalance - amount;
-      const newTx = {
-        id: `tx_${Date.now()}`,
-        date,
-        type: "withdraw",
-        title: `${title} ${memo ? `(${memo})` : ''}`,
-        amount,
-        balance: newBal
-      };
-
-      transactions.unshift(newTx);
-      await syncBalanceToDB(newBal);
-      renderTransactions();
-
-      try {
-        await setDoc(doc(db, "transactions", newTx.id), newTx);
-      } catch (err) {
-        console.warn(err);
-      }
-
-      document.getElementById("input-exp-title").value = "";
-      document.getElementById("input-exp-amount").value = "";
-      document.getElementById("input-exp-memo").value = "";
-      alert(`🧾 [지출 완료] ${amount.toLocaleString()}원이 차감되었습니다.`);
+  <script>
+    // 드롭다운 토글
+    const btnDropdown = document.getElementById("btn-dropdown");
+    const dropdownMenu = document.getElementById("dropdown-menu");
+    btnDropdown.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle("hidden");
     });
-
-    // 지출 내역 삭제 및 잔액 복구
-    async function deleteTransaction(txId) {
-      const idx = transactions.findIndex(t => t.id === txId);
-      if (idx === -1) return;
-
-      const tx = transactions[idx];
-      let newBal = currentBalance;
-      if (tx.type === "withdraw") newBal += tx.amount;
-      else if (tx.type === "deposit") newBal -= tx.amount;
-
-      transactions.splice(idx, 1);
-      await syncBalanceToDB(newBal);
-      renderTransactions();
-
-      try {
-        await deleteDoc(doc(db, "transactions", txId));
-      } catch (err) {
-        console.warn(err);
-      }
-      alert("지출 건이 삭제되고 잔액이 복구되었습니다.");
-    }
-
-    // DB 초기 데이터 로드
-    async function loadData() {
-      try {
-        const snap = await getDocs(collection(db, "transactions"));
-        if (!snap.empty) {
-          const list = [];
-          snap.forEach(d => list.push(d.data()));
-          list.sort((a, b) => b.id.localeCompare(a.id));
-          transactions = list;
-          currentBalance = list[0].balance;
-        } else {
-          await syncBalanceToDB(1765851);
-        }
-
-        const duesSnap = await getDocs(collection(db, "dues_status"));
-        if (!duesSnap.empty) {
-          const duesArr = [];
-          duesSnap.forEach(d => duesArr.push(d.data()));
-          duesMembers = duesMembers.map(m => duesArr.find(x => x.id === m.id) || m);
-        }
-      } catch (e) {
-        console.warn(e);
-      }
-      checkAuth();
-    }
-
-    currentUserSelect.addEventListener("change", checkAuth);
-    loadData();
+    document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
   </script>
 
 </body>
