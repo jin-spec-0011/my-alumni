@@ -28,58 +28,39 @@
       </div>
     </div>
 
-    <!-- 1. 기본 페이지 탭 4종 + 콤보박스(더보기) 드롭다운 -->
+   <!-- 5대 메인 탭 + 더보기 콤보박스 -->
     <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
-      <!-- 4대 고정 탭 -->
       <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
-        <a href="index.html" class="py-1.5 px-2.5 bg-blue-50 text-blue-600 rounded-lg whitespace-nowrap">
-          대시보드
-        </a>
-        <a href="history.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">
-          과거 여행/모임
-        </a>
-        <a href="wiki.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">
-          회칙
-        </a>
-        <a href="election.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">
-          회장 선출소
-        </a>
+        <a href="index.html" class="py-1.5 px-2 bg-blue-50 text-blue-600 rounded-lg whitespace-nowrap">대시보드</a>
+        <a href="history.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">과거 여행</a>
+        <a href="wiki.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">회칙</a>
+        <a href="settlement.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">개별 정산</a>
+        <a href="election.html" class="py-1.5 px-2 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">회장 선출</a>
       </div>
 
-      <!-- 콤보박스 (나머지 페이지 및 관리자 로그인) -->
-      <div class="relative inline-block text-left ml-1">
+      <!-- 콤보박스 (더보기) -->
+      <div class="relative inline-block text-left ml-1 flex-shrink-0">
         <button id="btn-dropdown" type="button" class="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg whitespace-nowrap flex items-center gap-1 border border-slate-200">
           <span>더보기 ▾</span>
         </button>
 
-        <!-- 드롭다운 메뉴 레이어 -->
         <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
-          <div class="px-3 py-1 text-[10px] text-slate-400 font-bold border-b border-slate-100 mb-1">
-            부가 기능 페이지
-          </div>
-          <a href="settlement.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-            <i class="fa-solid fa-receipt text-emerald-600 w-3.5"></i>
-            <span>개별 정산소</span>
-          </a>
+          <div class="px-3 py-1 text-[10px] text-slate-400 font-bold border-b border-slate-100 mb-1">부가 기능</div>
           <a href="gathering.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-            <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i>
-            <span>모임 & 예약</span>
+            <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i><span>모임 & 예약</span>
           </a>
           <a href="ledger.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-            <i class="fa-solid fa-won-sign text-amber-600 w-3.5"></i>
-            <span>회비 장부</span>
+            <i class="fa-solid fa-won-sign text-amber-600 w-3.5"></i><span>회비 장부</span>
           </a>
-
           <div class="border-t border-slate-100 my-1"></div>
-
-          <!-- 관리자 로그인 / 로그아웃 버튼 -->
           <button id="btn-admin-auth" type="button" class="w-full text-left px-3 py-2 text-slate-800 hover:bg-slate-50 flex items-center gap-2 font-bold">
             <i class="fa-solid fa-key text-indigo-600 w-3.5"></i>
-            <span id="admin-auth-text">관리자 로그인 (김진세)</span>
+            <span id="admin-auth-text">관리자 로그인 (비번:0000)</span>
           </button>
         </div>
       </div>
     </nav>
+    
   </header>
 
   <!-- 메인 모바일 컨테이너 -->
