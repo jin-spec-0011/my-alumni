@@ -3,123 +3,158 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>5인 동창 곗모임</title>
+  <title>회장 선출소 - 5인 동창 곗모임</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 상단 헤더 -->
+  <!-- 통합 모바일 상단 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
-        <span class="text-xl">🎓</span>
+        <span class="text-xl">👑</span>
         <div>
-          <h1 class="font-black text-base text-slate-900 leading-tight">5인 동창 곗모임</h1>
-          <span class="text-[10px] text-slate-400 font-medium">Since 2019 (8년차)</span>
+          <h1 class="font-black text-base text-slate-900 leading-tight">회장 선출소</h1>
+          <span class="text-[10px] text-slate-400 font-medium">대통령 임기 연동 룰렛제</span>
         </div>
       </div>
 
-      <!-- 접속자 스위처 -->
-      <select id="current-user-select" class="text-xs bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 font-semibold text-slate-700">
-        <option value="user_kim_js" selected>⚙️ 김진세 (관리자)</option>
-        <option value="user_song">👑 송환오 (회장)</option>
-        <option value="user_jang">🛡️ 장우석 (총무)</option>
-        <option value="user_kim_jungsoo">김정수 (회원)</option>
-        <option value="user_lee">이해웅 (회원)</option>
-      </select>
+      <!-- 관리자 로그인 뱃지 -->
+      <div id="admin-status-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+        일반 회원 모드
+      </div>
     </div>
 
-    <!-- 권한 연동 탭 메뉴 -->
-    <nav class="flex space-x-1 border-t border-slate-100 mt-2.5 pt-2 overflow-x-auto text-xs no-scrollbar">
-      <a href="index.html" class="py-1.5 px-3 bg-blue-50 text-blue-600 font-bold rounded-lg whitespace-nowrap">대시보드</a>
-      <a href="history.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">과거 여행/모임</a>
-      <a href="wiki.html" class="py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회칙</a>
-      <!-- 관리자 전용 메뉴 -->
-      <a href="settlement.html" class="admin-only py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">개별 정산</a>
-      <a href="election.html" class="admin-only py-1.5 px-3 text-slate-600 font-medium rounded-lg whitespace-nowrap">회장 선출</a>
+    <!-- 네비게이션 탭 4종 + 더보기 콤보박스 -->
+    <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
+      <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
+        <a href="index.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">대시보드</a>
+        <a href="history.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">과거 여행/모임</a>
+        <a href="wiki.html" class="py-1.5 px-2.5 text-slate-600 hover:text-slate-900 rounded-lg whitespace-nowrap">회칙</a>
+        <a href="election.html" class="py-1.5 px-2.5 bg-indigo-50 text-indigo-700 rounded-lg whitespace-nowrap">회장 선출소</a>
+      </div>
+
+      <div class="relative inline-block text-left ml-1">
+        <button id="btn-dropdown" type="button" class="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg whitespace-nowrap flex items-center gap-1 border border-slate-200">
+          <span>더보기 ▾</span>
+        </button>
+
+        <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
+          <div class="px-3 py-1 text-[10px] text-slate-400 font-bold border-b border-slate-100 mb-1">부가 기능</div>
+          <a href="settlement.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+            <i class="fa-solid fa-receipt text-emerald-600 w-3.5"></i><span>개별 정산소</span>
+          </a>
+          <a href="gathering.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+            <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i><span>모임 & 예약</span>
+          </a>
+          <a href="ledger.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+            <i class="fa-solid fa-won-sign text-amber-600 w-3.5"></i><span>회비 장부</span>
+          </a>
+          <div class="border-t border-slate-100 my-1"></div>
+          <button id="btn-admin-auth" type="button" class="w-full text-left px-3 py-2 text-slate-800 hover:bg-slate-50 flex items-center gap-2 font-bold">
+            <i class="fa-solid fa-key text-indigo-600 w-3.5"></i>
+            <span id="admin-auth-text">관리자 로그인 (비번:0000)</span>
+          </button>
+        </div>
+      </div>
     </nav>
   </header>
 
-  <!-- 메인 모바일 뷰 (공금 잔액 제거) -->
+  <!-- 메인 컨테이너 -->
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 송환오 회장 및 대통령 임기 D-day 카드 -->
-    <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-5 shadow-sm space-y-3">
+    <!-- 대통령 임기 연동 전광판 -->
+    <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-4 shadow-sm space-y-3">
       <div class="flex justify-between items-center text-xs">
-        <span class="bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded text-[10px]">CURRENT LEADER</span>
-        <span class="text-slate-400 text-[11px]">임기 연동제</span>
+        <span class="text-[10px] bg-indigo-500/30 text-indigo-200 border border-indigo-400/40 px-2 py-0.5 rounded-full font-bold">회칙 제4조 연동</span>
+        <span class="text-amber-300 font-bold text-[11px]">송환오 회장 재임 중</span>
       </div>
+
       <div>
-        <h2 class="text-xl font-black">👑 송환오 회장</h2>
-        <p class="text-xs text-slate-300 mt-1">모임 장소 및 예약 전권 단독 행사 (회칙 제5조: 딴지 불가)</p>
+        <h2 class="text-base font-black text-white">대한민국 대통령 임기 연동 시계</h2>
+        <p class="text-[11px] text-slate-300">대통령 임기 만료 시 4인 룰렛으로 차기 회장을 선출합니다.</p>
       </div>
-      <div class="pt-2 border-t border-white/10 flex justify-between items-center text-xs">
-        <span class="text-slate-400">대통령 임기 만료까지</span>
-        <span id="president-dday" class="text-base font-black text-amber-300">D-계산중</span>
+
+      <div class="grid grid-cols-4 gap-2 text-center text-xs">
+        <div class="bg-white/10 p-2 rounded-lg">
+          <div id="t-days" class="text-lg font-black text-amber-300">000</div>
+          <div class="text-[9px] text-slate-400">DAYS</div>
+        </div>
+        <div class="bg-white/10 p-2 rounded-lg">
+          <div id="t-hours" class="text-lg font-black">00</div>
+          <div class="text-[9px] text-slate-400">HOURS</div>
+        </div>
+        <div class="bg-white/10 p-2 rounded-lg">
+          <div id="t-mins" class="text-lg font-black">00</div>
+          <div class="text-[9px] text-slate-400">MINS</div>
+        </div>
+        <div class="bg-white/10 p-2 rounded-lg">
+          <div id="t-secs" class="text-lg font-black">00</div>
+          <div class="text-[9px] text-slate-400">SECS</div>
+        </div>
       </div>
     </div>
 
-    <!-- 빠른 바로가기 2구리드 -->
-    <div class="grid grid-cols-2 gap-2 text-xs">
-      <a href="history.html" class="p-3.5 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-slate-50 transition block space-y-1">
-        <i class="fa-solid fa-map-location-dot text-lg text-emerald-600"></i>
-        <div class="font-bold text-slate-800">과거 여행/모임</div>
-        <div class="text-[11px] text-slate-400">2019년부터 연도별 기록</div>
-      </a>
-      <a href="wiki.html" class="p-3.5 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-slate-50 transition block space-y-1">
-        <i class="fa-solid fa-book text-lg text-blue-600"></i>
-        <div class="font-bold text-slate-800">모임 합의 회칙</div>
-        <div class="text-[11px] text-slate-400">규정 및 판본 역사 열람</div>
-      </a>
-    </div>
-
-    <!-- 5인 회원 프로필 현황 -->
-    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
-      <div class="border-b pb-2 flex justify-between items-center">
-        <h3 class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
-          <i class="fa-solid fa-users text-slate-600"></i>
-          <span>동창 5인 현황</span>
-        </h3>
-        <span class="text-[11px] text-slate-400">창립 2019년 (정원 5인)</span>
+    <!-- 시각적 원형 회전판 룰렛 게임기 -->
+    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-4 text-center">
+      <div class="border-b pb-2 flex justify-between items-center text-left">
+        <div>
+          <h3 class="font-bold text-sm text-slate-900">차기 회장 4인 룰렛</h3>
+          <span class="text-[11px] text-slate-400">장우석 총무 영구 면제 (각 25% 확률)</span>
+        </div>
+        <span class="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded">후보 4인 균등</span>
       </div>
 
-      <div class="space-y-2 text-xs" id="member-list">
-        <!-- 5인 명단 -->
-        <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg">
-          <div>
-            <strong class="text-slate-900">김진세</strong>
-            <span class="text-[10px] bg-slate-800 text-white px-1.5 py-0.5 rounded font-bold ml-1">관리자</span>
-          </div>
-          <span class="text-slate-500">기혼 (자녀 1명)</span>
+      <!-- 장우석 총무 면제 뱃지 -->
+      <div class="p-2 bg-slate-50 border border-dashed rounded-lg flex justify-between items-center text-xs opacity-60">
+        <span class="font-bold text-slate-700">장우석 (총무)</span>
+        <span class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded">회장직 영구 면제</span>
+      </div>
+
+      <!-- Canvas 원형 회전 룰렛 판 -->
+      <div class="relative w-64 h-64 mx-auto my-2 flex items-center justify-center">
+        <!-- 상단 포인터 화살표 -->
+        <div class="absolute -top-3 z-20 text-rose-600 text-2xl filter drop-shadow">
+          <i class="fa-solid fa-caret-down"></i>
         </div>
-        <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg">
+        <!-- 룰렛 캔버스 -->
+        <canvas id="roulette-canvas" width="250" height="250" class="rounded-full shadow-md border-4 border-slate-800"></canvas>
+      </div>
+
+      <!-- 룰렛 돌리기 버튼 -->
+      <button id="btn-spin" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm rounded-xl transition shadow flex items-center justify-center gap-2">
+        <i class="fa-solid fa-play"></i>
+        <span>룰렛 회전 시작 (추첨)</span>
+      </button>
+
+      <!-- 당선 결과 가안 및 [확정] 버튼 -->
+      <div id="result-box" class="hidden p-3.5 bg-amber-50 border-2 border-amber-300 rounded-xl space-y-2">
+        <div class="text-[11px] font-bold text-amber-800">🎯 룰렛 추첨 결과</div>
+        <div id="winner-name-display" class="text-2xl font-black text-slate-900">당선자: -</div>
+        <p class="text-[10px] text-slate-500">아래 [확정] 버튼을 눌러야 차기 회장으로 공식 등록됩니다.</p>
+
+        <!-- [확정] 버튼 -->
+        <button id="btn-confirm-winner" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-lg shadow transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-stamp"></i>
+          <span>👑 차기 회장 공식 확정 및 DB 저장</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 역대 선출 기록 목록 -->
+    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2 text-xs">
+      <div class="font-bold text-slate-900 border-b pb-1.5 flex justify-between">
+        <span>역대 회장 선출 역사</span>
+        <span class="text-[10px] text-slate-400">2019~</span>
+      </div>
+      <div id="history-list" class="space-y-1.5 text-[11px]">
+        <div class="p-2 bg-slate-50 rounded flex justify-between items-center">
           <div>
-            <strong class="text-slate-900">송환오</strong>
-            <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold ml-1">회장</span>
+            <strong class="text-slate-800">송환오 회장</strong>
+            <span class="text-slate-400 ml-1">(모임 창립 추첨 당선)</span>
           </div>
-          <span class="text-slate-500">기혼 (무자녀)</span>
-        </div>
-        <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg">
-          <div>
-            <strong class="text-slate-900">장우석</strong>
-            <span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold ml-1">총무</span>
-          </div>
-          <span class="text-slate-500">기혼 (자녀 2명)</span>
-        </div>
-        <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg">
-          <div>
-            <strong class="text-slate-900">김정수</strong>
-            <span class="text-[10px] text-slate-400 ml-1">회원</span>
-          </div>
-          <span class="text-slate-500">미혼</span>
-        </div>
-        <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-lg">
-          <div>
-            <strong class="text-slate-900">이해웅</strong>
-            <span class="text-[10px] text-slate-400 ml-1">회원</span>
-          </div>
-          <span class="text-slate-500">미혼</span>
+          <span class="text-[10px] text-slate-400 font-mono">2019-09</span>
         </div>
       </div>
     </div>
@@ -127,28 +162,196 @@
   </main>
 
   <script type="module">
-    const currentUserSelect = document.getElementById("current-user-select");
+    import { db, doc, setDoc } from "./js/firebase.js";
 
-    // 권한별 메뉴 가시성 제어 (김진세 외에는 정산, 선출 숨김)
-    function updateMenuVisibility() {
-      const isAdmin = (currentUserSelect.value === "user_kim_js");
-      document.querySelectorAll(".admin-only").forEach(el => {
-        if (isAdmin) el.classList.remove("hidden");
-        else el.classList.add("hidden");
+    // 4인 후보 (각 25%, 90도씩)
+    const candidates = [
+      { id: "user_song", name: "송환오", color: "#F59E0B" },    // 앰버
+      { id: "user_kim_js", name: "김진세", color: "#3B82F6" },  // 블루
+      { id: "user_kim_jungsoo", name: "김정수", color: "#10B981" }, // 에메랄드
+      { id: "user_lee", name: "이해웅", color: "#8B5CF6" }     // 퍼플
+    ];
+
+    const canvas = document.getElementById("roulette-canvas");
+    const ctx = canvas.getContext("2d");
+    const arc = (2 * Math.PI) / candidates.length;
+
+    let currentAngle = 0;
+    let isSpinning = false;
+    let pendingWinner = null;
+
+    // 1. 룰렛 원형 판 그리기
+    function drawRoulette() {
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const radius = canvas.width / 2 - 4;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      candidates.forEach((cand, i) => {
+        const angle = currentAngle + i * arc;
+        ctx.beginPath();
+        ctx.fillStyle = cand.color;
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, angle, angle + arc);
+        ctx.lineTo(cx, cy);
+        ctx.fill();
+        ctx.stroke();
+
+        // 텍스트 그리기
+        ctx.save();
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "bold 15px sans-serif";
+        ctx.translate(
+          cx + Math.cos(angle + arc / 2) * (radius * 0.65),
+          cy + Math.sin(angle + arc / 2) * (radius * 0.65)
+        );
+        ctx.rotate(angle + arc / 2 + Math.PI / 2);
+        ctx.textAlign = "center";
+        ctx.fillText(cand.name, 0, 0);
+        ctx.restore();
       });
+
+      // 중앙 원형 핀
+      ctx.beginPath();
+      ctx.arc(cx, cy, 18, 0, 2 * Math.PI);
+      ctx.fillStyle = "#1E293B";
+      ctx.fill();
+      ctx.stroke();
     }
 
-    // 대통령 시계
+    // 2. 룰렛 회전 애니메이션
+    document.getElementById("btn-spin").onclick = () => {
+      if (isSpinning) return;
+      isSpinning = true;
+      document.getElementById("btn-spin").disabled = true;
+      document.getElementById("result-box").classList.add("hidden");
+
+      const spinRounds = 5 + Math.floor(Math.random() * 5); // 5~9바퀴
+      const extraAngle = Math.random() * 2 * Math.PI;
+      const totalSpin = spinRounds * 2 * Math.PI + extraAngle;
+
+      let start = null;
+      const duration = 4000; // 4초
+
+      function animate(time) {
+        if (!start) start = time;
+        const progress = Math.min((time - start) / duration, 1);
+        // Easing Out Cubic
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+
+        currentAngle = easeOut * totalSpin;
+        drawRoulette();
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          isSpinning = false;
+          document.getElementById("btn-spin").disabled = false;
+
+          // 포인터 위치(12시 방향 = -Math.PI / 2)에 멈춘 당선자 계산
+          const pointerAngle = (1.5 * Math.PI - (currentAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+          const winnerIndex = Math.floor(pointerAngle / arc) % candidates.length;
+          pendingWinner = candidates[winnerIndex];
+
+          document.getElementById("winner-name-display").innerText = `👑 당선자: ${pendingWinner.name}`;
+          document.getElementById("result-box").classList.remove("hidden");
+        }
+      }
+
+      requestAnimationFrame(animate);
+    };
+
+    // 3. [공식 확정] 버튼 클릭 이벤트
+    document.getElementById("btn-confirm-winner").onclick = async () => {
+      if (!pendingWinner) return;
+
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
+      // 역사 로그 추가
+      const list = document.getElementById("history-list");
+      const div = document.createElement("div");
+      div.className = "p-2 bg-indigo-50 border border-indigo-200 rounded flex justify-between items-center";
+      div.innerHTML = `
+        <div>
+          <strong class="text-indigo-900">${pendingWinner.name} 회장 (확정)</strong>
+          <span class="text-[10px] text-indigo-500 block">4인 룰렛 추첨 공식 선출</span>
+        </div>
+        <span class="text-[10px] text-indigo-400 font-mono">${dateStr}</span>
+      `;
+      list.prepend(div);
+
+      try {
+        await setDoc(doc(db, "app_state", "current_president"), {
+          presidentId: pendingWinner.id,
+          presidentName: pendingWinner.name,
+          confirmedAt: now.toISOString()
+        });
+        alert(`🎉 [공식 확정] ${pendingWinner.name} 회장이 차기 회장으로 등록되었습니다!`);
+      } catch (e) {
+        console.warn(e);
+      }
+
+      document.getElementById("result-box").classList.add("hidden");
+    };
+
+    // 공통 관리자 인증 & 드롭다운 로직
+    const adminBadge = document.getElementById("admin-status-badge");
+    const adminAuthText = document.getElementById("admin-auth-text");
+
+    function checkAuth() {
+      const isAdmin = (sessionStorage.getItem("alumni_admin_auth") === "true");
+      if (isAdmin) {
+        adminBadge.className = "text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
+        adminBadge.innerText = "⚙️ 관리자(김진세) 모드";
+        adminAuthText.innerText = "관리자 로그아웃";
+      } else {
+        adminBadge.className = "text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200";
+        adminBadge.innerText = "일반 회원 모드";
+        adminAuthText.innerText = "관리자 로그인 (비번:0000)";
+      }
+    }
+
+    const btnDropdown = document.getElementById("btn-dropdown");
+    const dropdownMenu = document.getElementById("dropdown-menu");
+    btnDropdown.onclick = (e) => { e.stopPropagation(); dropdownMenu.classList.toggle("hidden"); };
+    document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
+
+    document.getElementById("btn-admin-auth").onclick = () => {
+      const isAdmin = (sessionStorage.getItem("alumni_admin_auth") === "true");
+      if (isAdmin) {
+        if (confirm("로그아웃하시겠습니까?")) {
+          sessionStorage.removeItem("alumni_admin_auth");
+          alert("일반 회원 모드로 전환되었습니다.");
+          checkAuth();
+        }
+      } else {
+        const pw = prompt("김진세 관리자 비밀번호를 입력하세요:");
+        if (pw === "0000") {
+          sessionStorage.setItem("alumni_admin_auth", "true");
+          alert("🎉 관리자로 인증되었습니다.");
+          checkAuth();
+        } else if (pw !== null) {
+          alert("❌ 비밀번호가 올바르지 않습니다.");
+        }
+      }
+    };
+
+    // 대통령 시계 카운트다운
     function updateCountdown() {
       const diff = new Date("2027-05-10T00:00:00+09:00").getTime() - Date.now();
-      const el = document.getElementById("president-dday");
-      if (diff <= 0) el.innerText = "임기만료";
-      else el.innerText = `D-${Math.floor(diff / (1000 * 60 * 60 * 24))}일`;
+      if (diff <= 0) return;
+      document.getElementById("t-days").innerText = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(3, '0');
+      document.getElementById("t-hours").innerText = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+      document.getElementById("t-mins").innerText = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+      document.getElementById("t-secs").innerText = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
     }
 
-    currentUserSelect.addEventListener("change", updateMenuVisibility);
-    updateMenuVisibility();
+    setInterval(updateCountdown, 1000);
     updateCountdown();
+    checkAuth();
+    drawRoulette();
   </script>
 
 </body>
