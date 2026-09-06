@@ -1,16 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <!-- 앱 바로가기 및 PWA 설정 -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0f172a">
-
-  <!-- 아이폰(iOS) 전용 전체화면 단독 앱 설정 -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="5인곗모임">
-  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
-  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>5인 동창 곗모임 대시보드</title>
@@ -19,7 +9,6 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 공통 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
@@ -29,10 +18,11 @@
           <span class="text-[10px] text-slate-400 font-medium">Since 2019 (8년차)</span>
         </div>
       </div>
-      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">자율 참여 모드</span>
+      <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <i class="fa-solid fa-rotate mr-1"></i>실시간 연동
+      </span>
     </div>
 
-    <!-- 5대 메인 탭 + 부가기능 콤보박스 (관리자 로그인 제거 완료) -->
     <nav class="flex items-center justify-between border-t border-slate-100 mt-2.5 pt-2 text-xs">
       <div class="flex space-x-1 overflow-x-auto no-scrollbar font-bold">
         <a href="index.html" class="py-1.5 px-2 bg-blue-50 text-blue-600 rounded-lg whitespace-nowrap">대시보드</a>
@@ -48,10 +38,7 @@
         </button>
         <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
           <a href="gathering.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-            <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i><span>모임 & 예약</span>
-          </a>
-          <a href="ledger.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-            <i class="fa-solid fa-won-sign text-amber-600 w-3.5"></i><span>회비 장부</span>
+            <i class="fa-solid fa-bullhorn text-amber-600 w-3.5"></i><span>모임 공표</span>
           </a>
         </div>
       </div>
@@ -60,7 +47,6 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- CURRENT LEADER 배너 -->
     <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-2xl p-5 shadow-sm space-y-3">
       <div class="flex justify-between items-center text-xs">
         <span class="bg-amber-400 text-slate-950 font-black px-2.5 py-0.5 rounded text-[10px] tracking-wider uppercase">CURRENT LEADER</span>
@@ -82,7 +68,6 @@
       </div>
     </div>
 
-    <!-- 다음 정기 모임 안내 표 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="flex justify-between items-center border-b pb-2">
         <div class="flex items-center gap-1.5">
@@ -105,8 +90,8 @@
           <tr>
             <th class="py-2.5 px-2 bg-slate-50 font-bold text-slate-600">참석 규모</th>
             <td class="py-2.5 px-3 text-slate-700">
-              <strong class="text-blue-600 font-bold">총 11명 (풀가동)</strong>
-              <div class="text-[10px] text-slate-400 mt-0.5">성인 8명 + 어린이 3명 (유아의자 2개)</div>
+              <strong class="text-blue-600 font-bold" id="dash-capacity-total">총 11명 (풀가동)</strong>
+              <div class="text-[10px] text-slate-400 mt-0.5" id="dash-capacity-detail">성인 8명 + 어린이 3명</div>
             </td>
           </tr>
           <tr>
@@ -119,66 +104,96 @@
       </table>
 
       <a href="gathering.html" class="block w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-center text-xs font-bold rounded-lg transition">
-        참석 여부(RSVP) 및 가족 인원 체크
+        회장 모임 공표 내용 자세히 보기
       </a>
     </div>
 
-    <!-- 5인 회원 현황 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2.5">
       <div class="border-b pb-2 flex justify-between items-center">
         <h3 class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
           <i class="fa-solid fa-user-group text-slate-500"></i>
           <span>동창 5인 회원 현황</span>
         </h3>
-        <span class="text-[11px] text-slate-400">정원 5인 한정</span>
+        <button id="btn-open-member-modal" class="text-[11px] font-bold px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg flex items-center gap-1">
+          <i class="fa-solid fa-user-pen"></i>
+          <span>가족/인원 변경</span>
+        </button>
       </div>
 
-      <div class="space-y-1.5 text-xs">
-        <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
-          <div>
-            <strong class="text-slate-900">송환오</strong>
-            <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold ml-1">👑 회장</span>
-          </div>
-          <span class="text-slate-500">기혼 (무자녀)</span>
-        </div>
-        <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
-          <div>
-            <strong class="text-slate-900">장우석</strong>
-            <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-bold ml-1">🛡️ 총무</span>
-          </div>
-          <span class="text-slate-500">기혼 (자녀 2명)</span>
-        </div>
-        <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
-          <div>
-            <strong class="text-slate-900">김진세</strong>
-            <span class="text-[10px] text-slate-400 ml-1">회원</span>
-          </div>
-          <span class="text-slate-500">기혼 (자녀 1명)</span>
-        </div>
-        <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
-          <div>
-            <strong class="text-slate-900">김정수</strong>
-            <span class="text-[10px] text-slate-400 ml-1">회원</span>
-          </div>
-          <span class="text-slate-500">미혼</span>
-        </div>
-        <div class="flex justify-between items-center p-2 bg-slate-50 rounded-lg">
-          <div>
-            <strong class="text-slate-900">이해웅</strong>
-            <span class="text-[10px] text-slate-400 ml-1">회원</span>
-          </div>
-          <span class="text-slate-500">미혼</span>
-        </div>
+      <div id="members-list-container" class="space-y-1.5 text-xs">
+        <div class="p-4 text-center text-slate-400">회원 현황 동기화 중...</div>
       </div>
     </div>
 
   </main>
 
+  <div id="member-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 space-y-4 animate-bottom">
+      <div class="flex justify-between items-center border-b pb-2.5">
+        <div>
+          <h3 class="font-bold text-base text-slate-900">회원 가족/인원 상태 변경</h3>
+          <p class="text-[11px] text-slate-400">결혼 또는 출산 시 변경하면 총 인원이 자동 계산됩니다.</p>
+        </div>
+        <button id="btn-close-member-modal" class="text-slate-400 hover:text-slate-700 text-lg px-2">✕</button>
+      </div>
+
+      <form id="member-update-form" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">대상 동창 선택</label>
+          <select id="modal-member-select" class="w-full p-2.5 border rounded-lg bg-slate-50 font-bold text-slate-800 text-sm">
+            <option value="user_song">송환오 (회장)</option>
+            <option value="user_jang">장우석 (총무)</option>
+            <option value="user_kim_js">김진세</option>
+            <option value="user_kim_jungsoo">김정수</option>
+            <option value="user_lee">이해웅</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">결혼 여부</label>
+            <select id="modal-marital" class="w-full p-2.5 border rounded-lg bg-white font-bold text-slate-800">
+              <option value="single">미혼 (단독 1인)</option>
+              <option value="married">기혼 (부부 2인)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">자녀 수</label>
+            <select id="modal-children" class="w-full p-2.5 border rounded-lg bg-white font-bold text-slate-800">
+              <option value="0">0명</option>
+              <option value="1">1명</option>
+              <option value="2">2명</option>
+              <option value="3">3명</option>
+              <option value="4">4명 이상</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-[11px] text-blue-800 leading-relaxed">
+          💡 <strong>자동 연동 안내:</strong> '기혼' 선택 시 배우자(+1명)가 성인 인원에 자동 가산되며, 자녀 수는 어린이 인원에 실시간 합산됩니다.
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow transition">
+          변경 사항 저장 (실시간 합산 반영)
+        </button>
+      </form>
+    </div>
+  </div>
+
   <script type="module">
     import { db } from "./js/firebase.js";
-    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // 콤보박스 클릭
+    // 1. 초기 5인 기본 세팅 데이터
+    let membersData = [
+      { id: "user_song", name: "송환오", role: "👑 회장", roleBadge: "bg-amber-100 text-amber-800", marital: "married", children: 0 },
+      { id: "user_jang", name: "장우석", role: "🛡️ 총무", roleBadge: "bg-slate-200 text-slate-700", marital: "married", children: 2 },
+      { id: "user_kim_js", name: "김진세", role: "회원", roleBadge: "text-slate-400", marital: "married", children: 1 },
+      { id: "user_kim_jungsoo", name: "김정수", role: "회원", roleBadge: "text-slate-400", marital: "single", children: 0 },
+      { id: "user_lee", name: "이해웅", role: "회원", roleBadge: "text-slate-400", marital: "single", children: 0 }
+    ];
+
+    // 드롭다운 토글
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
     btnDropdown.addEventListener("click", (e) => {
@@ -187,18 +202,103 @@
     });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // 대통령 시계 카운트다운
-    function updateCountdown() {
-      const diff = new Date("2027-05-10T00:00:00+09:00").getTime() - Date.now();
-      const el = document.getElementById("president-dday");
-      if (diff <= 0) el.innerText = "임기 만료";
-      else el.innerText = `D-${Math.floor(diff / (1000 * 60 * 60 * 24))}일`;
-    }
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
+    // 2. 인원 자동 계산 및 화면 렌더링
+    function renderMembers() {
+      const container = document.getElementById("members-list-container");
+      container.innerHTML = "";
 
-    // 모임 정보 실시간 동기화
+      let adultCount = 5; // 회원 5명 기본
+      let childCount = 0;
+
+      membersData.forEach(m => {
+        // 기혼이면 배우자 +1명
+        if (m.marital === "married") adultCount += 1;
+        childCount += Number(m.children) || 0;
+
+        let statusText = (m.marital === "married")
+          ? (m.children > 0 ? `기혼 (자녀 ${m.children}명)` : "기혼 (무자녀)")
+          : "미혼";
+
+        const div = document.createElement("div");
+        div.className = "flex justify-between items-center p-2.5 bg-slate-50 rounded-lg";
+        div.innerHTML = `
+          <div>
+            <strong class="text-slate-900">${m.name}</strong>
+            <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ml-1 ${m.roleBadge}">${m.role}</span>
+          </div>
+          <span class="text-slate-600 font-semibold">${statusText}</span>
+        `;
+        container.appendChild(div);
+      });
+
+      const totalCount = adultCount + childCount;
+
+      // 상단 모임 안내 표 자동 갱신
+      document.getElementById("dash-capacity-total").innerText = `총 ${totalCount}명 (풀가동)`;
+      document.getElementById("dash-capacity-detail").innerText = `성인 ${adultCount}명 + 어린이 ${childCount}명`;
+    }
+
+    // 3. 모달 팝업 제어
+    const modal = document.getElementById("member-modal");
+    const memberSelect = document.getElementById("modal-member-select");
+    const maritalSelect = document.getElementById("modal-marital");
+    const childrenSelect = document.getElementById("modal-children");
+
+    document.getElementById("btn-open-member-modal").onclick = () => {
+      syncModalInputs();
+      modal.classList.remove("hidden");
+    };
+
+    document.getElementById("btn-close-member-modal").onclick = () => {
+      modal.classList.add("hidden");
+    };
+
+    function syncModalInputs() {
+      const selectedId = memberSelect.value;
+      const target = membersData.find(m => m.id === selectedId);
+      if (target) {
+        maritalSelect.value = target.marital;
+        childrenSelect.value = target.children;
+      }
+    }
+
+    memberSelect.addEventListener("change", syncModalInputs);
+
+    // 4. 모달에서 저장 시 클라우드 Firestore 동기화
+    document.getElementById("member-update-form").onsubmit = async (e) => {
+      e.preventDefault();
+      const selectedId = memberSelect.value;
+      const target = membersData.find(m => m.id === selectedId);
+
+      if (!target) return;
+
+      target.marital = maritalSelect.value;
+      target.children = parseInt(childrenSelect.value, 10);
+
+      renderMembers();
+      modal.classList.add("hidden");
+
+      try {
+        await setDoc(doc(db, "app_state", "members_status"), { list: membersData });
+        alert(`🎉 [${target.name}] 회원의 가족/인원 상태가 저장되었습니다.\n참석 총 규모가 실시간 갱신되었습니다.`);
+      } catch (err) {
+        alert(`❌ 클라우드 저장 실패: ${err.message}`);
+      }
+    };
+
+    // 5. Firestore 실시간 리스너 연동
     try {
+      // 회원 상태 실시간 구독
+      onSnapshot(doc(db, "app_state", "members_status"), (docSnap) => {
+        if (docSnap.exists() && docSnap.data().list) {
+          membersData = docSnap.data().list;
+        } else {
+          setDoc(doc(db, "app_state", "members_status"), { list: membersData });
+        }
+        renderMembers();
+      });
+
+      // 모임 장소/일시 실시간 연동
       onSnapshot(doc(db, "gathering", "latest"), (docSnap) => {
         if (docSnap.exists()) {
           const g = docSnap.data();
@@ -211,7 +311,19 @@
           if (g.note) document.getElementById("dash-meeting-note").innerText = g.note;
         }
       });
-    } catch(e){}
+    } catch(e) {
+      console.error(e);
+    }
+
+    // 대통령 시계 카운트다운
+    function updateCountdown() {
+      const diff = new Date("2027-05-10T00:00:00+09:00").getTime() - Date.now();
+      const el = document.getElementById("president-dday");
+      if (diff <= 0) el.innerText = "임기 만료";
+      else el.innerText = `D-${Math.floor(diff / (1000 * 60 * 60 * 24))}일`;
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
   </script>
 
 </body>
