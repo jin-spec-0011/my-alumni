@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>회칙 & 아카이브 - 5인 동창 곗모임</title>
 
-  <!-- PWA & 단독 웹앱 설정 -->
+  <!-- PWA & 모바일 단독 웹앱 설정 -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -230,43 +230,45 @@
 
     let currentFullText = "";
 
-    // [핵심] 제목 구분선과 본문 사이의 불필요한 공백을 완전히 없애는 렌더러
-        // [수정] DB에 빈 줄이 아무리 많아도 첫 줄 공백을 강제로 없애는 렌더러
+    // [핵심] 줄 단위 분해 방식으로 첫 줄 들뜸 원천 차단
     function renderWikiStyle(text) {
       const container = document.getElementById("wiki-rendered-container");
       container.innerHTML = "";
 
-      const sections = text.split(/\n(?=제\d+조)/g);
+      // 윈도우 캐리지 리턴(\r) 제거 및 조 단위 분할
+      const normalizedText = text.replace(/\r/g, "");
+      const sections = normalizedText.split(/\n(?=제\d+조)/g);
 
       sections.forEach((sec, idx) => {
-        const lines = sec.trim().split("\n");
-        const titleLine = lines[0].trim();
-        
-        // 제목 다음 줄부터 시작해서, 내용이 시작되기 전까지의 모든 빈 줄을 강제로 제거
-        let bodyLines = lines.slice(1);
-        while (bodyLines.length > 0 && bodyLines[0].trim() === "") {
-          bodyLines.shift(); // 맨 앞 빈 줄 제거
-        }
+        // 공백 및 빈 줄을 완벽하게 필터링
+        const lines = sec.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length === 0) return;
 
-        const cleanedBody = bodyLines.map(line => line.trim()).join("\n");
+        const titleLine = lines[0];
+        const bodyLines = lines.slice(1);
 
         const box = document.createElement("div");
         box.id = `sec-${idx + 1}`;
         box.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl scroll-mt-24 text-left";
 
+        // 본문 각 줄을 <p> 태그로 묶어 브라우저의 강제 공백 렌더링 제거
+        const bodyHtml = bodyLines.map(line => {
+          const styledLine = line.replace(/•/g, '<span class="text-blue-500 font-bold mr-1">•</span>');
+          return `<p class="text-xs text-slate-700 leading-relaxed break-keep font-sans m-0 py-0.5">${styledLine}</p>`;
+        }).join("");
+
         box.innerHTML = `
-          <div class="font-black text-slate-900 text-xs border-b border-slate-200 pb-1 flex items-center justify-between">
+          <div class="font-black text-slate-900 text-xs border-b border-slate-200 pb-1 mb-1.5 flex items-center justify-between">
             <span class="text-blue-700 font-bold">${titleLine}</span>
             <span class="text-[10px] text-slate-400 font-mono">§ ${idx + 1}</span>
           </div>
-          <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-line break-keep font-sans mt-1.5">
-            ${cleanedBody.replace(/•/g, '<span class="text-blue-500 font-bold mr-1">•</span>')}
+          <div>
+            ${bodyHtml}
           </div>
         `;
         container.appendChild(box);
       });
     }
-
 
     // 1. 회칙 전문 실시간 리스너
     try {
