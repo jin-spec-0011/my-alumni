@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>회칙 & 아카이브 - 5인 동창 곗모임</title>
 
-  <!-- PWA & 모바일 단독 웹앱 설정 -->
+  <!-- PWA & 단독 웹앱 설정 -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -83,7 +83,7 @@
           </button>
         </div>
 
-        <!-- 목차 (TOC) -->
+        <!-- 목차 -->
         <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs space-y-1">
           <div class="font-black text-slate-800 flex items-center gap-1 border-b border-slate-200 pb-1 mb-1.5">
             <i class="fa-solid fa-list-ol text-blue-600"></i>
@@ -98,7 +98,7 @@
             <a href="#sec-6" class="hover:text-blue-600">6. 가족 동반 및 수용 상한</a>
             <a href="#sec-7" class="hover:text-blue-600">7. 정기 회비 및 전환 규정</a>
             <a href="#sec-8" class="hover:text-blue-600">8. 공금 통장 용도 제한</a>
-            <a href="#sec-9" class="hover:text-blue-600">9. 경조사비 지급 규정</a>
+            <a href="#sec-9" class="hover:text-blue-600">9. 경조사비 원칙</a>
             <a href="#sec-10" class="hover:text-blue-600">10. 편집 요약 의무제</a>
           </div>
         </div>
@@ -110,7 +110,7 @@
       </div>
     </section>
 
-    <!-- 2. [개정 역사 뷰 (무제한 전체 출력)] -->
+    <!-- 2. [개정 역사 뷰] -->
     <section id="view-logs" class="hidden space-y-3">
       <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
         <div class="border-b pb-2 flex justify-between items-center">
@@ -157,7 +157,7 @@
 
           <div>
             <label class="block font-bold text-slate-700 mb-1">편집 요약 (필수 의무제)</label>
-            <input type="text" id="edit-rule-summary" placeholder="예: 제9조 경조사비 1·2항 구분 정돈" required class="w-full p-2 border rounded-lg font-medium">
+            <input type="text" id="edit-rule-summary" placeholder="예: 제9조 경조사비 내용 구체화" required class="w-full p-2 border rounded-lg font-medium">
           </div>
 
           <div class="flex justify-between items-center p-2 bg-slate-50 border rounded-lg">
@@ -230,7 +230,7 @@
 
     let currentFullText = "";
 
-    // [핵심] 첫 줄 들여쓰기 공백 완벽 제거 및 어절 단위 줄바꿈 렌더러
+    // [핵심] 제목 구분선과 본문 사이의 불필요한 공백을 완전히 없애는 렌더러
     function renderWikiStyle(text) {
       const container = document.getElementById("wiki-rendered-container");
       container.innerHTML = "";
@@ -241,7 +241,7 @@
         const lines = sec.trim().split("\n");
         const titleLine = lines[0].trim();
         
-        // 앞뒤 공백 및 빈 줄을 완벽하게 걸러내어 첫 줄 들뜸 현상 원천 차단
+        // 공백 및 빈 줄 제거
         const cleanedBody = lines.slice(1)
           .map(line => line.trim())
           .filter(line => line.length > 0)
@@ -249,14 +249,15 @@
 
         const box = document.createElement("div");
         box.id = `sec-${idx + 1}`;
-        box.className = "p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 scroll-mt-24 text-left";
+        // p-3 패딩 및 space 제거로 제목과 본문 밀착
+        box.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl scroll-mt-24 text-left";
 
         box.innerHTML = `
-          <div class="font-black text-slate-900 text-xs border-b border-slate-200 pb-1.5 flex items-center justify-between">
+          <div class="font-black text-slate-900 text-xs border-b border-slate-200 pb-1 flex items-center justify-between">
             <span class="text-blue-700 font-bold">${titleLine}</span>
             <span class="text-[10px] text-slate-400 font-mono">§ ${idx + 1}</span>
           </div>
-          <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-line break-keep font-sans pt-1">
+          <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-line break-keep font-sans mt-1.5">
             ${cleanedBody.replace(/•/g, '<span class="text-blue-500 font-bold mr-1">•</span>')}
           </div>
         `;
@@ -290,7 +291,6 @@
           list.push({ id: d.id, ...d.data() });
         });
 
-        // 최신 판본순 정렬
         list.sort((a, b) => {
           const numA = parseInt(String(a.rev || "").replace(/[^0-9]/g, ''), 10) || 0;
           const numB = parseInt(String(b.rev || "").replace(/[^0-9]/g, ''), 10) || 0;
