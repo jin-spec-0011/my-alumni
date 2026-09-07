@@ -15,6 +15,14 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* iOS 사파리 datetime-local 기본 칩 모양 리셋 */
+    input[type="datetime-local"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background-color: #ffffff;
+    }
+  </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
@@ -58,7 +66,7 @@
 
   <main class="flex-1 w-full max-w-md mx-auto p-4 space-y-4">
 
-    <!-- 현재 확정 공표 현황 카드 -->
+    <!-- 현재 확정 공표 안내 표 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="flex justify-between items-center border-b pb-2">
         <div class="flex items-center gap-1.5">
@@ -81,7 +89,6 @@
           <tr>
             <th class="py-2.5 px-2 bg-slate-50 font-bold text-slate-600">참석 규모</th>
             <td class="py-2.5 px-3 text-slate-700">
-              <!-- (풀가동) 제거 -->
               <strong class="text-blue-600 font-bold" id="view-capacity-total">총 0명</strong>
               <div class="text-[10px] text-slate-400 mt-0.5" id="view-capacity-detail">성인 0명 + 어린이 0명</div>
             </td>
@@ -96,7 +103,7 @@
       </table>
     </div>
 
-    <!-- 모임 공표 및 회장 지침 수정 폼 -->
+    <!-- 모임 정보 & 지침 수정 폼 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
       <div class="border-b pb-2 flex justify-between items-center">
         <div>
@@ -111,20 +118,24 @@
       <form id="gathering-form" class="space-y-3 text-xs">
         <div>
           <label class="block font-bold text-slate-700 mb-1">확정 모임 장소 (식당/장소명)</label>
-          <input type="text" id="input-place" placeholder="예: 충북 한우 명가 (단독 룸)" required
-                 class="w-full p-2.5 border rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-blue-500">
+          <input type="text" id="input-place" placeholder="예: 26년 연말 OR 27년 년초 / 장소미정" required
+                 class="w-full p-2.5 border border-slate-300 rounded-lg font-bold text-slate-900 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
         </div>
 
+        <!-- 모임 일시 입력 박스 -->
         <div>
           <label class="block font-bold text-slate-700 mb-1">모임 일시</label>
-          <input type="datetime-local" id="input-datetime" required
-                 class="w-full p-2.5 border rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-blue-500">
+          <div class="relative w-full">
+            <input type="datetime-local" id="input-datetime" required
+                   class="w-full p-2.5 pl-3 pr-9 border border-slate-300 rounded-lg font-bold text-slate-900 text-xs bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <i class="fa-regular fa-calendar absolute right-3 top-3 text-slate-400 pointer-events-none"></i>
+          </div>
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">회장 특별 지침 (미작성 시 "조심히 오세요.")</label>
           <textarea id="input-note" rows="3" placeholder="지침을 비워두면 자동으로 '조심히 오세요.'가 적용됩니다."
-                    class="w-full p-2.5 border rounded-lg text-xs leading-relaxed text-slate-800 focus:ring-2 focus:ring-blue-500"></textarea>
+                    class="w-full p-2.5 border border-slate-300 rounded-lg text-xs leading-relaxed text-slate-800 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
         </div>
 
         <button type="submit" id="btn-save-gathering" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow transition">
@@ -143,7 +154,7 @@
       onSnapshot 
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // 드롭다운 메뉴
+    // 더보기 드롭다운
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
     btnDropdown.addEventListener("click", (e) => {
@@ -152,7 +163,7 @@
     });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    // 참석 규모 실시간 계산 ((풀가동) 단어 제외)
+    // 참석 규모 실시간 계산
     try {
       onSnapshot(doc(db, "app_state", "members_status"), (docSnap) => {
         if (docSnap.exists() && docSnap.data().list) {
@@ -164,7 +175,6 @@
             childCount += Number(m.children) || 0;
           });
           const totalCount = adultCount + childCount;
-          // (풀가동) 제거된 깔끔한 표기
           document.getElementById("view-capacity-total").innerText = `총 ${totalCount}명`;
           document.getElementById("view-capacity-detail").innerText = `성인 ${adultCount}명 + 어린이 ${childCount}명`;
         }
@@ -173,13 +183,12 @@
       console.error(e);
     }
 
-    // 모임 정보 실시간 구독 및 폼에 기존값 채우기
+    // 모임 정보 실시간 구독
     try {
       onSnapshot(doc(db, "gathering", "latest"), (docSnap) => {
         if (docSnap.exists()) {
           const g = docSnap.data();
           const place = g.placeName || "미정";
-          // 미작성 시 "조심히 오세요." 기본값
           const note = (g.note && g.note.trim().length > 0) ? g.note.trim() : "조심히 오세요.";
 
           document.getElementById("view-place-name").innerText = place;
@@ -190,7 +199,6 @@
             const days = ['일', '월', '화', '수', '목', '금', '토'];
             document.getElementById("view-meeting-date").innerText = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} (${days[d.getDay()]}) ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
             
-            // 폼 입력창에 채워넣기
             const localIso = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
             document.getElementById("input-datetime").value = localIso;
           }
@@ -203,14 +211,13 @@
       console.error(e);
     }
 
-    // 모임 공표 폼 저장 처리
+    // 모임 공표 저장
     document.getElementById("gathering-form").onsubmit = async (e) => {
       e.preventDefault();
       const placeName = document.getElementById("input-place").value.trim();
       const dateStr = document.getElementById("input-datetime").value;
       let note = document.getElementById("input-note").value.trim();
 
-      // [핵심] 미작성 시 "조심히 오세요." 자동 대체
       if (!note) {
         note = "조심히 오세요.";
       }
