@@ -231,6 +231,7 @@
     let currentFullText = "";
 
     // [핵심] 제목 구분선과 본문 사이의 불필요한 공백을 완전히 없애는 렌더러
+        // [수정] DB에 빈 줄이 아무리 많아도 첫 줄 공백을 강제로 없애는 렌더러
     function renderWikiStyle(text) {
       const container = document.getElementById("wiki-rendered-container");
       container.innerHTML = "";
@@ -241,15 +242,16 @@
         const lines = sec.trim().split("\n");
         const titleLine = lines[0].trim();
         
-        // 공백 및 빈 줄 제거
-        const cleanedBody = lines.slice(1)
-          .map(line => line.trim())
-          .filter(line => line.length > 0)
-          .join("\n");
+        // 제목 다음 줄부터 시작해서, 내용이 시작되기 전까지의 모든 빈 줄을 강제로 제거
+        let bodyLines = lines.slice(1);
+        while (bodyLines.length > 0 && bodyLines[0].trim() === "") {
+          bodyLines.shift(); // 맨 앞 빈 줄 제거
+        }
+
+        const cleanedBody = bodyLines.map(line => line.trim()).join("\n");
 
         const box = document.createElement("div");
         box.id = `sec-${idx + 1}`;
-        // p-3 패딩 및 space 제거로 제목과 본문 밀착
         box.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl scroll-mt-24 text-left";
 
         box.innerHTML = `
@@ -264,6 +266,7 @@
         container.appendChild(box);
       });
     }
+
 
     // 1. 회칙 전문 실시간 리스너
     try {
