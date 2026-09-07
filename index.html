@@ -17,7 +17,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col pb-16 font-sans">
 
-  <!-- 상단 공통 헤더 -->
+  <!-- 헤더 -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
@@ -102,25 +102,26 @@
           <tr>
             <th class="py-2.5 px-2 bg-slate-50 font-bold text-slate-600">참석 규모</th>
             <td class="py-2.5 px-3 text-slate-700">
-              <strong class="text-blue-600 font-bold" id="dash-capacity-total">총 11명 (풀가동)</strong>
+              <!-- (풀가동) 제거 -->
+              <strong class="text-blue-600 font-bold" id="dash-capacity-total">총 11명</strong>
               <div class="text-[10px] text-slate-400 mt-0.5" id="dash-capacity-detail">성인 8명 + 어린이 3명</div>
             </td>
           </tr>
           <tr>
             <th class="py-2.5 px-2 bg-slate-50 font-bold text-slate-600 align-top pt-2.5 rounded-l">회장 지침</th>
-            <td class="py-2.5 px-3 text-[11px] text-slate-600 leading-relaxed" id="dash-meeting-note">
-              아이들과 함께 편하게 식사할 수 있도록 대형 룸으로 예약 완료했습니다. 이동 동선과 주차가 편리한 곳이니 딴지 없이 전원 참석 바랍니다.
+            <td class="py-2.5 px-3 text-[11px] text-slate-700 leading-relaxed font-sans" id="dash-meeting-note">
+              조심히 오세요.
             </td>
           </tr>
         </tbody>
       </table>
 
       <a href="gathering.html" class="block w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-center text-xs font-bold rounded-lg transition">
-        회장 모임 공표 내용 자세히 보기
+        회장 모임 공표 내용 자세히 보기 / 수정
       </a>
     </div>
 
-    <!-- 5인 회원 현황 카드 & 원클릭 가족 변경 버튼 -->
+    <!-- 5인 회원 현황 카드 -->
     <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2.5">
       <div class="border-b pb-2 flex justify-between items-center">
         <h3 class="font-bold text-sm text-slate-900 flex items-center gap-1.5">
@@ -215,7 +216,7 @@
       { id: "user_lee", name: "이해웅", role: "회원", roleBadge: "text-slate-400", marital: "single", children: 0 }
     ];
 
-    let currentTermEndDateStr = "2030-06-04T00:00:00+09:00";
+    let currentTermEndDateStr = "2027-05-10T00:00:00+09:00";
 
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
@@ -253,7 +254,8 @@
       });
 
       const totalCount = adultCount + childCount;
-      document.getElementById("dash-capacity-total").innerText = `총 ${totalCount}명 (풀가동)`;
+      // (풀가동) 제거
+      document.getElementById("dash-capacity-total").innerText = `총 ${totalCount}명`;
       document.getElementById("dash-capacity-detail").innerText = `성인 ${adultCount}명 + 어린이 ${childCount}명`;
     }
 
@@ -324,7 +326,7 @@ ${memberLines.join("\n")}
 정기·임시 모임의 장소 및 예약은 회장이 단독 결정한다. 모든 회원은 회장의 결정에 대해 일체의 불만이나 딴지를 제기할 수 없으며 오직 가족 참석 여부(RSVP)만 회신한다.
 
 제6조 (가족 동반 및 수용 상한)
-풀가동 시 최대 수용 규모는 성인 ${adultCount}명(회원 5 + 배우자 ${spouseCount}명)과 어린이 ${childCount}명을 합산한 총 ${totalCount}명으로 산정하여 단독 프라이빗 룸을 예약한다.
+최대 수용 규모는 성인 ${adultCount}명(회원 5 + 배우자 ${spouseCount}명)과 어린이 ${childCount}명을 합산한 총 ${totalCount}명으로 산정하여 단독 프라이빗 룸을 예약한다.
 
 제7조 (정기 회비 및 전환 규정)
 ① 월 정기 곗돈은 기혼자 월 80,000원, 미혼자 월 40,000원으로 차등 부과한다. (월 목표 ${monthlyTarget.toLocaleString()}원: 기혼 ${marriedCount}명, 미혼 ${singleCount}명)
@@ -333,8 +335,9 @@ ${memberLines.join("\n")}
 제8조 (공금 통장 용도 제한: 식대 전용)
 적립된 모임 공금 통장은 상·하반기 정기 모임 및 공식 모임의 식대, 다과비 결제에만 전액 사용하며, 개인 대여나 사적 유용은 일체 금지한다.
 
-제9조 (경조사비 개별 각출 원칙)
-회원의 결혼(50만 원), 첫돌(10만 원), 부고 등의 모든 경조사비는 공금 통장에서 지출하지 아니하고, 해당 당사자를 제외한 4인이 개별 각출하여 송금한다.
+제9조 (경조사비 원칙)
+① [개인 각출] 회원의 결혼(500,000원), 첫돌(100,000원), 부고 등의 모든 경조사비는 공금 통장에서 지출하지 아니하고, 해당 당사자를 제외한 4인이 개별 각출하여 송금한다.
+② [공금 지원] 회원의 출산(300,000원), 집들이(400,000원)는 공금 통장에서 해당 회원에게 송금한다.
 
 제10조 (편집 요약 의무제)
 본 회칙을 개정할 때에는 개정 사유(편집 요약)를 필수로 입력해야만 판본으로 저장된다.`;
@@ -350,7 +353,7 @@ ${memberLines.join("\n")}
 
       const btn = document.getElementById("btn-submit-member");
       btn.disabled = true;
-      btn.innerText = "회칙(제2·6·7조) 자동 갱신 중...";
+      btn.innerText = "회칙 자동 갱신 중...";
 
       target.marital = maritalSelect.value;
       target.children = parseInt(childrenSelect.value, 10);
@@ -375,7 +378,7 @@ ${memberLines.join("\n")}
         });
         const nextRev = `r${maxNum + 1}`;
 
-        const autoSummary = `[인원 변동] ${target.name} 가족 현황 반영 (제2·6·7조 자동 갱신: 총 ${totalCount}명, 월 목표 ${monthlyTarget.toLocaleString()}원)`;
+        const autoSummary = `[인원 변동] ${target.name} 가족 현황 반영 (제2·6·7조 자동 갱신: 총 ${totalCount}명)`;
 
         const newRec = { rev: nextRev, date: dateStr, author: target.name, summary: autoSummary };
 
@@ -389,7 +392,7 @@ ${memberLines.join("\n")}
 
         await setDoc(doc(db, "rule_revisions", uniqueRevDocId), newRec);
 
-        alert(`🎉 [${target.name}] 가족 현황 저장 완료!\n\n• 제2조 (회원 현황): ${target.marital === 'married' ? '기혼' : '미혼'} 갱신\n• 제6조 (참석 상한): 총 ${totalCount}명 자동 계산\n• 제7조 (월 곗돈 목표): 월 ${monthlyTarget.toLocaleString()}원 자동 변경\n• 회칙 새 판본 [${nextRev}]으로 영구 누적되었습니다.`);
+        alert(`🎉 [${target.name}] 가족 현황 저장 완료!`);
         modal.classList.add("hidden");
       } catch (err) {
         alert(`❌ 저장 실패: ${err.message}`);
@@ -401,14 +404,12 @@ ${memberLines.join("\n")}
 
     // 실시간 리스너 구독
     try {
-      // 1. 임기 만료일 리셋 동적 반영
       onSnapshot(doc(db, "app_state", "term_config"), (docSnap) => {
         if (docSnap.exists() && docSnap.data().targetDateStr) {
           currentTermEndDateStr = docSnap.data().targetDateStr;
         }
       });
 
-      // 2. 현재 회장 실시간 연동
       onSnapshot(doc(db, "app_state", "current_president"), (docSnap) => {
         if (docSnap.exists()) {
           const p = docSnap.data();
@@ -418,7 +419,6 @@ ${memberLines.join("\n")}
         }
       });
 
-      // 3. 5인 회원 상태 연동
       onSnapshot(doc(db, "app_state", "members_status"), (docSnap) => {
         if (docSnap.exists() && docSnap.data().list) {
           membersData = docSnap.data().list;
@@ -428,7 +428,7 @@ ${memberLines.join("\n")}
         renderMembers();
       });
 
-      // 4. 모임 정보 연동
+      // [핵심] 미작성 시 "조심히 오세요." 표기
       onSnapshot(doc(db, "gathering", "latest"), (docSnap) => {
         if (docSnap.exists()) {
           const g = docSnap.data();
@@ -438,19 +438,20 @@ ${memberLines.join("\n")}
             const days = ['일', '월', '화', '수', '목', '금', '토'];
             document.getElementById("dash-meeting-date").innerText = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} (${days[d.getDay()]}) ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
           }
-          if (g.note) document.getElementById("dash-meeting-note").innerText = g.note;
+          
+          const noteText = (g.note && g.note.trim().length > 0) ? g.note.trim() : "조심히 오세요.";
+          document.getElementById("dash-meeting-note").innerText = noteText;
         }
       });
     } catch(e) {
       console.error(e);
     }
 
-    // 대시보드 카운트다운 타이머 (동적 임기 만료일 기준)
     function updateCountdown() {
       const diff = new Date(currentTermEndDateStr).getTime() - Date.now();
       const el = document.getElementById("president-dday");
       if (diff <= 0) {
-        el.innerText = "임기 만료 (선출 필요)";
+        el.innerText = "임기 만료";
       } else {
         el.innerText = `D-${Math.floor(diff / (1000 * 60 * 60 * 24))}일`;
       }
