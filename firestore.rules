@@ -1,0 +1,146 @@
+rules_version = '2';
+
+// =====================================================================
+// 5인 동창 곗모임 — Firestore 보안 규칙
+// 적용 방법: Firebase 콘솔 → Firestore Database → 규칙(Rules) 탭에
+//           이 파일 전체를 붙여넣고 [게시]를 누르세요.
+//
+// 웹앱에 로그인 기능이 없으므로 "누가" 쓰는지는 막을 수 없지만,
+// 아래 규칙으로 (1) 정해진 컬렉션 외 접근 차단 (2) 필드·타입·길이 검증
+// (3) 회칙 로그 위·변조/삭제 금지 (4) 총무 회장 당선 차단(제3조)을 서버에서 강제합니다.
+// =====================================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function members()    { return ['송환오', '장우석', '김진세', '김정수', '이해웅']; }
+    function candidates() { return ['송환오', '김진세', '김정수', '이해웅']; }
+
+    function isStr(v, maxLen) { return v is string && v.size() <= maxLen; }
+    function isMember(v)      { return v is string && v in members(); }
+    function onlyKeys(keys)   { return request.resource.data.keys().hasOnly(keys); }
+    function hasKeys(keys)    { return request.resource.data.keys().hasAll(keys); }
+
+    // ---------- 회칙 전문 ----------
+    match /rule_content/{docId} {
+      allow read: if true;
+      allow create, update: if docId == 'latest'
+        && onlyKeys(['content', 'updatedAt', 'author', 'rev', 'summary'])
+        && hasKeys(['content', 'updatedAt', 'author', 'rev', 'summary'])
+        && isStr(request.resource.data.content, 30000)
+        && request.resource.data.content.size() > 0
+        && isStr(request.resource.data.updatedAt, 30)
+        && isMember(request.resource.data.author)
+        && isStr(request.resource.data.rev, 20)
+        && isStr(request.resource.data.summary, 300)
+        && request.resource.data.summary.size() > 0;   // 제10조 편집 요약 의무
+      allow delete: if false;
+    }
+
+    // ---------- 회칙 개정 로그 (추가만 가능, 수정·삭제 불가) ----------
+    match /rule_revisions/{revId} {
+      allow read: if true;
+      allow create: if onlyKeys(['rev', 'date', 'author', 'summary'])
+        && hasKeys(['rev', 'date', 'author', 'summary'])
+        && isStr(request.resource.data.rev, 20)
+        && isStr(request.resource.data.date, 30)
+        && isMember(request.resource.data.author)
+        && isStr(request.resource.data.summary, 300)
+        && request.resource.data.summary.size() > 0;
+      allow update, delete: if false;
+    }
+
+    // ---------- 앱 상태 ----------
+    match /app_state/current_president {
+      allow read: if true;
+      allow create, update: if onlyKeys(['presidentId', 'presidentName', 'confirmedBy', 'confirmedAt'])
+        && request.resource.data.presidentName in candidates()   // 제3조
+        && isStr(request.resource.data.presidentId, 40)
+        && isMember(request.resource.data.confirmedBy)
+        && isStr(request.resource.data.confirmedAt, 30);
+      allow delete: if false;
+    }
+
+    match /app_state/term_config {
+      allow read: if true;
+      allow create, update: if onlyKeys(['targetDateStr', 'updatedAt', 'setBy'])
+        && request.resource.data.targetDateStr is string
+        && request.resource.data.targetDateStr.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}T00:00:00\\+09:00$')
+        && isStr(request.resource.data.updatedAt, 40)
+        && isMember(request.resource.data.setBy);
+      allow delete: if false;
+    }
+
+    match /app_state/members_status {
+      allow read: if true;
+      allow create, update: if onlyKeys(['list'])
+        && request.resource.data.list is list
+        && request.resource.data.list.size() == 5;
+      allow delete: if false;
+    }
+
+    // ---------- 역대 회장 선출 로그 ----------
+    match /election_history/{elecId} {
+      allow read: if true;
+      allow create: if onlyKeys(['winner', 'confirmedBy', 'date', 'note'])
+        && request.resource.data.winner in candidates()          // 제3조
+        && isMember(request.resource.data.confirmedBy)
+        && isStr(request.resource.data.date, 30)
+        && isStr(request.resource.data.note, 300);
+      allow update: if false;
+      allow delete: if true;   // 오등록/테스트 건 삭제 기능 유지
+    }
+
+    // ---------- 모임 공표 ----------
+    match /gathering/{docId} {
+      allow read: if true;
+      allow create, update: if docId == 'latest'
+        && onlyKeys(['placeName', 'dateStr', 'note', 'updatedAt'])
+        && isStr(request.resource.data.placeName, 100)
+        && request.resource.data.placeName.size() > 0
+        && isStr(request.resource.data.dateStr, 30)
+        && isStr(request.resource.data.note, 1000)
+        && isStr(request.resource.data.updatedAt, 40);
+      allow delete: if false;
+    }
+
+    // ---------- 개별 정산 영수증 ----------
+    match /settlement_expenses/{expId} {
+      allow read: if true;
+      allow create: if onlyKeys(['seasonKey', 'author', 'amount', 'desc', 'date', 'createdAt'])
+        && request.resource.data.seasonKey is string
+        && request.resource.data.seasonKey.matches('^20[0-9]{2}_H[12]$')
+        && isMember(request.resource.data.author)
+        && request.resource.data.amount is int
+        && request.resource.data.amount > 0
+        && request.resource.data.amount <= 10000000
+        && isStr(request.resource.data.desc, 100)
+        && request.resource.data.desc.size() > 0
+        && isStr(request.resource.data.date, 30)
+        && request.resource.data.createdAt is int;
+      allow update: if false;
+      allow delete: if true;
+    }
+
+    // ---------- 과거 여행 & 모임 기록 ----------
+    match /gatherings_history/{histId} {
+      allow read: if true;
+      allow create, update: if onlyKeys(['id', 'place', 'date', 'memo', 'photo', 'author', 'updatedAt'])
+        && request.resource.data.id == histId
+        && isStr(request.resource.data.place, 100)
+        && request.resource.data.place.size() > 0
+        && request.resource.data.date is string
+        && request.resource.data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && isStr(request.resource.data.memo, 2000)
+        && isStr(request.resource.data.photo, 300000)
+        && (request.resource.data.photo == '' || request.resource.data.photo.matches('^data:image/(jpeg|png|webp);base64,.*'))
+        && isMember(request.resource.data.author)
+        && isStr(request.resource.data.updatedAt, 30);
+      allow delete: if true;
+    }
+
+    // ---------- 그 외 모든 경로 차단 ----------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

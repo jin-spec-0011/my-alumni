@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <meta charset="UTF-8">
   <!-- 앱 바로가기 및 PWA 설정 -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
@@ -11,7 +12,6 @@
   <meta name="apple-mobile-web-app-title" content="5인곗모임">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
   
-  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>과거 여행 & 모임 - 5인 동창 곗모임</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -62,10 +62,7 @@
         </button>
         <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
           <a href="gathering.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-            <i class="fa-solid fa-calendar-check text-blue-600 w-3.5"></i><span>모임 & 예약</span>
-          </a>
-          <a href="ledger.html" class="block px-3 py-2 text-slate-700 hover:bg-slate-50 flex items-center gap-2">
-            <i class="fa-solid fa-won-sign text-amber-600 w-3.5"></i><span>회비 장부</span>
+            <i class="fa-solid fa-bullhorn text-amber-600 w-3.5"></i><span>모임 공표</span>
           </a>
         </div>
       </div>
@@ -89,17 +86,17 @@
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">여행지 / 장소</label>
-          <input type="text" id="input-place" placeholder="예: 충북 한우 명가, 속초 해변" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-xs">
+          <input type="text" id="input-place" maxlength="100" placeholder="예: 충북 한우 명가, 속초 해변" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-xs">
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">방문 날짜</label>
-          <input type="date" id="input-date" value="2026-09-07" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-xs font-semibold text-slate-800">
+          <input type="date" id="input-date" required class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-xs font-semibold text-slate-800">
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">메모 / 후기</label>
-          <textarea id="input-memo" rows="2" placeholder="식당 평가나 재밌던 에피소드를 남겨주세요." class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"></textarea>
+          <textarea id="input-memo" rows="2" maxlength="2000" placeholder="식당 평가나 재밌던 에피소드를 남겨주세요." class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"></textarea>
         </div>
 
         <!-- 사진 첨부 (300px 초경량 압축) -->
@@ -134,10 +131,6 @@
       <span class="font-bold text-slate-600" id="record-count">총 0건</span>
       <div class="flex gap-1 overflow-x-auto no-scrollbar" id="year-filter-box">
         <button class="year-btn px-2.5 py-1 bg-slate-900 text-white rounded-lg font-bold" data-year="all">전체</button>
-        <button class="year-btn px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold" data-year="2026">2026년</button>
-        <button class="year-btn px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold" data-year="2025">2025년</button>
-        <button class="year-btn px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold" data-year="2024">2024년</button>
-        <button class="year-btn px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold" data-year="2019">2019년</button>
       </div>
     </div>
 
@@ -158,6 +151,10 @@
       collection, 
       onSnapshot 
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { escapeHtml, safeImageSrc, askMemberName, nowStr, todayStr, MEMBER_NAMES } from "./js/utils.js";
+
+    // 방문 날짜 기본값: 오늘
+    document.getElementById("input-date").value = todayStr();
 
     let historyList = [];
     let currentYearFilter = "all";
@@ -191,6 +188,10 @@
           document.getElementById("photo-preview").src = compressedPhotoBase64;
           document.getElementById("photo-preview-box").classList.remove("hidden");
         };
+        img.onerror = () => {
+          alert("이 사진 형식은 브라우저에서 읽을 수 없습니다. (HEIC 등은 JPG로 변환 후 첨부해 주세요)");
+          document.getElementById("input-photo").value = "";
+        };
         img.src = event.target.result;
       };
       reader.readAsDataURL(file);
@@ -201,6 +202,31 @@
       document.getElementById("input-photo").value = "";
       document.getElementById("photo-preview-box").classList.add("hidden");
     };
+
+    const YEAR_BTN_OFF = "year-btn px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold whitespace-nowrap";
+    const YEAR_BTN_ON = "year-btn px-2.5 py-1 bg-slate-900 text-white rounded-lg font-bold whitespace-nowrap";
+
+    // 저장된 기록의 연도로 필터 버튼 생성
+    function renderYearFilter() {
+      const box = document.getElementById("year-filter-box");
+      const years = [...new Set(historyList.map(h => String(h.date || "").substring(0, 4)).filter(y => /^\d{4}$/.test(y)))]
+        .sort((a, b) => b.localeCompare(a));
+      if (currentYearFilter !== "all" && !years.includes(currentYearFilter)) currentYearFilter = "all";
+
+      box.innerHTML = "";
+      ["all", ...years].forEach(y => {
+        const btn = document.createElement("button");
+        btn.className = (y === currentYearFilter) ? YEAR_BTN_ON : YEAR_BTN_OFF;
+        btn.dataset.year = y;
+        btn.textContent = (y === "all") ? "전체" : `${y}년`;
+        btn.onclick = () => {
+          currentYearFilter = y;
+          renderYearFilter();
+          renderCards();
+        };
+        box.appendChild(btn);
+      });
+    }
 
     function renderCards() {
       const container = document.getElementById("history-cards-container");
@@ -218,34 +244,35 @@
       }
 
       filtered.forEach(item => {
+        const photo = safeImageSrc(item.photo);
         const card = document.createElement("div");
         card.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-2.5";
         card.innerHTML = `
           <div class="flex justify-between items-start border-b pb-2 gap-2">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="flex-shrink-0 text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">${item.date ? item.date.substring(0, 4) : ''}년</span>
-              <strong class="text-sm font-black text-slate-900">${item.place}</strong>
+              <span class="flex-shrink-0 text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">${escapeHtml(String(item.date || '').substring(0, 4))}년</span>
+              <strong class="text-sm font-black text-slate-900 break-all">${escapeHtml(item.place)}</strong>
             </div>
             <div class="flex gap-1.5 flex-shrink-0">
-              <button class="btn-edit text-[11px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 font-bold" data-id="${item.id}">수정</button>
-              <button class="btn-del text-[11px] text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 font-bold" data-id="${item.id}">삭제</button>
+              <button class="btn-edit text-[11px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 font-bold" data-id="${escapeHtml(item.id)}">수정</button>
+              <button class="btn-del text-[11px] text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 font-bold" data-id="${escapeHtml(item.id)}">삭제</button>
             </div>
           </div>
 
-          ${item.photo ? `<div><img src="${item.photo}" class="w-full max-h-48 object-cover rounded-lg border"></div>` : ''}
+          ${photo ? `<div><img src="${photo}" alt="${escapeHtml(item.place)} 사진" class="w-full max-h-48 object-cover rounded-lg border"></div>` : ''}
 
           <div class="space-y-1 text-slate-600 text-[11px]">
             <div class="flex items-center gap-1">
               <span>📅</span>
               <strong>일시:</strong>
-              <span class="text-slate-800 font-bold whitespace-nowrap">${item.date}</span>
+              <span class="text-slate-800 font-bold whitespace-nowrap">${escapeHtml(item.date)}</span>
             </div>
-            ${item.memo ? `<div class="p-2.5 bg-slate-50 border rounded-lg text-slate-600 leading-relaxed text-xs">${item.memo}</div>` : ''}
+            ${item.memo ? `<div class="p-2.5 bg-slate-50 border rounded-lg text-slate-600 leading-relaxed text-xs whitespace-pre-line break-all">${escapeHtml(item.memo)}</div>` : ''}
           </div>
 
           <div class="text-[10px] text-slate-400 pt-1.5 border-t flex items-center justify-between gap-2">
-            <span class="truncate">기록자: <strong class="text-slate-600">${item.author || '회원'}</strong></span>
-            <span class="flex-shrink-0 font-mono">${item.updatedAt || item.date}</span>
+            <span class="truncate">기록자: <strong class="text-slate-600">${escapeHtml(item.author || '회원')}</strong></span>
+            <span class="flex-shrink-0 font-mono">${escapeHtml(item.updatedAt || item.date)}</span>
           </div>
         `;
         container.appendChild(card);
@@ -262,11 +289,12 @@
           document.getElementById("input-place").value = target.place;
           document.getElementById("input-date").value = target.date;
           document.getElementById("input-memo").value = target.memo || "";
-          document.getElementById("select-author").value = target.author || "김진세";
+          document.getElementById("select-author").value = MEMBER_NAMES.includes(target.author) ? target.author : "김진세";
 
-          if (target.photo) {
-            compressedPhotoBase64 = target.photo;
-            document.getElementById("photo-preview").src = target.photo;
+          const safePhoto = safeImageSrc(target.photo);
+          if (safePhoto) {
+            compressedPhotoBase64 = safePhoto;
+            document.getElementById("photo-preview").src = safePhoto;
             document.getElementById("photo-preview-box").classList.remove("hidden");
           } else {
             compressedPhotoBase64 = "";
@@ -284,7 +312,7 @@
       document.querySelectorAll(".btn-del").forEach(btn => {
         btn.onclick = async (e) => {
           const id = e.currentTarget.getAttribute("data-id");
-          const deleter = prompt("삭제자 본인 이름을 입력하세요 (김진세, 송환오, 장우석, 김정수, 이해웅):");
+          const deleter = askMemberName("삭제");
           if (!deleter) return;
 
           if (!confirm(`[${deleter}] 님이 이 기록을 클라우드 DB에서 삭제하시겠습니까?`)) return;
@@ -306,6 +334,7 @@
       document.getElementById("btn-submit").innerText = "클라우드 DB 실시간 저장";
       document.getElementById("btn-cancel-edit").classList.add("hidden");
       document.getElementById("history-form").reset();
+      document.getElementById("input-date").value = todayStr();
       compressedPhotoBase64 = "";
       document.getElementById("photo-preview-box").classList.add("hidden");
     };
@@ -315,15 +344,24 @@
       e.preventDefault();
       const id = document.getElementById("edit-id").value || `hist_${Date.now()}`;
       const author = document.getElementById("select-author").value;
-      const now = new Date();
-      const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const timeStr = nowStr();
+      const place = document.getElementById("input-place").value.trim();
+      const dateVal = document.getElementById("input-date").value;
+
+      if (!MEMBER_NAMES.includes(author)) { alert("작업자를 다시 선택해 주세요."); return; }
+      if (!place) { alert("여행지 / 장소를 입력해 주세요."); return; }
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateVal)) { alert("방문 날짜를 선택해 주세요."); return; }
+
+      const submitBtn = document.getElementById("btn-submit");
+      if (submitBtn.disabled) return;
+      submitBtn.disabled = true;
 
       const newRecord = {
         id,
-        place: document.getElementById("input-place").value.trim(),
-        date: document.getElementById("input-date").value,
+        place,
+        date: dateVal,
         memo: document.getElementById("input-memo").value.trim(),
-        photo: compressedPhotoBase64,
+        photo: safeImageSrc(compressedPhotoBase64),
         author: author,
         updatedAt: timeStr
       };
@@ -334,25 +372,20 @@
         document.getElementById("btn-cancel-edit").click();
       } catch (err) {
         alert(`❌ 클라우드 저장 실패! Firebase 콘솔에서 규칙을 확인하세요:\n${err.message}`);
+      } finally {
+        submitBtn.disabled = false;
       }
     };
 
-    document.querySelectorAll(".year-btn").forEach(btn => {
-      btn.onclick = (e) => {
-        document.querySelectorAll(".year-btn").forEach(b => b.className = "year-btn px-2.5 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold");
-        e.currentTarget.className = "year-btn px-2.5 py-1 bg-slate-900 text-white rounded-lg font-bold";
-        currentYearFilter = e.currentTarget.getAttribute("data-year");
-        renderCards();
-      };
-    });
 
     // 실시간 Firestore 리스너 (onSnapshot)
     try {
       onSnapshot(collection(db, "gatherings_history"), (snapshot) => {
         const list = [];
-        snapshot.forEach(d => list.push(d.data()));
+        snapshot.forEach(d => list.push({ ...d.data(), id: d.id }));
         list.sort((a, b) => String(b.date).localeCompare(String(a.date)));
         historyList = list;
+        renderYearFilter();
         renderCards();
       }, (error) => {
         console.error("Firestore 구독 에러:", error);

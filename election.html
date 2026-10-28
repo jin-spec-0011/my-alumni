@@ -170,6 +170,8 @@
       collection, 
       onSnapshot 
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { escapeHtml, askMemberName, nowStr, DEFAULT_TERM_END, CANDIDATE_NAMES } from "./js/utils.js";
+    import { autoUpdateArticles } from "./js/rules.js";
 
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
@@ -192,7 +194,7 @@
     let currentAngle = 0;
     let isSpinning = false;
     let pendingWinner = null;
-    let targetEndDateStr = "2030-06-04T00:00:00+09:00";
+    let targetEndDateStr = DEFAULT_TERM_END;
 
     function drawRoulette() {
       const cx = canvas.width / 2;
@@ -250,7 +252,11 @@
         alert("유효한 날짜를 선택해 주세요.");
         return;
       }
-      const operator = prompt("변경자 본인 이름을 입력하세요 (김진세, 송환오, 장우석, 김정수, 이해웅):");
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+        alert("날짜 형식이 올바르지 않습니다.");
+        return;
+      }
+      const operator = askMemberName("변경");
       if (!operator) return;
 
       const newISO = `${val}T00:00:00+09:00`;
@@ -310,47 +316,66 @@
     // 회장 확정 처리
     document.getElementById("btn-confirm-winner").onclick = async () => {
       if (!pendingWinner) return;
-      const operator = prompt("확정자 본인 이름을 입력하세요 (김진세, 송환오, 장우석, 김정수, 이해웅):");
+      // 회칙 제3조: 총무는 피선거권 영구 면제 — 후보 4인 외 당선 차단
+      if (!CANDIDATE_NAMES.includes(pendingWinner.name)) {
+        alert("회칙 제3조에 따라 해당 회원은 회장으로 선출될 수 없습니다.");
+        return;
+      }
+      const operator = askMemberName("확정");
       if (!operator) return;
+      if (!confirm(`${pendingWinner.name} 회원을 차기 회장으로 공식 확정하시겠습니까?`)) return;
 
       const btn = document.getElementById("btn-confirm-winner");
       btn.disabled = true;
       btn.innerText = "시스템 자동 갱신 중...";
 
-      const now = new Date();
-      const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const dateStr = nowStr();
+      const winner = pendingWinner;
 
       try {
         await setDoc(doc(db, "app_state", "current_president"), {
-          presidentId: pendingWinner.id,
-          presidentName: pendingWinner.name,
+          presidentId: winner.id,
+          presidentName: winner.name,
           confirmedBy: operator,
           confirmedAt: dateStr
         });
 
         const membersSnap = await getDoc(doc(db, "app_state", "members_status"));
-        let members = membersSnap.exists() ? membersSnap.data().list : [];
+        let members = (membersSnap.exists() && Array.isArray(membersSnap.data().list)) ? membersSnap.data().list : [];
 
         members = members.map(m => {
-          if (m.id === pendingWinner.id) {
+          if (m.id === winner.id) {
             return { ...m, role: "👑 회장", roleBadge: "bg-amber-100 text-amber-800" };
-          } else if (m.role.includes("회장")) {
+          } else if (String(m.role || "").includes("회장")) {
             return { ...m, role: "회원", roleBadge: "text-slate-400" };
           }
           return m;
         });
 
-        await setDoc(doc(db, "app_state", "members_status"), { list: members });
+        if (members.length === 5) {
+          await setDoc(doc(db, "app_state", "members_status"), { list: members });
+        }
 
         await setDoc(doc(db, "election_history", `elec_${Date.now()}`), {
-          winner: pendingWinner.name,
+          winner: winner.name,
           confirmedBy: operator,
           date: dateStr,
           note: `대통령 임기 연동 선출 승인 (승인자: ${operator})`
         });
 
-        alert(`🎉 [공식 확정] ${pendingWinner.name} 회장이 차기 회장으로 공식 취임했습니다!`);
+        // 회칙 제2조(회원 현황)·제4조 ③항(현 회장 이름) 자동 갱신
+        if (members.length === 5) {
+          await autoUpdateArticles({
+            members,
+            articleNums: [2, 4],
+            author: operator,
+            summary: `[회장 승계] ${winner.name} 회장 취임 (제2·4조 자동 갱신)`
+          });
+        }
+
+        alert(`🎉 [공식 확정] ${winner.name} 회장이 차기 회장으로 공식 취임했습니다!`);
         document.getElementById("result-box").classList.add("hidden");
+        pendingWinner = null;
       } catch (err) {
         alert(`❌ 승계 처리 실패: ${err.message}`);
       } finally {
@@ -365,8 +390,9 @@
         if (docSnap.exists() && docSnap.data().targetDateStr) {
           targetEndDateStr = docSnap.data().targetDateStr;
           document.getElementById("display-target-date").innerText = targetEndDateStr.substring(0, 10);
+          updateCountdown();
         }
-      });
+      }, (err) => console.error("term_config 구독 에러:", err));
 
       onSnapshot(doc(db, "app_state", "current_president"), (docSnap) => {
         if (docSnap.exists()) {
@@ -397,10 +423,10 @@
           div.className = "p-2 bg-indigo-50 border border-indigo-200 rounded flex justify-between items-center";
           div.innerHTML = `
             <div>
-              <strong class="text-indigo-900">${item.winner} 회장</strong>
-              <span class="text-[10px] text-indigo-500 block">[${item.confirmedBy}] 4인 룰렛 공식 선출 승인</span>
+              <strong class="text-indigo-900">${escapeHtml(item.winner)} 회장</strong>
+              <span class="text-[10px] text-indigo-500 block">[${escapeHtml(item.confirmedBy)}] 4인 룰렛 공식 선출 승인</span>
             </div>
-            <span class="text-[10px] text-indigo-400 font-mono">${item.date}</span>
+            <span class="text-[10px] text-indigo-400 font-mono">${escapeHtml(item.date)}</span>
           `;
           container.appendChild(div);
         });

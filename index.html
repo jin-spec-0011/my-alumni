@@ -200,13 +200,13 @@
 
   <script type="module">
     import { db } from "./js/firebase.js";
-    import { 
-      doc, 
-      setDoc, 
-      getDocs, 
-      collection, 
-      onSnapshot 
+    import {
+      doc,
+      setDoc,
+      onSnapshot
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { escapeHtml, DEFAULT_TERM_END } from "./js/utils.js";
+    import { computeStats, autoUpdateArticles } from "./js/rules.js";
 
     let membersData = [
       { id: "user_song", name: "송환오", role: "👑 회장", roleBadge: "bg-amber-100 text-amber-800", marital: "married", children: 0 },
@@ -216,7 +216,7 @@
       { id: "user_lee", name: "이해웅", role: "회원", roleBadge: "text-slate-400", marital: "single", children: 0 }
     ];
 
-    let currentTermEndDateStr = "2027-05-10T00:00:00+09:00";
+    let currentTermEndDateStr = DEFAULT_TERM_END;
 
     const btnDropdown = document.getElementById("btn-dropdown");
     const dropdownMenu = document.getElementById("dropdown-menu");
@@ -226,37 +226,37 @@
     });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
+    // roleBadge는 CSS 클래스이므로 영문/숫자/하이픈/공백만 허용
+    function safeClass(v) {
+      return String(v || "").replace(/[^a-zA-Z0-9\-\s/:]/g, "");
+    }
+
     function renderMembers() {
       const container = document.getElementById("members-list-container");
       container.innerHTML = "";
 
-      let adultCount = 5;
-      let childCount = 0;
-
       membersData.forEach(m => {
-        if (m.marital === "married") adultCount += 1;
-        childCount += Number(m.children) || 0;
-
-        let statusText = (m.marital === "married")
-          ? (m.children > 0 ? `기혼 (자녀 ${m.children}명)` : "기혼 (무자녀)")
+        const children = Number(m.children) || 0;
+        const statusText = (m.marital === "married")
+          ? (children > 0 ? `기혼 (자녀 ${children}명)` : "기혼 (무자녀)")
           : "미혼";
 
         const div = document.createElement("div");
         div.className = "flex justify-between items-center p-2.5 bg-slate-50 rounded-lg";
         div.innerHTML = `
           <div>
-            <strong class="text-slate-900">${m.name}</strong>
-            <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ml-1 ${m.roleBadge}">${m.role}</span>
+            <strong class="text-slate-900">${escapeHtml(m.name)}</strong>
+            <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ml-1 ${safeClass(m.roleBadge)}">${escapeHtml(m.role)}</span>
           </div>
           <span class="text-slate-600 font-semibold">${statusText}</span>
         `;
         container.appendChild(div);
       });
 
-      const totalCount = adultCount + childCount;
-      // (풀가동) 제거
-      document.getElementById("dash-capacity-total").innerText = `총 ${totalCount}명`;
-      document.getElementById("dash-capacity-detail").innerText = `성인 ${adultCount}명 + 어린이 ${childCount}명`;
+      // 제6조: "(풀가동)" 없이 총 OO명 표기
+      const s = computeStats(membersData);
+      document.getElementById("dash-capacity-total").innerText = `총 ${s.totalCount}명`;
+      document.getElementById("dash-capacity-detail").innerText = `성인 ${s.adultCount}명 + 어린이 ${s.childCount}명`;
     }
 
     const modal = document.getElementById("member-modal");
@@ -277,120 +277,40 @@
       const target = membersData.find(m => m.id === memberSelect.value);
       if (target) {
         maritalSelect.value = target.marital;
-        childrenSelect.value = target.children;
+        childrenSelect.value = String(Math.min(Number(target.children) || 0, 4));
       }
     }
     memberSelect.addEventListener("change", syncModalInputs);
 
-    function buildCompleteRuleBook(members) {
-      let adultCount = 5;
-      let spouseCount = 0;
-      let childCount = 0;
-      let marriedCount = 0;
-      let singleCount = 0;
-
-      let currentLeaderName = "송환오";
-      const leaderObj = members.find(m => m.role.includes("회장"));
-      if (leaderObj) currentLeaderName = leaderObj.name;
-
-      let memberLines = [];
-      members.forEach(m => {
-        if (m.marital === "married") { adultCount += 1; spouseCount += 1; marriedCount += 1; }
-        else { singleCount += 1; }
-        childCount += Number(m.children) || 0;
-
-        let roleClean = m.role.replace(/^[^\s]+\s*/, '');
-        let desc = (m.marital === "married") ? (m.children > 0 ? `기혼, 자녀 ${m.children}명` : "기혼, 무자녀") : "미혼";
-        memberLines.push(`• ${m.name}: ${roleClean} (${desc})`);
-      });
-
-      const totalCount = adultCount + childCount;
-      const monthlyTarget = (marriedCount * 80000) + (singleCount * 40000);
-
-      const fullContent = `제1조 (명칭 및 목적)
-본 모임은 고등학교 5인 동창 간의 친목 도모와 정기적인 회합, 상호 부조를 목적으로 2019년에 결성된 곗모임이다.
-
-제2조 (회원의 자격 및 현황)
-본 회의 정회원은 아래 5인으로 영구 한정한다.
-${memberLines.join("\n")}
-
-제3조 (총무의 영구 면제권)
-장우석 총무는 공금 관리 및 행정 업무를 상시 수행하는 대가로 차기 회장 피선거권에서 영구 면제된다.
-
-제4조 (임기 및 탄핵 연동)
-① 회장 임기는 대한민국 대통령 재임 기간과 일치한다.
-② 대통령 탄핵 인용 시 회장직은 즉시 자동 박탈되며 비상 선출을 진행한다.
-③ 차기 회장은 장우석 총무를 제외한 4인(${currentLeaderName} 현 회장 포함)을 대상으로 룰렛 추첨하며 확률은 각 25%로 균등하다. (연임 제한 없음)
-
-제5조 (장소 독점권 및 딴지 금지)
-정기·임시 모임의 장소 및 예약은 회장이 단독 결정한다. 모든 회원은 회장의 결정에 대해 일체의 불만이나 딴지를 제기할 수 없으며 오직 가족 참석 여부(RSVP)만 회신한다.
-
-제6조 (가족 동반 및 수용 상한)
-최대 수용 규모는 성인 ${adultCount}명(회원 5 + 배우자 ${spouseCount}명)과 어린이 ${childCount}명을 합산한 총 ${totalCount}명으로 산정하여 단독 프라이빗 룸을 예약한다.
-
-제7조 (정기 회비 및 전환 규정)
-① 월 정기 곗돈은 기혼자 월 80,000원, 미혼자 월 40,000원으로 차등 부과한다. (월 목표 ${monthlyTarget.toLocaleString()}원: 기혼 ${marriedCount}명, 미혼 ${singleCount}명)
-② 미혼 회원이 결혼할 경우 익월부터 기혼자 요율(8만 원)로 자동 전환 적용된다.
-
-제8조 (공금 통장 용도 제한: 식대 전용)
-적립된 모임 공금 통장은 상·하반기 정기 모임 및 공식 모임의 식대, 다과비 결제에만 전액 사용하며, 개인 대여나 사적 유용은 일체 금지한다.
-
-제9조 (경조사비 원칙)
-① [개인 각출] 회원의 결혼(500,000원), 첫돌(100,000원), 부고 등의 모든 경조사비는 공금 통장에서 지출하지 아니하고, 해당 당사자를 제외한 4인이 개별 각출하여 송금한다.
-② [공금 지원] 회원의 출산(300,000원), 집들이(400,000원)는 공금 통장에서 해당 회원에게 송금한다.
-
-제10조 (편집 요약 의무제)
-본 회칙을 개정할 때에는 개정 사유(편집 요약)를 필수로 입력해야만 판본으로 저장된다.`;
-
-      return { fullContent, totalCount, monthlyTarget };
-    }
-
+    // 가족/인원 변경 저장 → 회칙 제2·6·7조만 교체 (나머지 조항의 수동 편집 내용은 보존)
     document.getElementById("member-update-form").onsubmit = async (e) => {
       e.preventDefault();
       const selectedId = memberSelect.value;
-      const target = membersData.find(m => m.id === selectedId);
-      if (!target) return;
+      const idx = membersData.findIndex(m => m.id === selectedId);
+      if (idx === -1) return;
 
       const btn = document.getElementById("btn-submit-member");
       btn.disabled = true;
       btn.innerText = "회칙 자동 갱신 중...";
 
-      target.marital = maritalSelect.value;
-      target.children = parseInt(childrenSelect.value, 10);
-
-      renderMembers();
-
-      const now = new Date();
-      const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-      const uniqueRevDocId = `rev_${Date.now()}`;
+      // 저장 실패 시 화면이 잘못된 값으로 남지 않도록 복사본으로 작업
+      const updatedList = membersData.map(m => ({ ...m }));
+      const target = updatedList[idx];
+      target.marital = maritalSelect.value === "married" ? "married" : "single";
+      target.children = parseInt(childrenSelect.value, 10) || 0;
 
       try {
-        await setDoc(doc(db, "app_state", "members_status"), { list: membersData });
+        await setDoc(doc(db, "app_state", "members_status"), { list: updatedList });
 
-        const { fullContent, totalCount, monthlyTarget } = buildCompleteRuleBook(membersData);
-        localStorage.setItem("alumni_wiki_content", fullContent);
-
-        const revSnap = await getDocs(collection(db, "rule_revisions"));
-        let maxNum = 0;
-        revSnap.forEach(d => {
-          const num = parseInt(String(d.data().rev || "").replace(/[^0-9]/g, ''), 10) || 0;
-          if (num > maxNum) maxNum = num;
-        });
-        const nextRev = `r${maxNum + 1}`;
-
+        const { totalCount } = computeStats(updatedList);
         const autoSummary = `[인원 변동] ${target.name} 가족 현황 반영 (제2·6·7조 자동 갱신: 총 ${totalCount}명)`;
 
-        const newRec = { rev: nextRev, date: dateStr, author: target.name, summary: autoSummary };
-
-        await setDoc(doc(db, "rule_content", "latest"), {
-          content: fullContent,
-          updatedAt: dateStr,
+        await autoUpdateArticles({
+          members: updatedList,
+          articleNums: [2, 6, 7],
           author: target.name,
-          rev: nextRev,
           summary: autoSummary
         });
-
-        await setDoc(doc(db, "rule_revisions", uniqueRevDocId), newRec);
 
         alert(`🎉 [${target.name}] 가족 현황 저장 완료!`);
         modal.classList.add("hidden");
@@ -403,59 +323,63 @@ ${memberLines.join("\n")}
     };
 
     // 실시간 리스너 구독
-    try {
-      onSnapshot(doc(db, "app_state", "term_config"), (docSnap) => {
-        if (docSnap.exists() && docSnap.data().targetDateStr) {
-          currentTermEndDateStr = docSnap.data().targetDateStr;
-        }
-      });
+    const logErr = (label) => (err) => console.error(`[${label}] Firestore 구독 에러:`, err);
 
-      onSnapshot(doc(db, "app_state", "current_president"), (docSnap) => {
-        if (docSnap.exists()) {
-          const p = docSnap.data();
-          const name = p.presidentName || "송환오";
-          document.getElementById("dash-leader-name").innerText = `👑 ${name} 회장`;
-          document.getElementById("dash-leader-desc").innerText = `정기·임시 모임의 장소 및 예약은 ${name} 회장이 단독 결정합니다. (회칙 제5조: 딴지 및 반대 불가)`;
-        }
-      });
+    onSnapshot(doc(db, "app_state", "term_config"), (docSnap) => {
+      if (docSnap.exists() && docSnap.data().targetDateStr) {
+        currentTermEndDateStr = docSnap.data().targetDateStr;
+        updateCountdown();
+      }
+    }, logErr("term_config"));
 
-      onSnapshot(doc(db, "app_state", "members_status"), (docSnap) => {
-        if (docSnap.exists() && docSnap.data().list) {
-          membersData = docSnap.data().list;
-        } else {
-          setDoc(doc(db, "app_state", "members_status"), { list: membersData });
-        }
-        renderMembers();
-      });
+    onSnapshot(doc(db, "app_state", "current_president"), (docSnap) => {
+      if (docSnap.exists()) {
+        const p = docSnap.data();
+        const name = p.presidentName || "송환오";
+        document.getElementById("dash-leader-name").innerText = `👑 ${name} 회장`;
+        document.getElementById("dash-leader-desc").innerText = `정기·임시 모임의 장소 및 예약은 ${name} 회장이 단독 결정합니다. (회칙 제5조: 딴지 및 반대 불가)`;
+      }
+    }, logErr("current_president"));
 
-      // [핵심] 미작성 시 "조심히 오세요." 표기
-      onSnapshot(doc(db, "gathering", "latest"), (docSnap) => {
-        if (docSnap.exists()) {
-          const g = docSnap.data();
-          if (g.placeName) document.getElementById("dash-place-name").innerText = g.placeName;
-          if (g.dateStr) {
-            const d = new Date(g.dateStr);
+    onSnapshot(doc(db, "app_state", "members_status"), (docSnap) => {
+      if (docSnap.exists() && Array.isArray(docSnap.data().list)) {
+        membersData = docSnap.data().list;
+      } else {
+        setDoc(doc(db, "app_state", "members_status"), { list: membersData }).catch(logErr("members_seed"));
+      }
+      renderMembers();
+    }, logErr("members_status"));
+
+    // 회장 지침 미작성 시 "조심히 오세요." 표기
+    onSnapshot(doc(db, "gathering", "latest"), (docSnap) => {
+      if (docSnap.exists()) {
+        const g = docSnap.data();
+        if (g.placeName) document.getElementById("dash-place-name").innerText = g.placeName;
+        if (g.dateStr) {
+          const d = new Date(g.dateStr);
+          if (!isNaN(d.getTime())) {
             const days = ['일', '월', '화', '수', '목', '금', '토'];
             document.getElementById("dash-meeting-date").innerText = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} (${days[d.getDay()]}) ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
           }
-          
-          const noteText = (g.note && g.note.trim().length > 0) ? g.note.trim() : "조심히 오세요.";
-          document.getElementById("dash-meeting-note").innerText = noteText;
         }
-      });
-    } catch(e) {
-      console.error(e);
-    }
+
+        const noteText = (g.note && g.note.trim().length > 0) ? g.note.trim() : "조심히 오세요.";
+        document.getElementById("dash-meeting-note").innerText = noteText;
+      }
+    }, logErr("gathering"));
 
     function updateCountdown() {
       const diff = new Date(currentTermEndDateStr).getTime() - Date.now();
       const el = document.getElementById("president-dday");
-      if (diff <= 0) {
+      if (isNaN(diff)) {
+        el.innerText = "D-?";
+      } else if (diff <= 0) {
         el.innerText = "임기 만료";
       } else {
         el.innerText = `D-${Math.floor(diff / (1000 * 60 * 60 * 24))}일`;
       }
     }
+    renderMembers();
     updateCountdown();
     setInterval(updateCountdown, 1000);
   </script>

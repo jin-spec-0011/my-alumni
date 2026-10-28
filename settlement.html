@@ -104,7 +104,7 @@
           <div>
             <label class="block font-bold text-slate-700 mb-1">지출 금액 (1원 단위)</label>
             <div class="relative">
-              <input type="number" id="exp-amount" step="1" min="1" placeholder="예: 28450" required
+              <input type="number" id="exp-amount" step="1" min="1" max="10000000" inputmode="numeric" placeholder="예: 28450" required
                      class="w-full p-2 pr-6 border rounded-lg font-mono font-bold text-slate-900 text-xs focus:ring-2 focus:ring-blue-500">
               <span class="absolute right-2 top-2 text-slate-400 font-bold text-[11px]">원</span>
             </div>
@@ -114,7 +114,7 @@
         <div>
           <label class="block font-bold text-slate-700 mb-1">지출 내용 (항목)</label>
           <div class="flex gap-1.5">
-            <input type="text" id="exp-desc" placeholder="예: 택시비, 카페, 유류비 등" required
+            <input type="text" id="exp-desc" maxlength="100" placeholder="예: 택시비, 카페, 유류비 등" required
                    class="flex-1 p-2 border rounded-lg font-medium text-slate-800 text-xs focus:ring-2 focus:ring-blue-500">
             <!-- 빠른 태그 -->
             <button type="button" class="btn-tag px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-[11px] font-bold">택시비</button>
@@ -187,8 +187,11 @@
       setDoc, 
       deleteDoc,
       collection, 
+      query,
+      where,
       onSnapshot 
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { escapeHtml, nowStr, MEMBER_NAMES } from "./js/utils.js";
 
     // 드롭다운 메뉴 토글
     const btnDropdown = document.getElementById("btn-dropdown");
@@ -199,7 +202,7 @@
     });
     document.addEventListener("click", () => dropdownMenu.classList.add("hidden"));
 
-    const members = ["송환오", "장우석", "김진세", "김정수", "이해웅"];
+    const members = MEMBER_NAMES;
     let currentSeasonExpenses = [];
 
     // 1. 접속 시점 기준 연도/반기 자동 인식
@@ -211,6 +214,16 @@
       const year = String(now.getFullYear());
       const month = now.getMonth() + 1;
       const half = (month <= 6) ? "H1" : "H2";
+
+      // 연도 옵션 자동 생성 (2025년 ~ 내년) — 해가 바뀌어도 선택지가 사라지지 않음
+      const maxYear = now.getFullYear() + 1;
+      selectYear.innerHTML = "";
+      for (let y = 2025; y <= maxYear; y++) {
+        const opt = document.createElement("option");
+        opt.value = String(y);
+        opt.textContent = `${y}년`;
+        selectYear.appendChild(opt);
+      }
 
       selectYear.value = year;
       selectHalf.value = half;
@@ -233,17 +246,29 @@
     expenseForm.onsubmit = async (e) => {
       e.preventDefault();
       const author = document.getElementById("exp-author").value;
-      const amount = parseInt(document.getElementById("exp-amount").value, 10);
+      const rawAmount = document.getElementById("exp-amount").value.trim();
+      const amount = Number(rawAmount);
       const desc = document.getElementById("exp-desc").value.trim();
 
-      if (isNaN(amount) || amount <= 0) {
-        alert("금액을 올바른 숫자로 입력해 주세요.");
+      if (!MEMBER_NAMES.includes(author)) {
+        alert("결제자를 다시 선택해 주세요.");
+        return;
+      }
+      if (!/^\d+$/.test(rawAmount) || !Number.isSafeInteger(amount) || amount <= 0 || amount > 10000000) {
+        alert("금액은 1원 ~ 10,000,000원 사이의 정수로 입력해 주세요.");
+        return;
+      }
+      if (!desc || desc.length > 100) {
+        alert("지출 내용을 1~100자로 입력해 주세요.");
         return;
       }
 
+      const submitBtn = document.getElementById("btn-submit-expense");
+      if (submitBtn.disabled) return; // 중복 제출 방지
+      submitBtn.disabled = true;
+
       const seasonKey = getSeasonKey();
-      const now = new Date();
-      const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const dateStr = nowStr();
       const docId = `exp_${seasonKey}_${Date.now()}`;
 
       try {
@@ -260,6 +285,8 @@
         document.getElementById("exp-desc").value = "";
       } catch (err) {
         alert(`저장 실패: ${err.message}`);
+      } finally {
+        submitBtn.disabled = false;
       }
     };
 
@@ -270,6 +297,7 @@
 
       let grandTotal = 0;
       currentSeasonExpenses.forEach(item => {
+        item.amount = Number(item.amount) || 0;
         if (spentMap[item.author] !== undefined) {
           spentMap[item.author] += item.amount;
         } else {
@@ -300,7 +328,7 @@
 
         div.innerHTML = `
           <div>
-            <strong class="text-slate-900">${name}</strong>
+            <strong class="text-slate-900">${escapeHtml(name)}</strong>
             <span class="text-[10px] text-slate-400 block">${name === '장우석' ? '🛡️ 총무 계좌 관리' : '선결제 정산 대상'}</span>
           </div>
           <div class="text-right">
@@ -325,13 +353,13 @@
         itemDiv.className = "flex justify-between items-center p-2 bg-slate-50 border border-slate-100 rounded-lg";
         itemDiv.innerHTML = `
           <div class="flex items-center gap-1.5">
-            <span class="font-bold text-slate-800">${item.author}</span>
+            <span class="font-bold text-slate-800">${escapeHtml(item.author)}</span>
             <span class="text-slate-400">•</span>
-            <span class="text-slate-600">${item.desc}</span>
+            <span class="text-slate-600 break-all">${escapeHtml(item.desc)}</span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="font-mono font-bold text-slate-900">${item.amount.toLocaleString()}원</span>
-            <button class="btn-del-exp text-slate-400 hover:text-rose-600 p-1" data-id="${item.id}" title="삭제">
+            <span class="font-mono font-bold text-slate-900 whitespace-nowrap">${Number(item.amount).toLocaleString()}원</span>
+            <button class="btn-del-exp text-slate-400 hover:text-rose-600 p-1" data-id="${escapeHtml(item.id)}" title="삭제">
               <i class="fa-regular fa-trash-can"></i>
             </button>
           </div>
@@ -359,17 +387,20 @@
 
       const currentKey = getSeasonKey();
       try {
-        unsubscribe = onSnapshot(collection(db, "settlement_expenses"), (snapshot) => {
+        // 선택한 시즌 영수증만 서버에서 조회 (전체 컬렉션 다운로드 방지)
+        const q = query(collection(db, "settlement_expenses"), where("seasonKey", "==", currentKey));
+        unsubscribe = onSnapshot(q, (snapshot) => {
           const list = [];
           snapshot.forEach(docSnap => {
-            const data = docSnap.data();
-            if (data.seasonKey === currentKey) {
-              list.push({ id: docSnap.id, ...data });
-            }
+            list.push({ id: docSnap.id, ...docSnap.data() });
           });
           list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
           currentSeasonExpenses = list;
           calculateAndRender();
+        }, (err) => {
+          console.error("Firestore 구독 에러:", err);
+          document.getElementById("members-settlement-list").innerHTML =
+            `<div class="text-center text-rose-500 py-4">데이터를 불러오지 못했습니다. 네트워크 또는 보안 규칙을 확인하세요.</div>`;
         });
       } catch (err) {
         console.error("Firestore 연결 에러:", err);
